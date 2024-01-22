@@ -1,0 +1,39 @@
+﻿using Microsoft.EntityFrameworkCore;
+using ELearn.Domain.Entities;
+
+namespace ELearn.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+        public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupAnnouncment> GroupAnnouncments { get; set; }
+        public DbSet<GroupDepartment> GroupDepartments { get; set; }
+        public DbSet<GroupSurvey> GroupSurveys { get; set; }
+        public DbSet<GroupVoting> GroupVotings { get; set; }
+        public DbSet<Material> Materials { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Option> Options { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<QuestionSurvey> QuestionsSurveys { get; set; }
+        public DbSet<QuestionQuiz> QuestionQuizzes { get; set; }
+        public DbSet<Quiz> Quizzes { get; set; }
+        public DbSet<React> Reacts { get; set; }
+        public DbSet<Survey> Surveys { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<UserDepartment> UserDepartments { get; set; }
+        public DbSet<UserQuestion> UserQuestions { get; set; }
+        public DbSet<UserSurvey> UserSurveys { get; set; }
+        public DbSet<UserVoting> UserVotings { get; set; }
+        public DbSet<Voting> Votings { get; set; }
+
+    }
+}
