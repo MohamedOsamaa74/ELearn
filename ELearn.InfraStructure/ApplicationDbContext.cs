@@ -1,13 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ELearn.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Reflection.Emit;
 
 namespace ELearn.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+
+        }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
+            builder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
+            builder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
         }
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -28,7 +38,6 @@ namespace ELearn.Data
         public DbSet<React> Reacts { get; set; }
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
-        public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<UserDepartment> UserDepartments { get; set; }
         public DbSet<UserQuestion> UserQuestions { get; set; }
         public DbSet<UserSurvey> UserSurveys { get; set; }
