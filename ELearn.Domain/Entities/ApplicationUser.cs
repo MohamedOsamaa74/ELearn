@@ -19,5 +19,6 @@ namespace ELearn.Domain.Entities
         public required string Nationality { get; set; }
         public required string Religion { get; set; }
         public required string Grade { get; set; }
+        public ICollection<Post> Posts { get; set; }
     }
 }
