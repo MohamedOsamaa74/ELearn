@@ -7,6 +7,10 @@
         public required ICollection<Option> Options { get; set; }
         public DateTime Date { get; set; }
         public required Duration Duration { get; set; }
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+        public ICollection<UserSurvey> UserSurvey { get; set; }
 
+        public ICollection<ApplicationUser> user { get; set; }
     }
 }

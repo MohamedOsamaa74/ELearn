@@ -9,5 +9,9 @@
         public required Duration Duration { get; set; }
         public required ICollection<Option> Option { get; set; }
         //UserId
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+        public ICollection<UserVoting> UserVoting { get; set; }
+        public ICollection<ApplicationUser> user { get; set; }
     }
 }

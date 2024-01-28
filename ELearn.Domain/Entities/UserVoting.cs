@@ -2,9 +2,11 @@
 {
     public class UserVoting
     {
-        public int Id { get; set; }
-        //userId
-        //VotingId
-        //OptionsId
+    
+        public int userId { get; set; }
+        public ApplicationUser User { get; set; }
+        public int VotingId { get; set; }
+        public Voting Voting { get; set; }
+        public int OptionsId { get; set; }
     }
 }

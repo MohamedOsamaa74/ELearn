@@ -2,9 +2,12 @@
 {
     public class UserSurvey
     {
-        public int Id { get; set; }
-        //SurveyId
-        //UserId
-        //OptionId
+       
+        public int SurveyId { get; set; }
+        public Survey Survey { get; set; }
+        public int UserId { get; set; }
+        public ApplicationUser User { get; set; }
+
+        public int OptionId { get; set; }
     }
 }

@@ -21,5 +21,11 @@ namespace ELearn.Domain.Entities
         public required string Grade { get; set; }
         public ICollection<Post> Posts { get; set; }
         public React React { get; set; }
+        public ICollection<Voting> Votings { get; set; }
+        public ICollection<UserVoting> UserVoting { get; set; }
+        public ICollection<Survey> Surveys { get; set; }
+        public ICollection<UserSurvey> UserSurvey { get; set; }
+
+
     }
 }
