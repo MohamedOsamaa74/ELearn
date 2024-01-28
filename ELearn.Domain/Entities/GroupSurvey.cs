@@ -4,9 +4,10 @@
     {
         // public int GroupsurveyId { get; set; }
         public required int GroupId { get; set; }
-        public required int SyrveyId { get; set; }
-        public virtual Group Group { get; set; }
-        public virtual Voting Survey { get; set; }
+        public Group Group { get; set; }
+        public required int SurveyId { get; set; }
+        
+        public  Survey Survey { get; set; }
 
     }  
 }

@@ -14,6 +14,10 @@ namespace ELearn.Domain.Entities
         public int ParentGroupIdId { get; set; }
 
         //public virtual User User { get; set; }
-        public virtual Group? group { get; set; }
+       // public virtual Group? group { get; set; }
+        public ICollection<Survey> Surveys { get; set; }
+        public ICollection<GroupSurvey> GroupSurvey { get; set; }
+        public ICollection<Voting> votings { get; set; }
+        public ICollection<GroupVoting> GroupVoting { get; set; }
     }
 }

@@ -13,5 +13,8 @@
         public ApplicationUser ApplicationUser { get; set; }
         public ICollection<UserVoting> UserVoting { get; set; }
         public ICollection<ApplicationUser> user { get; set; }
+
+        public ICollection<GroupVoting> GroupVoting { get; set; }
+        public ICollection<Group> Group { get; set; }
     }
 }
