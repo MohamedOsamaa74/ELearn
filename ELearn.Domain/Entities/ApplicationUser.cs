@@ -20,5 +20,6 @@ namespace ELearn.Domain.Entities
         public required string Religion { get; set; }
         public required string Grade { get; set; }
         public ICollection<Post> Posts { get; set; }
+        public React React { get; set; }
     }
 }
