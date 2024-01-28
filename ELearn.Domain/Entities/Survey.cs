@@ -12,5 +12,8 @@
         public ICollection<UserSurvey> UserSurvey { get; set; }
 
         public ICollection<ApplicationUser> user { get; set; }
+        public ICollection<GroupSurvey> GroupSurvey { get; set; }
+        public ICollection<Group> Group { get; set; }
+
     }
 }
