@@ -27,11 +27,7 @@ namespace ELearn.InfraStructure.Configuritions
                   .IsRequired(false);
 
 
-            builder.HasOne(p => p.User)
-                 .WithMany(r => r.Posts)
-                 .HasForeignKey(p => p.UserId)
-
-                 .IsRequired(false);
+            
         }
     }
 
