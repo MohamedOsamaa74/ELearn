@@ -3,6 +3,7 @@ using ELearn.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection.Emit;
+using ELearn.InfraStructure.Configurations;
 
 namespace ELearn.Data
 {
@@ -18,6 +19,7 @@ namespace ELearn.Data
             builder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             builder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
             builder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+            builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Comment> Comments { get; set; }

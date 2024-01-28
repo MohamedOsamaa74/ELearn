@@ -13,7 +13,12 @@ namespace ELearn.InfraStructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Quiz> builder)
         {
-            throw new NotImplementedException();
+            builder.ToTable("Quizzes");
+            builder.HasKey(x => x.QuizId);
+
+            builder.HasOne(g => g.Group)
+                .WithMany(u => u.Quizzes)
+                .HasForeignKey(m => m.GroupId);
         }
     }
 }
