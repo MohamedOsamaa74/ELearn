@@ -14,6 +14,5 @@
         public required ICollection<React> Reacts { get; set; }
         public required ICollection<Comment> Comments { get; set; }
 
-
     }
 }
