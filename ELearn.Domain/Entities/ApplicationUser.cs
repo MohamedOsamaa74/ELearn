@@ -24,5 +24,11 @@ namespace ELearn.Domain.Entities
         public ICollection<Message> SentMessages { get; set; }
         public ICollection<Message> ReceivedMessages { get; set; }
         public React React { get; set; }
+        public ICollection<Voting> Votings { get; set; }
+        public ICollection<UserVoting> UserVoting { get; set; }
+        public ICollection<Survey> Surveys { get; set; }
+        public ICollection<UserSurvey> UserSurvey { get; set; }
+
+
     }
 }
