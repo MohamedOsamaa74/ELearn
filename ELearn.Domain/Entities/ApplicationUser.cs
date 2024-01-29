@@ -19,7 +19,10 @@ namespace ELearn.Domain.Entities
         public required string Nationality { get; set; }
         public required string Religion { get; set; }
         public required string Grade { get; set; }
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<Post>? Posts { get; set; }
+        public ICollection<Material>? Materials { get; set; }
+        public ICollection<Message> SentMessages { get; set; }
+        public ICollection<Message> ReceivedMessages { get; set; }
         public React React { get; set; }
     }
 }

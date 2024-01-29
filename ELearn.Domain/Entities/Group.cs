@@ -15,5 +15,8 @@ namespace ELearn.Domain.Entities
 
         //public virtual User User { get; set; }
         public virtual Group? group { get; set; }
+        public ICollection<Material>? Materials { get; set; }
+        public ICollection<Quiz>? Quizzes { get; set; }
+
     }
 }
