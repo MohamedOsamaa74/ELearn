@@ -7,8 +7,8 @@ namespace ELearn.Domain.Entities
         public int AnnouncementId { get; set; }
         public required string Text { get; set; }
 
-        public required int UserId { get; set; }
 
-        //public virtual User User { get; set; }
+        public required int UserId { get; set; }
+        public virtual required ApplicationUser User { get; set; }
     }
 }
