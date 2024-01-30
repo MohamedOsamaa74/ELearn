@@ -16,11 +16,13 @@ namespace ELearn.Api.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IConfiguration config)
+        public AccountController(UserManager<ApplicationUser> userManager, IConfiguration config, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _config = config;
+            _signInManager = signInManager;
         }
         [HttpPost("LogIn")]
         public async Task<IActionResult>LogIn([FromBody] LogInUserDTO UserDTO)
@@ -63,6 +65,23 @@ namespace ELearn.Api.Controllers
                 expiration = DateTime.Now.AddMinutes(30),
             });
             #endregion
+        }
+
+        [HttpPut("Change-Password")]
+        public async Task<IActionResult>ChangePassword([FromBody] ChangePasswordDTO Model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var CurrentUser = await _userManager.FindByNameAsync(User.Identity.Name);
+            var result = await _userManager.ChangePasswordAsync(CurrentUser, Model.OldPassword, Model.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            await _signInManager.RefreshSignInAsync(CurrentUser);
+            return Ok("Password Changed Succesfully");
         }
     }
 }
