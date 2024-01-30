@@ -16,12 +16,12 @@ namespace ELearn.Domain.Entities
         public string? Grade { get; set; }
 
         #region Foreign Key
-        //public int DeptId { get; set; }
+        public int DeptId { get; set; }
         #endregion
 
         #region Navigation Property
         public React? React { get; set; }
-        //public required Department Department { get; set; }
+        public Department Department { get; set; }
 
         public ICollection<Post>? Posts { get; set; }
         public ICollection<Material>? Materials { get; set; }
