@@ -47,7 +47,19 @@ namespace ELearn.InfraStructure.Configurations
             //many to many survey (student) => userServeyconfiguration
             //many to many voting (student) => userVotingconfiguration
 
+            //one user many comments
 
+            builder.HasMany(p => p.Comments)
+                   .WithOne(r => r.User)
+                   .HasForeignKey(v => v.UserId)
+                   .IsRequired(false);
+
+
+            //Announcement
+            builder.HasMany(p => p.Announcements)
+             .WithOne(r => r.User)
+             .HasForeignKey(v => v.UserId)
+             .IsRequired(false);
         }
     }
 }

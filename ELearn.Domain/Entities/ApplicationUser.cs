@@ -31,6 +31,8 @@ namespace ELearn.Domain.Entities
         public ICollection<UserVoting>? UserVoting { get; set; }
         public ICollection<Survey>? Surveys { get; set; }
         public ICollection<UserSurvey>? UserSurvey { get; set; }
+        public ICollection<Comment> Comments { get; set; }
+        public ICollection<Announcement> Announcements { get; set; }
         #endregion
 
     }
