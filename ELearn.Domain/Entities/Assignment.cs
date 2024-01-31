@@ -8,5 +8,8 @@
         public required Duration Duration { get; set; }
         //GroupId
         //UserId
+        public int UserId { get; set; }//CreatorId
+
+        public virtual required ApplicationUser User { get; set; }
     }
 }
