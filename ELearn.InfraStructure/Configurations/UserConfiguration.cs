@@ -60,6 +60,14 @@ namespace ELearn.InfraStructure.Configurations
              .WithOne(r => r.User)
              .HasForeignKey(v => v.UserId)
              .IsRequired(false);
+
+            //one user create many tasks (satff)
+
+            builder.HasMany(p => p.Assignments)
+           .WithOne(r => r.User)
+           .HasForeignKey(v => v.UserId)
+           .IsRequired(false);
+
         }
     }
 }

@@ -33,6 +33,7 @@ namespace ELearn.Domain.Entities
         public ICollection<UserSurvey>? UserSurvey { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<Announcement> Announcements { get; set; }
+        public ICollection<Assignment> Assignments { get; set; }
         #endregion
 
     }
