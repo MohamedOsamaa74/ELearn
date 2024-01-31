@@ -22,6 +22,9 @@ namespace ELearn.Domain.Entities
         #region Navigation Property
         public React? React { get; set; }
         public Department Department { get; set; }
+        public virtual ApplicationUser Sender { get; set; }
+        
+        public virtual ApplicationUser Receiver { get; set; }
 
         public ICollection<Post>? Posts { get; set; }
         public ICollection<Material>? Materials { get; set; }

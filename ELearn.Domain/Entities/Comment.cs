@@ -11,7 +11,7 @@
 
 
         //PostId
-        public required Post PostId { get; set; }
+        public required int PostId { get; set; }
         public virtual required Post Post { get; set; }
     }
 }
