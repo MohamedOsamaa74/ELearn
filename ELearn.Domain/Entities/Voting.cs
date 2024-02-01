@@ -16,5 +16,7 @@
 
         public ICollection<GroupVoting> GroupVoting { get; set; }
         public ICollection<Group> Group { get; set; }
+        public int QuestionId { get; set; }
+        public virtual Question Question { get; set; }
     }
 }
