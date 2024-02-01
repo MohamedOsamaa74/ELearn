@@ -27,7 +27,7 @@ namespace ELearn.InfraStructure.Configuritions
                   .IsRequired(false);
 
 
-            
+
         }
     }
 

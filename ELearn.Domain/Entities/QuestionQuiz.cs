@@ -1,10 +1,17 @@
-﻿namespace ELearn.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ELearn.Domain.Entities
 {
     public class QuestionQuiz
     {
+        [Key]
+        [ForeignKey("Question")]
         public int QuestionId { get; set; }
-        public required string QuizId { get; set; }
-        public required Question Question { get; set; }
-        public required Quiz Quiz { get; set; }
+
+        [ForeignKey("Quiz")]
+        public int QuizId { get; set; }
+        public virtual Question Question { get; set; }
+        public virtual Quiz Quiz { get; set; }
     }
 }

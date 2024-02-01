@@ -15,6 +15,21 @@ namespace ELearn.InfraStructure.Configurations
         {
             builder.ToTable("Questions");
             builder.HasKey(x => x.QuestionId);
+
+            builder.HasOne(q => q.Voting)
+                    .WithOne(x => x.Question)
+                    .HasForeignKey<Voting>(x => x.Id);
+
+            builder.HasOne(s => s.Survey)
+               .WithMany(q => q.Question)
+                .HasForeignKey(s => s.SurveyId);
+
+            //m to m
+            builder.HasMany(u => u.ApplicationUser)
+                .WithMany(u => u.Question)
+                .UsingEntity<UserQuestion>();
+            
+
         }
     }
 }

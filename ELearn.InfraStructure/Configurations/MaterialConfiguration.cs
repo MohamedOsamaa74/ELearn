@@ -15,7 +15,6 @@ namespace ELearn.InfraStructure.Configurations
         {
             builder.ToTable("Materials");
             builder.HasKey(x => x.MaterialId);
-            builder.Property(s => s.title).HasMaxLength(30);
 
             builder.HasOne(u => u.User)
                 .WithMany(m=>m.Materials)

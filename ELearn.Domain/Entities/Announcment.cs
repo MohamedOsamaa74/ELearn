@@ -10,5 +10,11 @@ namespace ELearn.Domain.Entities
 
         public required int UserId { get; set; }
         public virtual required ApplicationUser User { get; set; }
+
+        //many announcement in many groups
+        public virtual ICollection<Group> GroupsOfAnnouncement { get; set; }
+        public virtual ICollection<GroupAnnouncment> GroupAnnouncements { get; set; }
+
+
     }
 }

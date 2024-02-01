@@ -11,8 +11,8 @@
 
         public virtual required ApplicationUser User { get; set; }
 
-        public required ICollection<React> Reacts { get; set; }
-        public required ICollection<Comment> Comments { get; set; }
+        public ICollection<React>? Reacts { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
 
     }
 }

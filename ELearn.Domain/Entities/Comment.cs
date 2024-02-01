@@ -8,7 +8,7 @@
         //UserId
 
         //PostId
-        public required Post PostId { get; set; }
+        public required int PostId { get; set; }
         public virtual required Post Post { get; set; }
         public int UserId { get; set; }//CreatorId
 
