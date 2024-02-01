@@ -11,7 +11,7 @@ namespace ELearn.InfraStructure.Configurations
 {
     public class QuizConfiguration : IEntityTypeConfiguration<Quiz>
     {
-        public void Configure(EntityTypeBuilder<Quiz> builder)
+        public void Configure(EntityTypeBuilder<Quiz> builder) //3relation
         {
             builder.ToTable("Quizzes");
             builder.HasKey(x => x.QuizId);
@@ -24,7 +24,11 @@ namespace ELearn.InfraStructure.Configurations
                 .WithMany(u => u.Quizzes)
                 .HasForeignKey(m => m.UserId);
 
-            //فاضل وحده
+            //one(quiz) to many (questions) in QuestionConfiguration
+
+
+
+
 
         }
     }

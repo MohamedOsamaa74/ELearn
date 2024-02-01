@@ -43,7 +43,7 @@ namespace ELearn.Domain.Entities
         public ICollection<Question> Question { get; set; }
 
         //user create many groups
-        public virtual ICollection<Group>? CreatedGroups { get; set; }
+        public virtual ICollection<Group>? CreatedGroups { get; set; }= new HashSet<Group>();
 
         //users in groups
         public virtual ICollection<Group>? MyGroups { get; set; }= new HashSet<Group>();

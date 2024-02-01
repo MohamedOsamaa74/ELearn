@@ -6,7 +6,7 @@
         public required string Text { get; set; }
         public char CorrectOption { get; set; }
         public required ICollection<Option> Option { get; set; }
-        //QuizId
+        //one to many (questions)
         public int? QuizId { get; set; }
         public virtual Quiz? Quiz { get; set; }
         public int? SurveyId { get; set; }

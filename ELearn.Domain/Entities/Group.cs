@@ -5,6 +5,11 @@ namespace ELearn.Domain.Entities
 {
     public class Group
     {
+        /// <summary>
+        /// The relationship from 'Group.Creator' to 'ApplicationUser.CreatedGroups' with foreign key properties
+        /// {'CreatorId' : int} cannot target the primary key {'Id' : string} because it is not compatible.
+        /// Configure a principal key or a set of foreign key properties with compatible types for this relationship.
+        /// </summary>
         public int GroupId { get; set; }
         public required string GroupName { get; set; }
         public DateTime CreationDate { get; set; }

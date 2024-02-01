@@ -34,14 +34,11 @@ namespace ELearn.Data
         public DbSet<Option> Options { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Question> Questions { get; set; }
-        public DbSet<QuestionSurvey> QuestionsSurveys { get; set; }
-        public DbSet<QuestionQuiz> QuestionQuizzes { get; set; }
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<React> Reacts { get; set; }
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
-        public DbSet<UserDepartment> UserDepartments { get; set; }
         public DbSet<UserQuestion> UserQuestions { get; set; }
         public DbSet<UserSurvey> UserSurveys { get; set; }
         public DbSet<UserVoting> UserVotings { get; set; }
