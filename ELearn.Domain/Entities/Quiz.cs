@@ -7,7 +7,7 @@
         public int UserId { get; set; }
         public DateTime Date { get; set; }
         public required string title { get; set; }
-        public required Duration Duration { get; set; }
+        public Duration Duration { get; set; }
         public virtual Group Group { get; set; }
         public virtual ApplicationUser User { get; set; }
         public ICollection<Question> Questions { get; set; }

@@ -2,7 +2,7 @@
 
 namespace ELearn.Domain.Entities
 {
-    //[NotMapped]
+    [NotMapped]
     public class Duration
     {
         public DateTime StartTime { get; set; }
