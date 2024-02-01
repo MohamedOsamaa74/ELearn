@@ -19,6 +19,11 @@ namespace ELearn.InfraStructure.Configurations
             builder.HasOne(g => g.Group)
                 .WithMany(u => u.Quizzes)
                 .HasForeignKey(m => m.GroupId);
+            
+            builder.HasOne(u => u.User)
+                .WithMany(u => u.Quizzes)
+                .HasForeignKey(m => m.UserId);
+
         }
     }
 }

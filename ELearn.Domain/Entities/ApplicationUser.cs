@@ -28,12 +28,18 @@ namespace ELearn.Domain.Entities
 
         public ICollection<Post>? Posts { get; set; }
         public ICollection<Material>? Materials { get; set; }
+        public ICollection<Quiz>? Quizzes { get; set; }
+
         public ICollection<Message>? SentMessages { get; set; }
         public ICollection<Message>? ReceivedMessages { get; set; }
         public ICollection<Voting>? Votings { get; set; }
         public ICollection<UserVoting>? UserVoting { get; set; }
         public ICollection<Survey>? Surveys { get; set; }
         public ICollection<UserSurvey>? UserSurvey { get; set; }
+        public ICollection<UserQuestion>? UserQuestion { get; set; }
+        public ICollection<Question> Question { get; set; }
+
+
         #endregion
 
     }

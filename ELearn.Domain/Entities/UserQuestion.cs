@@ -6,5 +6,9 @@
         //QuestionId
         //UserId
         //OptionId
+        public int QuestionId { get; set; }
+        public virtual Question Question { get; set; }
+        public int ApplicationUserId { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }
