@@ -21,13 +21,14 @@ namespace ELearn.InfraStructure.Configurations
                     .HasForeignKey<Voting>(x => x.Id);
 
             builder.HasOne(s => s.Survey)
-                .WithMany(q => q.Question)
+               .WithMany(q => q.Question)
                 .HasForeignKey(s => s.SurveyId);
 
             //m to m
             builder.HasMany(u => u.ApplicationUser)
                 .WithMany(u => u.Question)
                 .UsingEntity<UserQuestion>();
+            
 
         }
     }

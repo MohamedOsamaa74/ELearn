@@ -27,6 +27,7 @@ namespace ELearn.InfraStructure.Configurations
 
         builder .HasOne(p => p.React)
                 .WithOne(r => r.User)
+                .HasForeignKey<React>(a=>a.UserID)
                 .IsRequired(false); //optinal
 
 

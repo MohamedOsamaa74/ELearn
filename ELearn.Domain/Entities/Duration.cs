@@ -1,5 +1,8 @@
-﻿namespace ELearn.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ELearn.Domain.Entities
 {
+    //[NotMapped]
     public class Duration
     {
         public DateTime StartTime { get; set; }

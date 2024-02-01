@@ -24,6 +24,8 @@ namespace ELearn.InfraStructure.Configurations
                 .WithMany(u => u.Quizzes)
                 .HasForeignKey(m => m.UserId);
 
+            //فاضل وحده
+
         }
     }
 }

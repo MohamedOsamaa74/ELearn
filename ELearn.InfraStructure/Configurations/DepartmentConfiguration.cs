@@ -14,7 +14,11 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Department> builder)
         {
             builder.ToTable("Departments");
-            builder.HasKey(x => x.Department_id);
+            builder.HasKey(x => x.DepartmentId);
+
+            builder.HasMany(u => u.Users)
+                .WithOne(d => d.Department)
+                .HasForeignKey(d => d.DepartmentId);
         }
     }
 }

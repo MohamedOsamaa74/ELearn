@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ELearn.Domain.Entities
 {
-    public class UserDepartment
+    public class UserDepartment//المفروض اشيله
     {
         public int UserId { get; set; }
         public int DepartmentId { get; set; }

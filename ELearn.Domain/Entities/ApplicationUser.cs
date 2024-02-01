@@ -16,15 +16,15 @@ namespace ELearn.Domain.Entities
         public string? Grade { get; set; }
 
         #region Foreign Key
-        public int DeptId { get; set; }
+        public int DepartmentId { get; set; }
         #endregion
 
         #region Navigation Property
         public React? React { get; set; }
-        public Department Department { get; set; }
-        public virtual ApplicationUser Sender { get; set; }
+        public virtual Department Department { get; set; }
+        //public virtual ApplicationUser Sender { get; set; }
         
-        public virtual ApplicationUser Receiver { get; set; }
+        //public virtual ApplicationUser Receiver { get; set; }
 
         public ICollection<Post>? Posts { get; set; }
         public ICollection<Material>? Materials { get; set; }
@@ -42,8 +42,15 @@ namespace ELearn.Domain.Entities
         public ICollection<UserQuestion>? UserQuestion { get; set; }
         public ICollection<Question> Question { get; set; }
 
+        //user create many groups
+        public virtual ICollection<Group>? CreatedGroups { get; set; }
 
- 
+        //users in groups
+        public virtual ICollection<Group>? MyGroups { get; set; }= new HashSet<Group>();
+        public virtual ICollection<UserGroup>? UserGroups { get; set; }=new HashSet<UserGroup>();
+
+
+
         #endregion
 
     }
