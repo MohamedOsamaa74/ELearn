@@ -43,6 +43,7 @@ namespace ELearn.Data
         public DbSet<UserSurvey> UserSurveys { get; set; }
         public DbSet<UserVoting> UserVotings { get; set; }
         public DbSet<Voting> Votings { get; set; }
+        public DbSet<UserAssignment> UserAssignments { get; set; }
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using ELearn.Domain.Entities;
+﻿ using ELearn.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -69,6 +69,21 @@ namespace ELearn.InfraStructure.Configurations
            .HasForeignKey(v => v.UserId)
            .IsRequired(false);
 
+            //many student to many tasks (student)
+            builder.HasMany(u => u.Assignments)
+                .WithMany(r => r.User)
+                .UsingEntity<UserAssignment>(
+                u => u
+                .HasOne(us => us.User)
+                .WithMany(u => u.UserAssignment)
+                .HasForeignKey(us => us.UserId),
+
+                u => u
+                .HasOne(us => us.Assignment)
+                .WithMany(s => s.UserAssignment)
+                .HasForeignKey(us => us.AssignmentId)
+
+                );
         }
     }
 }
