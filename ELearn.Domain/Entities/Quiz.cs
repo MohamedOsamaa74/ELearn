@@ -10,6 +10,6 @@
         public Duration Duration { get; set; }
         public virtual Group Group { get; set; }
         public virtual ApplicationUser User { get; set; }
-        public ICollection<Question> Questions { get; set; }
+        public virtual required ICollection<Question> Questions { get; set; }= new HashSet<Question>();
     }
 }

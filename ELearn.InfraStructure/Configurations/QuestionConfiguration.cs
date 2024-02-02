@@ -28,7 +28,12 @@ namespace ELearn.InfraStructure.Configurations
             builder.HasMany(u => u.ApplicationUser)
                 .WithMany(u => u.Question)
                 .UsingEntity<UserQuestion>();
-            
+            //one(quiz) to many (questions)
+            builder.HasOne(q => q.Quiz)
+                .WithMany(s => s.Questions)
+                .HasForeignKey(q => q.QuizId);
+
+
 
         }
     }
