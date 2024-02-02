@@ -71,9 +71,9 @@ namespace ELearn.InfraStructure.Configurations
 
             //many student to many tasks (student)
             builder.HasMany(u => u.Assignments)
-                .WithMany(r => r.User)
-                .UsingEntity<UserAssignment>(
-                u => u
+                .WithMany(r => r.users)
+                .UsingEntity<UserAssignment>();
+               /* u => u
                 .HasOne(us => us.User)
                 .WithMany(u => u.UserAssignment)
                 .HasForeignKey(us => us.UserId),
@@ -83,7 +83,7 @@ namespace ELearn.InfraStructure.Configurations
                 .WithMany(s => s.UserAssignment)
                 .HasForeignKey(us => us.AssignmentId)
 
-                );
+                );*/
         }
     }
 }

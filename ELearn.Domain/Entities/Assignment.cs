@@ -17,7 +17,7 @@
         //many to many task 
         public List<UserAssignment> UserAssignment { get; set; }
 
-        public ICollection<ApplicationUser> user { get; set; }
+        public ICollection<ApplicationUser> users { get; set; }
 
     }
 }
