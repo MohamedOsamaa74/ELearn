@@ -3,7 +3,7 @@
     public class UserVoting
     {
     
-        public int userId { get; set; }
+        public string userId { get; set; }
         public ApplicationUser User { get; set; }
         public int VotingId { get; set; }
         public Voting Voting { get; set; }

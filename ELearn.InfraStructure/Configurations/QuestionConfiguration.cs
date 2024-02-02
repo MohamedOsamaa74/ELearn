@@ -34,7 +34,6 @@ namespace ELearn.InfraStructure.Configurations
                 .HasForeignKey(q => q.QuizId);
 
 
-
         }
     }
 }
