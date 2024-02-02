@@ -11,6 +11,6 @@ namespace ELearn.Domain.Entities
         public int AssignmentId { get; set; }
         public string UserId { get; set; }
         public virtual Assignment Assignment { get; set; }
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser Users { get; set; }
     }
 }
