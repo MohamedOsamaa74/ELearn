@@ -14,6 +14,10 @@
         //many tasks in one group
         public int GroupId { get; set; }
         public virtual Group Group { get; set; }
+        //many to many task 
+        public List<UserAssignment> UserAssignment { get; set; }
+
+        public ICollection<ApplicationUser> user { get; set; }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.ComponentModel.DataAnnotations;
 
 namespace ELearn.Domain.Entities
@@ -7,7 +8,7 @@ namespace ELearn.Domain.Entities
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        [Required(ErrorMessage = "Password Required")]
+        
         public string? Image { get; set; }
         public DateTime BirthDate { get; set; }
         public required string Address { get; set; }
@@ -49,6 +50,8 @@ namespace ELearn.Domain.Entities
         public virtual ICollection<Group>? MyGroups { get; set; }= new HashSet<Group>();
         public virtual ICollection<UserGroup>? UserGroups { get; set; }=new HashSet<UserGroup>();
 
+        //many to many task
+        public List<UserAssignment> UserAssignment { get; set; }
 
 
         #endregion
