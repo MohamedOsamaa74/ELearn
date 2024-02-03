@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Quiz> builder) //3relation
         {
             builder.ToTable("Quizzes");
-            builder.HasKey(x => x.QuizId);
+            builder.HasKey(x => x.Id);
 
             builder.HasOne(g => g.Group)
                 .WithMany(u => u.Quizzes)

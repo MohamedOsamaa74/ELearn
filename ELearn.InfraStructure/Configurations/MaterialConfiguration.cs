@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Material> builder)
         {
             builder.ToTable("Materials");
-            builder.HasKey(x => x.MaterialId);
+            builder.HasKey(x => x.Id);
 
             builder.HasOne(u => u.User)
                 .WithMany(m=>m.Materials)

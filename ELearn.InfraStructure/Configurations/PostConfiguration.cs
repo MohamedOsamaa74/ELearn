@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configuritions
     {
         public void Configure(EntityTypeBuilder<Post> builder)
         {
-            builder.HasKey(p => p.PostId);
+            builder.HasKey(p => p.Id);
 
             builder.HasMany(p => p.Reacts)
                    .WithOne(r => r.Post)

@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Question> builder)
         {
             builder.ToTable("Questions");
-            builder.HasKey(x => x.QuestionId);
+            builder.HasKey(x => x.Id);
 
             builder.HasOne(q => q.Voting)
                     .WithOne(x => x.Question)
