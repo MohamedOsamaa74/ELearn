@@ -81,7 +81,7 @@ builder.Services.AddSwaggerGen(opt =>
 #endregion
 
 var app = builder.Build();
-AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
+//AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
