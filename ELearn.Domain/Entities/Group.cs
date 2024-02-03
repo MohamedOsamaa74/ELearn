@@ -16,7 +16,7 @@ namespace ELearn.Domain.Entities
         public required string Description { get; set; }
 
         //for create groups
-        public required int CreatorId { get; set; }
+        public required string CreatorId { get; set; }
         public virtual ApplicationUser Creator { get; set; }
 
         //public virtual User User { get; set; }

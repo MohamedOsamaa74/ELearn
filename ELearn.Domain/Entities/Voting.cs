@@ -7,7 +7,7 @@
         public required string Text { get; set; }
         public DateTime CreateDate { get; set; }
         public required Duration Duration { get; set; }
-        public required ICollection<Option> Option { get; set; }
+        public required ICollection<Option> Options { get; set; }
         //UserId
         public string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }

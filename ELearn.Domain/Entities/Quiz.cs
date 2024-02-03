@@ -4,7 +4,7 @@
     {
         public int QuizId { get; set; }
         public required int GroupId { get; set; }
-        public int UserId { get; set; }
+        public required string UserId { get; set; }
         public DateTime Date { get; set; }
         public required string title { get; set; }
         public Duration Duration { get; set; }

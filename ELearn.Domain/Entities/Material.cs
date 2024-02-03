@@ -4,7 +4,7 @@
     {
         public int MaterialId { get; set; }
         public required int GroupId { get; set; }
-        public required int UserId { get; set; }
+        public required string UserId { get; set; }
         public required string title { get; set; }
         public required string link { get; set; }
         public virtual ApplicationUser User { get; set; }

@@ -7,7 +7,7 @@
         public required string PostText { get; set; }
         public DateTime Date { get; set; }
 
-        public int UserId { get; set; }//CreatorId
+        public string UserId { get; set; }//CreatorId
 
         public virtual required ApplicationUser User { get; set; }
 
