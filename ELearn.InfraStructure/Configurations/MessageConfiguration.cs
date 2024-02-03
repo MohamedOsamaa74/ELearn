@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Message> builder)
         {
             builder.ToTable("Messages");
-            builder.HasKey(x => x.MessageId);
+            builder.HasKey(x => x.Id);
 
             builder.HasOne(m => m.Sender)
                 .WithMany(u => u.SentMessages)

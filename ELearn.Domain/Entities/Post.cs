@@ -3,8 +3,8 @@
     public class Post
     {
 
-        public int PostId { get; set; }
-        public required string PostText { get; set; }
+        public int Id { get; set; }
+        public required string Text { get; set; }
         public DateTime Date { get; set; }
 
         public string UserId { get; set; }//CreatorId

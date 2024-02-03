@@ -2,7 +2,7 @@
 {
     public class Quiz
     {
-        public int QuizId { get; set; }
+        public int Id { get; set; }
         public required int GroupId { get; set; }
         public required string UserId { get; set; }
         public DateTime Date { get; set; }
