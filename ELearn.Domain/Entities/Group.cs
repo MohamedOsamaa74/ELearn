@@ -5,32 +5,24 @@ namespace ELearn.Domain.Entities
 {
     public class Group
     {
-        /// <summary>
-        /// The relationship from 'Group.Creator' to 'ApplicationUser.CreatedGroups' with foreign key properties
-        /// {'CreatorId' : int} cannot target the primary key {'Id' : string} because it is not compatible.
-        /// Configure a principal key or a set of foreign key properties with compatible types for this relationship.
-        /// </summary>
+       
         public int GroupId { get; set; }
         public required string GroupName { get; set; }
-        public DateTime CreationDate { get; set; }
+        public required DateTime CreationDate { get; set; }
         public required string Description { get; set; }
 
         //for create groups
         public required string CreatorId { get; set; }
         public virtual ApplicationUser Creator { get; set; }
-
-        //public virtual User User { get; set; }
         public ICollection<Material>? Materials { get; set; }
         public ICollection<Quiz>? Quizzes { get; set; }
-
-       // public virtual Group? group { get; set; }
         public ICollection<Survey> Surveys { get; set; }
         public ICollection<GroupSurvey> GroupSurvey { get; set; }
         public ICollection<Voting> votings { get; set; }
         public ICollection<GroupVoting> GroupVoting { get; set; }
 
         //for self relation (subgroups)
-        public int ParentGroupId { get; set; }
+        public int? ParentGroupId { get; set; }
         public virtual Group? ParentGroup { get; set; }
         public virtual ICollection<Group>? SubGroups { get; set; }= new HashSet<Group>();
 

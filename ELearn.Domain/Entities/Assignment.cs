@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public required string Title { get; set; }
-        public DateTime Date { get; set; }
+        public required DateTime Date { get; set; }
         public required Duration Duration { get; set; }
         //UserId
         public string UserId { get; set; }//CreatorId
