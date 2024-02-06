@@ -20,7 +20,8 @@ namespace ELearn.InfraStructure.Configurations
            builder.HasMany(p => p.Posts)
                   .WithOne(r => r.User)
                   .HasForeignKey(p => p.UserId)
-                  .IsRequired(false);
+                  .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             //one user (o) to one react (M)
@@ -28,7 +29,8 @@ namespace ELearn.InfraStructure.Configurations
         builder .HasOne(p => p.React)
                 .WithOne(r => r.User)
                 .HasForeignKey<React>(a=>a.UserID)
-                .IsRequired(false); //optinal
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction); //optinal
 
 
             //one user to many voting (staff)
@@ -36,13 +38,15 @@ namespace ELearn.InfraStructure.Configurations
          builder.HasMany(p => p.Votings)
                 .WithOne(r => r.ApplicationUser)
                 .HasForeignKey(v => v.ApplicationUserId)
-                .IsRequired(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //one user to many survey (staff)
         builder.HasMany(p => p.Surveys)
                .WithOne(r => r.ApplicationUser)
                .HasForeignKey(v => v.ApplicationUserId)
-               .IsRequired(false);
+               .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             //many to many survey (student) => userServeyconfiguration
@@ -53,21 +57,24 @@ namespace ELearn.InfraStructure.Configurations
             builder.HasMany(p => p.Comments)
                    .WithOne(r => r.User)
                    .HasForeignKey(v => v.UserId)
-                   .IsRequired(false);
+                   .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             //Announcement
             builder.HasMany(p => p.Announcements)
              .WithOne(r => r.User)
              .HasForeignKey(v => v.UserId)
-             .IsRequired(false);
+             .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //one user create many tasks (satff)
 
             builder.HasMany(p => p.Assignments)
            .WithOne(r => r.User)
            .HasForeignKey(v => v.UserId)
-           .IsRequired(false);
+           .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //many student to many tasks (student) userassignment
           

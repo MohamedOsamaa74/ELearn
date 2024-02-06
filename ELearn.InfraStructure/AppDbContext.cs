@@ -22,6 +22,7 @@ namespace ELearn.Data
             builder.Ignore<Duration>();
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
+        public DbSet<ApplicationUser> users { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Department> Departments { get; set; }

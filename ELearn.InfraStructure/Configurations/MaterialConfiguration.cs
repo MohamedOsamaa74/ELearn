@@ -24,8 +24,6 @@ namespace ELearn.InfraStructure.Configurations
                 .WithMany(m => m.Materials)
                 .HasForeignKey(g => g.GroupId);
 
-
-
         }
     }
 }

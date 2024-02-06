@@ -33,7 +33,10 @@ namespace ELearn.InfraStructure.Configurations
                 .WithMany(s => s.Questions)
                 .HasForeignKey(q => q.QuizId);
 
-
+            builder.HasMany(u => u.UserQuestion)
+                .WithOne(q => q.Question)
+                .HasForeignKey(q => q.QuestionId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
