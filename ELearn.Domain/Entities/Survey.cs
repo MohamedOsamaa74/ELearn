@@ -2,7 +2,7 @@
 {
     public class Survey
     {
-        public int SurveyId { get; set; }
+        public int Id { get; set; }
         public required string Text { get; set; }
         public required ICollection<Option> Options { get; set; } = new HashSet<Option>();
         public DateTime Date { get; set; }
