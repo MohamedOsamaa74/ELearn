@@ -4,7 +4,7 @@ namespace ELearn.Domain.Entities
 {
     public class Department
     {
-        public int DepartmentId { get; set; }
+        public int Id { get; set; }
         public required string title { get; set; }
         public virtual ICollection<ApplicationUser>? Users { get; set; }=new List<ApplicationUser>();
 

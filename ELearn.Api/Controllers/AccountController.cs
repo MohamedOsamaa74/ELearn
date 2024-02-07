@@ -24,23 +24,18 @@ namespace ELearn.Api.Controllers
             _config = config;
             _signInManager = signInManager;
         }
-        [HttpPost("LogIn")]
-        public async Task<IActionResult>LogIn([FromBody] LogInUserDTO UserDTO)
+
+        private async Task<JwtSecurityToken> CreateToken(ApplicationUser user)
         {
-            var result = await _userManager.FindByNameAsync(UserDTO.UserName);
-            if (result == null)
-                return StatusCode(StatusCodes.Status400BadRequest, new { status = "Error", Message = "User Not Found" });
-            if (!await _userManager.CheckPasswordAsync(result, UserDTO.Password))
-                return StatusCode(StatusCodes.Status400BadRequest, new { status = "Error", Message = $"InCorrect Password" });
             #region claims
             var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, result.UserName));
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Id));
+            claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             #endregion
 
             #region get roles
-            var roles = await _userManager.GetRolesAsync(result);
+            var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
             #endregion
@@ -59,12 +54,25 @@ namespace ELearn.Api.Controllers
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: signingCred
             );
-            return Ok(new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = DateTime.Now.AddMinutes(30),
-            });
             #endregion
+
+            return token;
+        }
+
+        [HttpPost("LogIn")]
+        public async Task<IActionResult> LogIn([FromBody] LogInUserDTO Model)
+        {
+            var result = await _userManager.FindByNameAsync(Model.UserName);
+            if (result == null || !await _userManager.CheckPasswordAsync(result, Model.Password))
+                return StatusCode(StatusCodes.Status400BadRequest, new { status = "Error", Message = "Invalid Credintials" });
+
+            var token = await CreateToken(result);
+            return StatusCode(StatusCodes.Status200OK,
+                new {
+                status = "Success",
+                Message = $"Welcome Back, {result.FirstName}",
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = DateTime.Now.AddMinutes(30) });
         }
 
         [HttpPut("Change-Password")]

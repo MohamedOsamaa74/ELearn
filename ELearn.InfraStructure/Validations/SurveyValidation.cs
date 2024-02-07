@@ -11,7 +11,7 @@ namespace ELearn.InfraStructure.Validations
     public class SurveyValidation : AbstractValidator<Survey>
     {
         public SurveyValidation() {
-            RuleFor(s => s.SurveyId).NotEmpty();
+            RuleFor(s => s.Id).NotEmpty();
             RuleFor(s => s.Text).NotEmpty();
             RuleFor(s => s.Options).NotEmpty().WithMessage("Survey must have at least one option.");
             RuleFor(s => s.Date).NotEmpty();

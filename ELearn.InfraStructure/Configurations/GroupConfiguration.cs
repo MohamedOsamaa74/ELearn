@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Group> builder)
         {
             builder.ToTable("Groups");
-            builder.HasKey(x => x.GroupId);
+            builder.HasKey(x => x.Id);
             //10 relation 
 
             //self relation (one to many)

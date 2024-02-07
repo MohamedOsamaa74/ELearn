@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Configurations
         public void Configure(EntityTypeBuilder<Department> builder)
         {
             builder.ToTable("Departments");
-            builder.HasKey(x => x.DepartmentId);
+            builder.HasKey(x => x.Id);
 
             builder.HasMany(u => u.Users)
                 .WithOne(d => d.Department)

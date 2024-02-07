@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
+using ELearn.Data;
 
 namespace ELearn.InfraStructure
 {
@@ -18,8 +19,36 @@ namespace ELearn.InfraStructure
         {
             using(var ServiceScope = builder.ApplicationServices.CreateScope())
             {
+
+                var context = ServiceScope.ServiceProvider.GetService<AppDbContext>();
+                context.Database.EnsureCreated();
+
+                #region Departments
+                if(!context.Departments.Any())
+                {
+                     context.Departments.AddRange(new List<Department>()
+                    {
+                        new Department()
+                        {
+                            title = "Dept1",
+                        },
+                        new Department()
+                        {
+                            title = "Dept2",
+                        },
+                        new Department()
+                        {
+                            title = "Dept3",
+                        }
+                    });
+                    
+                }
+                context.SaveChanges();
+                #endregion
+
                 #region roles
-                var RoleManager = ServiceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var RoleManager = ServiceScope.ServiceProvider
+                    .GetRequiredService<RoleManager<IdentityRole>>();
                 if(!await RoleManager.RoleExistsAsync(UserRoles.Admin))
                     await RoleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
                 if (!await RoleManager.RoleExistsAsync(UserRoles.Staff))
@@ -29,7 +58,8 @@ namespace ELearn.InfraStructure
                 #endregion
 
                 #region Users
-                var UserManager = ServiceScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                var UserManager = ServiceScope.ServiceProvider
+                    .GetRequiredService<UserManager<ApplicationUser>>();
 
                 #region Admin
                 string AdminNID = "0000000000";
@@ -38,15 +68,16 @@ namespace ELearn.InfraStructure
                 {
                     var newAdminUser = new ApplicationUser()
                     {
-                        FirstName = "محمد",
-                        LastName = "أسامة",
-                        BirthDate = DateTime.Parse("6/5/2001"),
-                        Address = "قنا - الشؤون",
-                        Nationality = "مصري",
-                        Religion = "مسلم",
+                        UserName = AdminNID,
+                        DepartmentId = 1,
+                        FirstName = "Admin",
+                        LastName = "Test",
+                        Address = "test address",
+                        Nationality = "test",
+                        Religion = "test",
                     };
-                    await UserManager.CreateAsync(newAdminUser, "Staff@123");
-                    await UserManager.AddToRoleAsync(newAdminUser, UserRoles.Staff);
+                    await UserManager.CreateAsync(newAdminUser, "Admin@123");
+                    await UserManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
                 }
                 #endregion
 
@@ -57,12 +88,14 @@ namespace ELearn.InfraStructure
                 {
                     var newStaffUser = new ApplicationUser()
                     {
-                        FirstName = "محمد",
-                        LastName = "أسامة",
+                        UserName = StaffNID,
+                        DepartmentId = 2,
+                        FirstName = "Staff",
+                        LastName = "Test",
                         BirthDate = DateTime.Parse("6/5/2001"),
-                        Address = "قنا - الشؤون",
-                        Nationality = "مصري",
-                        Religion = "مسلم",
+                        Address = "Test Address",
+                        Nationality = "test",
+                        Religion = "test",
                     };
                     await UserManager.CreateAsync(newStaffUser, "Staff@123");
                     await UserManager.AddToRoleAsync(newStaffUser, UserRoles.Staff);
@@ -70,19 +103,20 @@ namespace ELearn.InfraStructure
                 #endregion
 
                 #region Student
-                string StudentNID = "30105068801177";
+                string StudentNID = "12345678901234";
                 var StudentUser = await UserManager.FindByNameAsync(StudentNID);
                 if (StudentUser == null)
                 {
                     var newStudentUser = new ApplicationUser()
                     {
-                        FirstName = "محمد",
-                        LastName = "أسامة",
+                        UserName = StudentNID,
+                        DepartmentId = 3,
+                        FirstName = "student",
+                        LastName = "Test",
                         BirthDate = DateTime.Parse("6/5/2001"),
-                        Address = "قنا - الشؤون",
-                        Nationality = "مصري",
-                        Religion = "مسلم",
-                        Grade = "الفرقة الرابعة",
+                        Address = "test address",
+                        Nationality = "test",
+                        Religion = "test",
                     };
                     await UserManager.CreateAsync(newStudentUser, "Student@123");
                     await UserManager.AddToRoleAsync(newStudentUser, UserRoles.Student);

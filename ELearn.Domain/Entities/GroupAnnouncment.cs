@@ -2,7 +2,7 @@
 {
     public class GroupAnnouncment
     {
-        public int GroupAnnouncmentId { get; set; }
+        public int Id { get; set; }
         public int GroupId { get; set; }
         public int AnnouncementId { get; set; }
         public virtual Group Group { get; set; }

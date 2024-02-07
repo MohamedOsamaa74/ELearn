@@ -6,7 +6,7 @@ namespace ELearn.Domain.Entities
     public class Group
     {
        
-        public int GroupId { get; set; }
+        public int Id { get; set; }
         public required string GroupName { get; set; }
         public required DateTime CreationDate { get; set; }
         public required string Description { get; set; }
