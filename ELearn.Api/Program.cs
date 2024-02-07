@@ -52,7 +52,7 @@ builder.Services.AddAuthentication(options =>
 #region swagger config
 builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "IMDBclone", Version = "v1" });
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "ELearn", Version = "v1" });
     opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -81,7 +81,7 @@ builder.Services.AddSwaggerGen(opt =>
 #endregion
 
 var app = builder.Build();
-//AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
+AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

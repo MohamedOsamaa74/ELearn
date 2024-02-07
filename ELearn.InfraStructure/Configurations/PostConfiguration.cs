@@ -19,12 +19,14 @@ namespace ELearn.InfraStructure.Configuritions
             builder.HasMany(p => p.Reacts)
                    .WithOne(r => r.Post)
                    .HasForeignKey(p => p.PostID)
-                   .IsRequired(false);
+                   .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(p => p.Comments)
                   .WithOne(r => r.Post)
                   .HasForeignKey(p => p.PostId)
-                  .IsRequired(false);
+                  .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
 

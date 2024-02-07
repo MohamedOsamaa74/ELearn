@@ -21,8 +21,7 @@ namespace ELearn.InfraStructure.Configurations
             builder.HasOne(p =>p.ParentGroup)
                 .WithMany(s => s.SubGroups)
                 .HasForeignKey(e => e.ParentGroupId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.Cascade);
+                .IsRequired(false);
 
             //one user create many groups  
             builder.HasOne(u => u.Creator)
@@ -37,7 +36,8 @@ namespace ELearn.InfraStructure.Configurations
             //many tasks in one group
             builder.HasMany(a => a.Assignments)
                 .WithOne(a => a.Group)
-                .HasForeignKey(a => a.GroupId);
+                .HasForeignKey(a => a.GroupId)
+                .OnDelete(DeleteBehavior.NoAction);
             //many announcement in many groups
             builder.HasMany(u => u.AnnouncementsOfGroups)
                 .WithMany(g => g.GroupsOfAnnouncement)
@@ -47,10 +47,23 @@ namespace ELearn.InfraStructure.Configurations
             //dept has many groups
             builder.HasOne(d => d.Department)
                 .WithMany(g => g.GroupsOfDepartment)
-                .HasForeignKey(a => a.DepartmentId);
+                .HasForeignKey(a => a.DepartmentId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(m => m.Materials)
+                .WithOne(g => g.Group)
+                .HasForeignKey(g => g.GroupId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(q => q.Quizzes)
+                .WithOne(g => g.Group)
+                .HasForeignKey(g => g.GroupId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(u => u.UserGroups)
+                .WithOne(g => g.Group)
+                .HasForeignKey(g => g.GroupId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

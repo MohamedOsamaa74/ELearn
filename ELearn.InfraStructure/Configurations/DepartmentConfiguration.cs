@@ -18,7 +18,8 @@ namespace ELearn.InfraStructure.Configurations
 
             builder.HasMany(u => u.Users)
                 .WithOne(d => d.Department)
-                .HasForeignKey(d => d.DepartmentId);
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
