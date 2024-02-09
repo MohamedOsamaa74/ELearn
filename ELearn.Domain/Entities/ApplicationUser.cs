@@ -8,7 +8,6 @@ namespace ELearn.Domain.Entities
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        
         public string? Image { get; set; }
         public DateTime BirthDate { get; set; }
         public required string Address { get; set; }
