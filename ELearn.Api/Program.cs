@@ -1,6 +1,8 @@
 using ELearn.Data;
 using ELearn.Domain.Entities;
+using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -83,7 +85,9 @@ builder.Services.AddSwaggerGen(opt =>
 });
 #endregion
 
-
+#region Register repositories
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+#endregion
 
 var app = builder.Build();
 AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();

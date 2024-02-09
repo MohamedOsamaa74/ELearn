@@ -22,8 +22,4 @@
     <ProjectReference Include="..\ELearn.Domain\ELearn.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>
