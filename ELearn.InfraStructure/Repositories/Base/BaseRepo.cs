@@ -1,6 +1,10 @@
 ﻿using ELearn.Data;
+using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces.Base;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +18,8 @@ namespace ELearn.InfraStructure.Repositories.Base
     {
         #region props and constructures
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         public BaseRepo(AppDbContext context)
         {
             _context = context;
@@ -21,6 +27,7 @@ namespace ELearn.InfraStructure.Repositories.Base
         #endregion
 
         #region Methods
+        
         public virtual async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
@@ -63,15 +70,11 @@ namespace ELearn.InfraStructure.Repositories.Base
             await _context.SaveChangesAsync();
         }
 
-        public virtual async Task UpdateRangeAsync(ICollection<T> entities)
-        {
-            _context.Set<T>().UpdateRange(entities);
-            await _context.SaveChangesAsync();
-        }
-
         public void Commit() => _context.Database.CommitTransaction();
 
         public void RollBack() => _context.Database.RollbackTransaction();
+
+
         #endregion
     }
 }

@@ -72,7 +72,7 @@ namespace ELearn.Api.Controllers
                 status = "Success",
                 Message = $"Welcome Back, {result.FirstName}",
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = DateTime.Now.AddMinutes(30) });
+                expiration = DateTime.Now.AddHours(2) });
         }
 
         [HttpPut("Change-Password")]
