@@ -23,6 +23,17 @@ namespace ELearn.InfraStructure
                 var context = ServiceScope.ServiceProvider.GetService<AppDbContext>();
                 context.Database.EnsureCreated();
 
+                #region roles
+                var RoleManager = ServiceScope.ServiceProvider
+                    .GetRequiredService<RoleManager<IdentityRole>>();
+                if(!await RoleManager.RoleExistsAsync(UserRoles.Admin))
+                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+                if (!await RoleManager.RoleExistsAsync(UserRoles.Staff))
+                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Staff));
+                if (!await RoleManager.RoleExistsAsync(UserRoles.Student))
+                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Student));
+                #endregion
+
                 #region Departments
                 if(!context.Departments.Any())
                 {
@@ -44,17 +55,6 @@ namespace ELearn.InfraStructure
                     
                 }
                 context.SaveChanges();
-                #endregion
-
-                #region roles
-                var RoleManager = ServiceScope.ServiceProvider
-                    .GetRequiredService<RoleManager<IdentityRole>>();
-                if(!await RoleManager.RoleExistsAsync(UserRoles.Admin))
-                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-                if (!await RoleManager.RoleExistsAsync(UserRoles.Staff))
-                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Staff));
-                if (!await RoleManager.RoleExistsAsync(UserRoles.Student))
-                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Student));
                 #endregion
 
                 #region Users
@@ -82,7 +82,7 @@ namespace ELearn.InfraStructure
                 #endregion
 
                 #region Staff
-                string StaffNID = "0000000000";
+                string StaffNID = "123456789";
                 var StaffUser = await UserManager.FindByNameAsync(StaffNID);
                 if (StaffUser == null)
                 {

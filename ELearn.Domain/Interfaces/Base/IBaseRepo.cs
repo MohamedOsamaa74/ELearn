@@ -12,10 +12,14 @@ namespace ELearn.Domain.Interfaces.Base
         Task<T> GetByIdAsync(int id);
         Task<IEnumerable<T>> GetAllAsync();
         Task<IEnumerable<T>> GetByNameAsync(Expression<Func<T, bool>> expression, string name);
+        // Get By Department Id
+        // Get X from Multiple Groups 1
+        // Get x From Group Y
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(ICollection<T> entities);
+        //Create x To Multiple Groups 2
+        //Task AddToGroupsAsync(ICollection<T> Groups, T Entity);
         Task UpdateAsync(T entity);
-        Task UpdateRangeAsync(ICollection<T> entities);
         Task DeleteAsync(T entity);
         Task DeleteRangeAsync(ICollection<T> entities);
         Task SaveChangesAsync();
