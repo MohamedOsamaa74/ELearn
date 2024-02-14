@@ -8,7 +8,7 @@ namespace ELearn.Domain.Entities
        
         public int Id { get; set; }
         public required string GroupName { get; set; }
-        public DateTime CreationDate {get; set; }
+        //public DateTime CreationDate { get; set; }
         public required string Description { get; set; }
 
         //for create groups
