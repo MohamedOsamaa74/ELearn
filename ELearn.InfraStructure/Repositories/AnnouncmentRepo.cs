@@ -18,6 +18,5 @@ namespace ELearn.InfraStructure.Repositories
         public AnnouncmentRepository(AppDbContext context) : base(context)
         {
         }
-        
     }
 }

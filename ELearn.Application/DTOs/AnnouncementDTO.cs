@@ -10,9 +10,9 @@ namespace ELearn.Application.DTOs
     public class AnnouncementDTO
     {
         [Required]
-        public required string Description { get; set; }
+        public required string text { get; set; }
         [Required]
-        public required ICollection<int> Target { get; set; }
-        public DateTime Time => DateTime.Now.ToLocalTime();
+        public required ICollection<int> Groups { get; set; }
+        //public DateTime Time => DateTime.UtcNow.ToLocalTime();
     }
 }

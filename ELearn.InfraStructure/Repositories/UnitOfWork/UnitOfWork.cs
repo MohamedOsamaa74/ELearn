@@ -1,5 +1,6 @@
 ﻿using ELearn.Data;
 using ELearn.Domain.Entities;
+using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.Base;
 using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure.Repositories.Base;
@@ -38,6 +39,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         public IBaseRepo<UserSurvey> UserSurveys { get; private set; }
         public IBaseRepo<UserVoting> UserVotings { get; private set; }
         public IBaseRepo<Voting> Votings { get; private set; }
+
         #endregion
 
         public UnitOfWork(AppDbContext context)
