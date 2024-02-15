@@ -123,5 +123,24 @@ namespace ELearn.Api.Controllers
             return File(bytes, contenttype, Path.GetFileName(filepath));
         }
         #endregion
+
+        
+        #region Delete Mateial
+        [HttpDelete("Delete/{MaterialId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteMaterial(int MaterialId)
+        {
+            var Material = await _unitOfWork.Materials.GetByIdAsync(MaterialId);
+            if (Material == null)
+            {
+                return BadRequest("Material not found.");
+            }
+            else
+            {
+                await _unitOfWork.Materials.DeleteAsync(Material);
+                return Ok("Material Deleted Successfully");
+            }
+        } 
+        #endregion
     }
 }
