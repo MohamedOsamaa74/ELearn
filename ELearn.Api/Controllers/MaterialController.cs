@@ -4,6 +4,7 @@ using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.UnitOfWork;
+using ELearn.InfraStructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -140,7 +141,24 @@ namespace ELearn.Api.Controllers
                 await _unitOfWork.Materials.DeleteAsync(Material);
                 return Ok("Material Deleted Successfully");
             }
-        } 
+        }
         #endregion
+
+
+        
+        [HttpGet("Details/{id}")]
+        public async Task<ActionResult<Material>> Details(int id)
+           
+        {
+            var material = await _unitOfWork.Materials.GetByIdAsync(id);
+
+            if (material == null)
+            {
+                return NotFound(); // Material with the specified ID was not found
+            }
+
+            return Ok(material);
+        }
+
     }
 }
