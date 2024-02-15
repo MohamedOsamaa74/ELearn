@@ -23,4 +23,8 @@
     <ProjectReference Include="..\ELearn.Application\ELearn.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Upload\" />
+  </ItemGroup>
+
 </Project>

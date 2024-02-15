@@ -1,0 +1,20 @@
+﻿using ELearn.Domain.Interfaces;
+using ELearn.Domain.Interfaces.UnitOfWork;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ELearn.Application.DTOs
+{
+    public class AddMaterialDTO
+    {
+        public required string Title { get; set; }
+        public string? Link { get; set; }
+        public int Week { get; set; }
+        public IFormFile File { get; set; }
+    }
+}
