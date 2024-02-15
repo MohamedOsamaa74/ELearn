@@ -39,7 +39,7 @@ namespace ELearn.Api.Controllers
         }
 
         #endregion
-        
+         
         [HttpGet("GetAllFromGroup")]
         public async Task<IActionResult> GetAllFromGroup(int id)
         {
