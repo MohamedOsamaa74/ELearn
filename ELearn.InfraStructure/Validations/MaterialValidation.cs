@@ -13,8 +13,8 @@ namespace ELearn.InfraStructure.Validations
         public MaterialValidation()
         {
             RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
-            RuleFor(x => x.title).MaximumLength(30).NotEmpty();
-            RuleFor(x=>x.link).NotEmpty();
+            RuleFor(x => x.Title).MaximumLength(30).NotEmpty();
+            RuleFor(x=>x.Link).NotEmpty();
         }
     }
 }
