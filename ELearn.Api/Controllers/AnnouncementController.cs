@@ -94,5 +94,21 @@ namespace ELearn.Api.Controllers
                 return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
             }
         }
+
+        [HttpDelete("Delete/{AnnouncementId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAnnouncement(int AnnouncementId)
+        {
+            var announce = await _unitOfWork.Announcments.GetByIdAsync(AnnouncementId);
+            if (announce == null)
+            {
+                return BadRequest("There Is No Such Announcement");
+            }
+            else
+            {
+                await _unitOfWork.Announcments.DeleteAsync(announce);
+                return Ok("Announcement Deleted Successfully");
+            }
+        }
     }
 }

@@ -58,7 +58,8 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminGetAll()
         {
-            return Ok(await _unitOfWork.Groups.GetAllAsync());
+            /*await _unitOfWork.Groups.GetAllAsync()*/
+            return Ok(_context.Groups.Select(p => new { p.GroupName , p.Description, p.DepartmentId}));
         }
 
         [HttpGet("GetUserGroups")]
@@ -76,11 +77,11 @@ namespace ELearn.Api.Controllers
             else return Ok(UserGroups);
         }
 
-        [HttpDelete("Delete-Group")]
+        [HttpDelete("Delete/{GroupId:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteGroup([FromBody] int Id)
+        public async Task<IActionResult> DeleteGroup(int GroupId)
         {
-            var Group = await _unitOfWork.Groups.GetByIdAsync(Id);
+            var Group = await _unitOfWork.Groups.GetByIdAsync(GroupId);
             if(Group == null)
             {
                 return BadRequest("There Is No Such Group");

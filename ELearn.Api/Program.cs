@@ -19,9 +19,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add services to the container.
+
+#region Register Services
 var db = builder.Configuration.GetConnectionString("Default Connection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
-
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddCors();
+#endregion
 
 #region authentication&autherization
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
@@ -85,9 +89,6 @@ builder.Services.AddSwaggerGen(opt =>
 });
 #endregion
 
-#region Register repositories
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-#endregion
 
 var app = builder.Build();
 AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
@@ -100,6 +101,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthentication();
 

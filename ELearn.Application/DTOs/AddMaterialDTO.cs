@@ -13,8 +13,7 @@ namespace ELearn.Application.DTOs
     public class AddMaterialDTO
     {
         public required string Title { get; set; }
-        public string? Link { get; set; }
         public int Week { get; set; }
-        public IFormFile File { get; set; }
+        public required IFormFile File { get; set; }
     }
 }

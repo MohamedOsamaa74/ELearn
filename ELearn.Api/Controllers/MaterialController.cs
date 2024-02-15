@@ -6,8 +6,10 @@ using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 
 namespace ELearn.Api.Controllers
 {
@@ -16,25 +18,34 @@ namespace ELearn.Api.Controllers
     public class MaterialController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly AppDbContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _context;
 
-        public MaterialController(IUnitOfWork unitOfWork, AppDbContext dbContext)
+        public MaterialController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
         {
             _unitOfWork = unitOfWork;
-            _dbContext = dbContext;
+            _userManager = userManager;
+            _context = appDbContext;
+
 
         }
         //done
         #region GetAll
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_dbContext.Materials.ToList());
+            return Ok(_context.Materials.Select(m => new {m.Title, m.Week, m.FilePath}));
         }
 
         #endregion
-
+        
+        [HttpGet("GetAllFromGroup")]
+        public async Task<IActionResult> GetAllFromGroup(int id)
+        {
+            return Ok(await _context.Materials.Where(x => x.GroupId == id).ToListAsync());
+        }
+        
         #region Upload
 
         [HttpPost("UploadMaterial")]
@@ -47,19 +58,18 @@ namespace ELearn.Api.Controllers
             }
             else
             {
+
                 var material = new Material
                 {
                     Title = materialDTO.Title,
-                    Link = materialDTO.Link,
                     Week = materialDTO.Week,
                     File = materialDTO.File,
-                    FilePath= await WriteFile(materialDTO.File),
+                    FilePath = await WriteFile(materialDTO.File),
                     GroupId = 2, // Replace with current group ID
-                    UserId = "0d67a794-84ea-4c9f-b963-05f00abb985c", // Replace with logic to get current user ID
+                    UserId = _userManager.GetUserId(User),
 
                 };
-                _dbContext.Materials.Add(material);
-                await _dbContext.SaveChangesAsync();
+                await _unitOfWork.Materials.AddAsync(material);
                 return Ok(material.FilePath);
 
             }
@@ -111,7 +121,7 @@ namespace ELearn.Api.Controllers
 
             var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
             return File(bytes, contenttype, Path.GetFileName(filepath));
-        } 
+        }
         #endregion
     }
 }
