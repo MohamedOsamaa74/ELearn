@@ -35,7 +35,7 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(_context.Materials.Select(m => new {m.Title, m.Week, m.FilePath}));
+            return Ok(await _unitOfWork.Materials.GetAllAsync(m => new {m.Title, m.Week, m.FilePath}));
         }
 
         #endregion

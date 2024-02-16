@@ -58,9 +58,17 @@ namespace ELearn.InfraStructure.Repositories.Base
 
         public virtual async Task<T> GetByIdAsync(int Id) => await _context.Set<T>().FindAsync(Id);
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync() => await _context.Set<T>().ToListAsync();
-        public virtual async Task<IEnumerable<T>> GetByNameAsync(Expression<Func<T, bool>> expression, string name)
-         => await _context.Set<T>().Where(expression).ToListAsync();
+        public async Task<IEnumerable<object>> GetWhereSelectAsync(Expression<Func<T, bool>> Condition, Expression<Func<T, object>> expression)
+        => await _context.Set<T>().Where(Condition).Select(expression).ToListAsync();
+
+        public virtual async Task<IEnumerable<object>> GetAllAsync(Expression<Func<T, object>> Selected)
+            => await _context.Set<T>().Select(Selected).ToListAsync();
+        
+        public virtual async Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> Condition)
+         => await _context.Set<T>().Where(Condition).ToListAsync();
+
+        
+        public virtual async Task<bool> FindIfExistAsync(Expression<Func<T, bool>> Condition) => await _context.Set<T>().AnyAsync(Condition);
 
         public virtual async Task SaveChangesAsync() => await _context.SaveChangesAsync();
 
@@ -73,6 +81,8 @@ namespace ELearn.InfraStructure.Repositories.Base
         public void Commit() => _context.Database.CommitTransaction();
 
         public void RollBack() => _context.Database.RollbackTransaction();
+
+
 
 
         #endregion

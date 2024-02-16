@@ -59,7 +59,7 @@ namespace ELearn.Api.Controllers
         public async Task<IActionResult> AdminGetAll()
         {
             /*await _unitOfWork.Groups.GetAllAsync()*/
-            return Ok(_context.Groups.Select(p => new { p.GroupName , p.Description, p.DepartmentId}));
+            return Ok(await _unitOfWork.Groups.GetAllAsync(p => new { p.GroupName, p.Description, p.DepartmentId }));
         }
 
         [HttpGet("GetUserGroups")]
