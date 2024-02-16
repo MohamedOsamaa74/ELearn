@@ -33,7 +33,7 @@ namespace ELearn.Api.Controllers
         {
             try
             {
-                return Ok(await _unitOfWork.Announcments.GetAllAsync());
+                return Ok(await _unitOfWork.Announcments.GetAllAsync(a => a.Text));
             }
             catch (Exception ex)
             {
@@ -66,7 +66,7 @@ namespace ELearn.Api.Controllers
 
         [HttpPost("CreateNew")]
         [Authorize(Roles = "Admin ,Staff")]
-        public async Task<IActionResult> Create([FromBody] AnnouncementDTO announcement)
+        public async Task<IActionResult> Create([FromBody] AnnouncementDTO Model)
         {
             try
             {
@@ -74,10 +74,10 @@ namespace ELearn.Api.Controllers
                 Announcement NewAnnouncement = new Announcement()
                 {
                     UserId = CurrentUser.Id,
-                    Text = announcement.text
+                    Text = Model.text
                 };
                 await _unitOfWork.Announcments.AddAsync(NewAnnouncement);
-                foreach (var groupId in announcement.Groups)
+                foreach (var groupId in Model.Groups)
                 {
                     var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
                     GroupAnnouncment NewGroupAnnouncement = new GroupAnnouncment()
@@ -108,6 +108,36 @@ namespace ELearn.Api.Controllers
             {
                 await _unitOfWork.Announcments.DeleteAsync(announce);
                 return Ok("Announcement Deleted Successfully");
+            }
+        }
+        
+        [HttpPut("EditAnnouncement/{AnnouncementId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateAnnouncement([FromBody] AnnouncementDTO Model, int AnnouncementId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var announcement = await _unitOfWork.Announcments.GetByIdAsync(AnnouncementId);
+                announcement.Text = Model.text;
+                foreach (var groupId in Model.Groups)
+                {
+                    var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
+                    if(!await _unitOfWork.GroupAnnouncments.FindIfExistAsync(ga => ga.GroupId == groupId && ga.AnnouncementId == AnnouncementId))
+                    {
+                         await _unitOfWork.GroupAnnouncments.AddAsync(new GroupAnnouncment() { AnnouncementId = AnnouncementId, GroupId = groupId});
+                    }
+                }
+                await _unitOfWork.Announcments.UpdateAsync(announcement);
+                return Ok("Updated Successfully");
+
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
             }
         }
     }
