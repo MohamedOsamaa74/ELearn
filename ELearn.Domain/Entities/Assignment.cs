@@ -1,4 +1,6 @@
-﻿namespace ELearn.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ELearn.Domain.Entities
 {
     public class Assignment
     {
@@ -7,9 +9,10 @@
         public required DateTime Date { get; set; }
         public required Duration Duration { get; set; }
         //UserId
+        [Required]
         public string UserId { get; set; }//CreatorId
 
-        public virtual required ApplicationUser User { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
         //many tasks in one group
         public int GroupId { get; set; }

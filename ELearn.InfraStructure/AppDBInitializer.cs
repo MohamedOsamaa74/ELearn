@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
 using ELearn.Data;
+using System.Text.RegularExpressions;
+using Group = ELearn.Domain.Entities.Group;
 
 namespace ELearn.InfraStructure
 {
@@ -123,6 +125,179 @@ namespace ELearn.InfraStructure
                 }
                 #endregion
 
+                #endregion
+
+                #region Announcements
+                if (!context.Announcements.Any())
+                {
+                    context.Announcements.AddRange(new List<Announcement>()
+                    {
+                        new Announcement()
+                        {
+                            Text="First announcement text",
+                            UserId="786ff688-6ef9-4e49-b7df-2ea5418ea2c5"
+
+                        },
+                        new Announcement()
+                        {
+                            Text = "Second announcement text",
+                            UserId = "429a3de1-af0e-4b6c-803f-ace25939cc72"
+                        },
+                        new Announcement()
+                        {
+                            Text = "Third announcement text",
+                            UserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5"
+                        }
+                    });
+
+                }
+                context.SaveChanges();
+                #endregion
+
+                #region Groups
+                if (!context.Groups.Any())
+                {
+                    context.Groups.AddRange(new List<Group>()
+                    {
+                        new Group()
+                        {
+                            GroupName = "Group 1",
+                            Description = "Description for Group 1",
+                            CreatorId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            DepartmentId = 1
+                        },
+                        new Group()
+                        {
+                            GroupName = "Group 2",
+                            Description = "Description for Group 2",
+                            CreatorId = "429a3de1-af0e-4b6c-803f-ace25939cc72",
+                            DepartmentId = 1
+                            
+                        },
+                        new Group()
+                        {
+                            GroupName = "Group 3",
+                            Description = "Description for Group 3",
+                            CreatorId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            DepartmentId = 2
+                        }
+                    });
+
+                }
+                context.SaveChanges();
+                #endregion
+
+                #region Assignments
+                if (!context.Assignments.Any())
+                {
+                    context.Assignments.AddRange(new List<Assignment>()
+                    {
+                        new Assignment()
+                        {
+                            Title = "Assignment 1",
+                            Date = DateTime.Now.AddDays(-7), // Example date
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
+                            UserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            GroupId = 1,
+                        },
+                        new Assignment()
+                        {
+                            Title = "Assignment 2",
+                            Date = DateTime.Now.AddDays(-5), // Example date
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
+                            UserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            GroupId = 3
+                        },
+                        new Assignment()
+                        {
+                            Title = "Assignment 3",
+                            Date = DateTime.Now.AddDays(-3), // Example date
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
+                            UserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            GroupId = 3
+                        }
+                    });
+
+                }
+                context.SaveChanges();
+                #endregion
+
+                #region Surveys
+                if (!context.Surveys.Any())
+                {
+                    context.Surveys.AddRange(new List<Survey>()
+                    {
+                        new Survey
+                        {
+                            Text = "Survey 1 Text",
+                            Date = DateTime.Now.AddDays(-7), 
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) }, 
+                            ApplicationUserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 1, Text = "Option 1 for Survey 1" },
+                                new Option { Id = 2, Text = "Option 2 for Survey 1" },
+                                new Option { Id = 3, Text = "Option 3 for Survey 1" },
+                                new Option { Id = 4, Text = "Option 4 for Survey 1" }
+                            }
+                        },
+                        new Survey
+                        {
+                            Text = "Survey 2 Text",
+                            Date = DateTime.Now.AddDays(-5),
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2) },
+                            ApplicationUserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 3, Text = "Option 1 for Survey 2" },
+                                new Option { Id = 4, Text = "Option 2 for Survey 2" }
+                            }
+                        }
+                    });
+
+                }
+                context.SaveChanges();
+                #endregion
+
+                #region Votings
+                if (!context.Votings.Any())
+                {
+                    context.Votings.AddRange(new List<Voting>()
+                    {
+                        new Voting
+                        {
+                            Id = 1,
+                            Text = "Voting 1 Text",
+                            CreateDate = DateTime.Now.AddDays(-7),
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) }, 
+                            ApplicationUserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 1, Text = "Option 1 for Voting 1" },
+                                new Option { Id = 2, Text = "Option 2 for Voting 1" }
+                                
+                            }
+                            
+                        },
+                        new Voting
+                        {
+                            Id = 2,
+                            Text = "Voting 2 Text",
+                            CreateDate = DateTime.Now.AddDays(-5), 
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2) }, 
+                            ApplicationUserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 3, Text = "Option 1 for Voting 2" },
+                                new Option { Id = 4, Text = "Option 2 for Voting 2" }
+                                
+                            }
+                            
+                        }
+                    });
+
+                }
+                context.SaveChanges();
                 #endregion
             }
         }
