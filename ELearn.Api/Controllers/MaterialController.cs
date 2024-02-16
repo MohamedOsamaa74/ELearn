@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace ELearn.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -145,20 +146,36 @@ namespace ELearn.Api.Controllers
         #endregion
 
 
-        
-        [HttpGet("Details/{id}")]
-        public async Task<ActionResult<Material>> Details(int id)
-           
-        {
-            var material = await _unitOfWork.Materials.GetByIdAsync(id);
 
-            if (material == null)
+        // view material in browser لسة مش ممول هنشوف تيم الفرونت 
+
+
+        #region Get Mateial By ID
+        [HttpGet("GetMaterialById/{MaterialId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetMaterialById(int MaterialId)
+        {
+            try
             {
-                return NotFound(); // Material with the specified ID was not found
+                var Material = await _unitOfWork.Materials.GetByIdAsync(MaterialId);
+                if (Material == null)
+                {
+                    return NotFound($"Material with ID {MaterialId} not found");
+                }
+                return Ok(Material);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
             }
 
-            return Ok(material);
         }
+
+        #endregion
+       
+
+
 
     }
 }
