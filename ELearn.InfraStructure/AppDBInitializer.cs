@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
 using ELearn.Data;
+using System.Text.RegularExpressions;
+using Group = ELearn.Domain.Entities.Group;
 
 namespace ELearn.InfraStructure
 {
@@ -123,6 +125,66 @@ namespace ELearn.InfraStructure
                 }
                 #endregion
 
+                #endregion
+
+                #region Announcements
+                if (!context.Announcements.Any())
+                {
+                    context.Announcements.AddRange(new List<Announcement>()
+                    {
+                        new Announcement()
+                        {
+                            Text="First announcement text",
+                            UserId="786ff688-6ef9-4e49-b7df-2ea5418ea2c5"
+
+                        },
+                        new Announcement()
+                        {
+                            Text = "Second announcement text",
+                            UserId = "429a3de1-af0e-4b6c-803f-ace25939cc72"
+                        },
+                        new Announcement()
+                        {
+                            Text = "Third announcement text",
+                            UserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5"
+                        }
+                    });
+
+                }
+                context.SaveChanges();
+                #endregion
+
+                #region Groups
+                if (!context.Groups.Any())
+                {
+                    context.Groups.AddRange(new List<Group>()
+                    {
+                        new Group()
+                        {
+                            GroupName = "Group 1",
+                            Description = "Description for Group 1",
+                            CreatorId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            DepartmentId = 1
+                        },
+                        new Group()
+                        {
+                            GroupName = "Group 2",
+                            Description = "Description for Group 2",
+                            CreatorId = "429a3de1-af0e-4b6c-803f-ace25939cc72",
+                            DepartmentId = 1
+                            
+                        },
+                        new Group()
+                        {
+                            GroupName = "Group 3",
+                            Description = "Description for Group 3",
+                            CreatorId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            DepartmentId = 2
+                        }
+                    });
+
+                }
+                context.SaveChanges();
                 #endregion
             }
         }
