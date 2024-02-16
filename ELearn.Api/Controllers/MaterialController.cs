@@ -37,21 +37,21 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _unitOfWork.Materials.GetAllAsync(m => new {m.Title, m.Week, m.FilePath}));
+            return Ok(await _unitOfWork.Materials.GetAllAsync(m => new { m.Title, m.Week, m.FilePath }));
         }
 
         #endregion
-         
+
         [HttpGet("GetAllFromGroup")]
         public async Task<IActionResult> GetAllFromGroup(int id)
         {
             return Ok(await _context.Materials.Where(x => x.GroupId == id).ToListAsync());
         }
-        
+
         #region Upload
 
         [HttpPost("UploadMaterial")]
-        [Authorize(Roles ="Admin , Staff")]
+        [Authorize(Roles = "Admin , Staff")]
         public async Task<IActionResult> UploaldMaterial(AddMaterialDTO materialDTO)
         {
             if (!ModelState.IsValid)
@@ -76,7 +76,7 @@ namespace ELearn.Api.Controllers
 
             }
         }
-        
+
         private async Task<string> WriteFile(IFormFile file)
         {
             string filename = "";
@@ -102,7 +102,7 @@ namespace ELearn.Api.Controllers
             {
             }
             return filename;
-        } 
+        }
         #endregion
 
         #region DownloadFile
@@ -126,7 +126,7 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        
+
         #region Delete Mateial
         [HttpDelete("Delete/{MaterialId:int}")]
         [Authorize(Roles = "Admin")]
@@ -173,9 +173,43 @@ namespace ELearn.Api.Controllers
         }
 
         #endregion
-       
+
+        #region update Material
+        [HttpPut("UpdateMaterial/{MaterialId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateMaterial(int MaterialId, [FromBody] UpdatMaterialeDto updateDto)
+        {
+            try
+            {
+                var materialToUpdate = await _unitOfWork.Materials.GetByIdAsync(MaterialId);
+                if (materialToUpdate == null)
+                {
+                    return NotFound($"Material with ID {MaterialId} not found");
+                }
+
+                // Update properties from the DTO
+                materialToUpdate.Title = updateDto.Title;
+                materialToUpdate.Link = updateDto.Link;
+                materialToUpdate.Week = updateDto.Week;
 
 
+
+                _unitOfWork.Materials.UpdateAsync(materialToUpdate);
+
+
+                return Ok(materialToUpdate);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+
+
+
+
+        }
+        #endregion        
 
     }
 }
