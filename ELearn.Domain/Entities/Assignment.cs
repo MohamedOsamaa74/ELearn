@@ -10,7 +10,7 @@ namespace ELearn.Domain.Entities
         public required Duration Duration { get; set; }
         //UserId
         [Required]
-        public string UserId { get; set; }//CreatorId
+        public required string UserId { get; set; }//CreatorId
 
         public virtual ApplicationUser User { get; set; }
 

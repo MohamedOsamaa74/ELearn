@@ -1,7 +1,9 @@
 using ELearn.Data;
 using ELearn.Domain.Entities;
+using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure;
+using ELearn.InfraStructure.Repositories;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -24,7 +26,8 @@ builder.Services.AddSwaggerGen();
 var db = builder.Configuration.GetConnectionString("Default Connection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddCors();
+builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserRepo>();
+//builder.Services.AddCors();
 #endregion
 
 #region authentication&autherization
@@ -33,6 +36,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
 });
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
@@ -102,7 +106,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+//app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthentication();
 

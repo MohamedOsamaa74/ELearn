@@ -35,7 +35,7 @@ namespace ELearn.InfraStructure.Repositories.Base
             return entity;
         }
 
-        public virtual async Task AddRangeAsync(ICollection<T> entities)
+        public virtual async Task AddRangeAsync(IEnumerable<T> entities)
         {
             await _context.Set<T>().AddRangeAsync(entities);
             await _context.SaveChangesAsync();
@@ -81,9 +81,6 @@ namespace ELearn.InfraStructure.Repositories.Base
         public void Commit() => _context.Database.CommitTransaction();
 
         public void RollBack() => _context.Database.RollbackTransaction();
-
-
-
 
         #endregion
     }

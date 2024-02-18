@@ -4,6 +4,7 @@ using ELearn.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELearn.InfraStructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240217122334_Application-Users-Updated")]
+    partial class ApplicationUsersUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +44,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Announcements", (string)null);
+                    b.ToTable("Announcements");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.ApplicationUser", b =>
@@ -142,7 +145,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("VotingId");
 
-                    b.ToTable("ApplicationUser", (string)null);
+                    b.ToTable("ApplicationUser");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Assignment", b =>
@@ -173,7 +176,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Assignments", (string)null);
+                    b.ToTable("Assignments");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Comment", b =>
@@ -203,7 +206,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Department", b =>
@@ -280,7 +283,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("GroupAnnouncments", (string)null);
+                    b.ToTable("GroupAnnouncments");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.GroupSurvey", b =>
@@ -298,7 +301,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("SurveyId");
 
-                    b.ToTable("GroupSurveys", (string)null);
+                    b.ToTable("GroupSurveys");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.GroupVoting", b =>
@@ -316,7 +319,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("VotingId");
 
-                    b.ToTable("GroupVotings", (string)null);
+                    b.ToTable("GroupVotings");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Material", b =>
@@ -438,7 +441,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Question", b =>
@@ -533,7 +536,7 @@ namespace ELearn.InfraStructure.Migrations
                         .IsUnique()
                         .HasFilter("[UserID] IS NOT NULL");
 
-                    b.ToTable("Reacts", (string)null);
+                    b.ToTable("Reacts");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Survey", b =>
@@ -558,7 +561,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Surveys", (string)null);
+                    b.ToTable("Surveys");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
@@ -573,7 +576,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("AssignmentId");
 
-                    b.ToTable("UserAssignments", (string)null);
+                    b.ToTable("UserAssignments");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserGroup", b =>
@@ -588,7 +591,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserGroups", (string)null);
+                    b.ToTable("UserGroups");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserQuestion", b =>
@@ -617,7 +620,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("UserQuestions", (string)null);
+                    b.ToTable("UserQuestions");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
@@ -635,7 +638,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("SurveyId");
 
-                    b.ToTable("UserSurveys", (string)null);
+                    b.ToTable("UserSurveys");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserVoting", b =>
@@ -653,7 +656,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("VotingId");
 
-                    b.ToTable("UserVotings", (string)null);
+                    b.ToTable("UserVotings");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Voting", b =>
@@ -678,7 +681,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Votings", (string)null);
+                    b.ToTable("Votings");
                 });
 
             modelBuilder.Entity("GroupSurvey", b =>
@@ -693,7 +696,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("SurveysId");
 
-                    b.ToTable("GroupSurvey", (string)null);
+                    b.ToTable("GroupSurvey");
                 });
 
             modelBuilder.Entity("GroupVoting", b =>
@@ -708,7 +711,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("votingsId");
 
-                    b.ToTable("GroupVoting", (string)null);
+                    b.ToTable("GroupVoting");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -727,7 +730,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -749,7 +752,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RoleClaims", (string)null);
+                    b.ToTable("RoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -771,7 +774,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserClaims", (string)null);
+                    b.ToTable("UserClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -790,7 +793,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.ToTable("UserLogins", (string)null);
+                    b.ToTable("UserLogins");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -803,7 +806,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("UserId", "RoleId");
 
-                    b.ToTable("UserRoles", (string)null);
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -822,7 +825,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserTokens", (string)null);
+                    b.ToTable("UserTokens");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Announcement", b =>
