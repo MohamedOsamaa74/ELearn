@@ -12,7 +12,7 @@ namespace ELearn.Domain.Entities
         public DateTime BirthDate { get; set; }
         public required string Address { get; set; }
         public required string Nationality { get; set; }
-        public required string Religion { get; set; }
+        public required string NId { get; set; }
         public string? Grade { get; set; }
 
         #region Foreign Key
@@ -36,23 +36,21 @@ namespace ELearn.Domain.Entities
         public ICollection<UserVoting>? UserVoting { get; set; }
         public ICollection<Survey>? Surveys { get; set; }
         public ICollection<UserSurvey>? UserSurvey { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<Announcement> Announcements { get; set; }
-        public ICollection<Assignment> Assignments { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
+        public ICollection<Announcement>? Announcements { get; set; }
+        public ICollection<Assignment>? Assignments { get; set; }
         public ICollection<UserQuestion>? UserQuestion { get; set; }
-        public ICollection<Question> Question { get; set; }
+        public ICollection<Question>? Question { get; set; }
 
         //user create many groups
-        public virtual ICollection<Group>? CreatedGroups { get; set; }= new HashSet<Group>();
+        public virtual ICollection<Group>? CreatedGroups { get; set; } = new HashSet<Group>();
 
         //users in groups
-        public virtual ICollection<Group>? MyGroups { get; set; }= new HashSet<Group>();
-        public virtual ICollection<UserGroup>? UserGroups { get; set; }=new HashSet<UserGroup>();
+        public virtual ICollection<Group>? MyGroups { get; set; } = new HashSet<Group>();
+        public virtual ICollection<UserGroup>? UserGroups { get; set; } = new HashSet<UserGroup>();
 
         //many to many task
-        public List<UserAssignment> UserAssignment { get; set; }
-
-
+        public ICollection<UserAssignment>? UserAssignment { get; set; }
         #endregion
 
     }

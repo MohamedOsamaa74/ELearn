@@ -146,10 +146,6 @@ namespace ELearn.Api.Controllers
         #endregion
 
 
-
-        // view material in browser لسة مش ممول هنشوف تيم الفرونت 
-
-
         #region Get Mateial By ID
         [HttpGet("GetMaterialById/{MaterialId:int}")]
         [Authorize(Roles = "Admin")]
@@ -173,6 +169,7 @@ namespace ELearn.Api.Controllers
         }
 
         #endregion
+
 
         #region update Material
         [HttpPut("UpdateMaterial/{MaterialId:int}")]
@@ -211,5 +208,6 @@ namespace ELearn.Api.Controllers
         }
         #endregion        
 
+        // view material in browser لسة مش معمول هنشوف تيم الفرونت 
     }
 }

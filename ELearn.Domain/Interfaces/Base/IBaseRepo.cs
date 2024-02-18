@@ -18,7 +18,7 @@ namespace ELearn.Domain.Interfaces.Base
         // Get X from Multiple Groups 1
         // Get x From Group Y
         Task<T> AddAsync(T entity);
-        Task AddRangeAsync(ICollection<T> entities);
+        Task AddRangeAsync(IEnumerable<T> entities);
         //Create x To Multiple Groups 2
         //Task AddToGroupsAsync(ICollection<T> Groups, T Entity);
         Task UpdateAsync(T entity);
