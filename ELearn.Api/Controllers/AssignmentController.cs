@@ -134,6 +134,7 @@ namespace ELearn.Api.Controllers
                     UserId = assignmentDTO.UserId,
                     GroupId = assignmentDTO.GroupId,
                     FilePath = filePath // Save the file path in the database
+
                 };
 
                 // Add assignment to database
