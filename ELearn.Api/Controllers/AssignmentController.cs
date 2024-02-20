@@ -81,5 +81,77 @@ namespace ELearn.Api.Controllers
         }
         #endregion       
 
+        #region GetAll Assiguments
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title,m.Date }));
+        }
+
+        #endregion
+
+        #region Get assignment By ID
+        [HttpGet("GetAssignmentById/{AssignmentId:int}")]
+        [Authorize(Roles = "Admin , Staff")]
+        public async Task<IActionResult> GetAssignmentById(int AssignmentId)
+        {
+            try
+            {
+                var Assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+                if (Assignment == null)
+                {
+                    return NotFound($"Assignment with ID {AssignmentId} not found");
+                }
+                return Ok(Assignment);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+
+        }
+
+        #endregion
+
+        #region Upload Assignment
+
+        [HttpPost("UploadAssignment{groupId:int}")]
+        [Authorize(Roles = "Admin , Staff")]
+        public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
+        {
+            try
+            { 
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+
+                    var assignment = new Assignment
+                    {
+                        Date = assignmentDTO.Date,
+                        Duration = assignmentDTO.Duration,
+                        UserId = _userManager.GetUserId(User),
+                        Title = assignmentDTO.Title,
+                        GroupId=groupId
+
+                    };
+                    await _unitOfWork.Assignments.AddAsync(assignment);
+                    return Ok();
+            
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
+            }
+        }
+        #endregion
+
     }
 }
+

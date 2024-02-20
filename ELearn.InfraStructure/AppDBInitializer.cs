@@ -186,7 +186,7 @@ namespace ELearn.InfraStructure
                 }
                 context.SaveChanges();
                 #endregion
-
+/*
                 #region Assignments
                 if (!context.Assignments.Any())
                 {
@@ -222,7 +222,7 @@ namespace ELearn.InfraStructure
                 context.SaveChanges();
                 #endregion
 
-                /*
+                
                 #region Surveys
                 if (!context.Surveys.Any())
                 {
