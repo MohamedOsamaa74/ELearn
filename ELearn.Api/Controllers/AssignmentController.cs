@@ -59,7 +59,7 @@ namespace ELearn.Api.Controllers
                 if (AssignmentToUpdate == null)
                 {
                     return NotFound($"Assignment with ID {AssignmentId} not found");
-                }
+                }  
 
                 // Update properties from the DTO
                 AssignmentToUpdate.Title = updateDto.Title;
