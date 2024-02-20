@@ -78,6 +78,37 @@ namespace ELearn.InfraStructure.Repositories.Base
             await _context.SaveChangesAsync();
         }
 
+
+       
+            public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
+            {
+                if (file == null || file.Length == 0)
+                    throw new ArgumentException("File not selected or empty.");
+
+                // Create the folder if it doesn't exist
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                // Define the file path within the folder
+                var filePath = Path.Combine(folderPath, file.FileName);
+
+                // Save the file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                return filePath;
+            }
+        
+
+
+
+
+
+
         public void Commit() => _context.Database.CommitTransaction();
 
         public void RollBack() => _context.Database.RollbackTransaction();

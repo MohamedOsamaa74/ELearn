@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ELearn.Domain.Entities
 {
@@ -8,6 +10,8 @@ namespace ELearn.Domain.Entities
         public required string Title { get; set; }
         public required DateTime Date { get; set; }
         public required Duration Duration { get; set; }
+      
+        public string FilePath { get; set; }
         //UserId
         [Required]
         public required string UserId { get; set; }//CreatorId
@@ -21,6 +25,8 @@ namespace ELearn.Domain.Entities
         public List<UserAssignment> UserAssignment { get; set; }
 
         public ICollection<ApplicationUser> users { get; set; }
+        [NotMapped]
+        public IFormFile File { get; set; }
 
     }
 }

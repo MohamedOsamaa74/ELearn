@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,7 +15,7 @@ namespace ELearn.Domain.Interfaces.Base
         Task<bool> FindIfExistAsync(Expression<Func<T, bool>> Condition);
         Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> expression);
         Task<IEnumerable<object>> GetWhereSelectAsync(Expression<Func<T, bool>> Condition, Expression<Func<T, object>> expression);
-        // Get By Department Id
+        // Get By Department Id   
         // Get X from Multiple Groups 1
         // Get x From Group Y
         Task<T> AddAsync(T entity);
@@ -24,7 +25,10 @@ namespace ELearn.Domain.Interfaces.Base
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task DeleteRangeAsync(ICollection<T> entities);
+        
+        Task<string> UploadFileAsync(IFormFile file, string folderPath);
         Task SaveChangesAsync();
+        
         void Commit();
         void RollBack();
     }

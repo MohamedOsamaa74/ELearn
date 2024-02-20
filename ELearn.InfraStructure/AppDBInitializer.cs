@@ -127,100 +127,100 @@ namespace ELearn.InfraStructure
 
                 #endregion
 
-                #region Announcements
-                if (!context.Announcements.Any())
-                {
-                    context.Announcements.AddRange(new List<Announcement>()
-                    {
-                        new Announcement()
-                        {
-                            Text="First announcement text",
-                            UserId="925eda7d-288d-419c-ac7f-bcdc64b45187"
+                //#region Announcements
+                //if (!context.Announcements.Any())
+                //{
+                //    context.Announcements.AddRange(new List<Announcement>()
+                //    {
+                //        new Announcement()
+                //        {
+                //            Text="First announcement text",
+                //            UserId="925eda7d-288d-419c-ac7f-bcdc64b45187"
 
-                        },
-                        new Announcement()
-                        {
-                            Text = "Second announcement text",
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
-                        },
-                        new Announcement()
-                        {
-                            Text = "Third announcement text",
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
-                        }
-                    });
+                //        },
+                //        new Announcement()
+                //        {
+                //            Text = "Second announcement text",
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
+                //        },
+                //        new Announcement()
+                //        {
+                //            Text = "Third announcement text",
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
+                //        }
+                //    });
 
-                }
-                context.SaveChanges();
-                #endregion
+                //}
+                //context.SaveChanges();
+                //#endregion
 
-                #region Groups
-                if (!context.Groups.Any())
-                {
-                    context.Groups.AddRange(new List<Group>()
-                    {
-                        new Group()
-                        {
-                            GroupName = "Group 1",
-                            Description = "Description for Group 1",
-                            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
-                            DepartmentId = 1
-                        },
-                        new Group()
-                        {
-                            GroupName = "Group 2",
-                            Description = "Description for Group 2",
-                            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
-                            DepartmentId = 1
-                            
-                        },
-                        new Group()
-                        {
-                            GroupName = "Group 3",
-                            Description = "Description for Group 3",
-                            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
-                            DepartmentId = 2
-                        }
-                    });
+                //#region Groups
+                //if (!context.Groups.Any())
+                //{
+                //    context.Groups.AddRange(new List<Group>()
+                //    {
+                //        new Group()
+                //        {
+                //            GroupName = "Group 1",
+                //            Description = "Description for Group 1",
+                //            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
+                //            DepartmentId = 1
+                //        },
+                //        new Group()
+                //        {
+                //            GroupName = "Group 2",
+                //            Description = "Description for Group 2",
+                //            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
+                //            DepartmentId = 1
 
-                }
-                context.SaveChanges();
-                #endregion
+                //        },
+                //        new Group()
+                //        {
+                //            GroupName = "Group 3",
+                //            Description = "Description for Group 3",
+                //            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
+                //            DepartmentId = 2
+                //        }
+                //    });
 
-                #region Assignments
-                if (!context.Assignments.Any())
-                {
-                    context.Assignments.AddRange(new List<Assignment>()
-                    {
-                        new Assignment()
-                        {
-                            Title = "Assignment 1",
-                            Date = DateTime.Now.AddDays(-7), // Example date
-                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
-                            GroupId = 1,
-                        },
-                        new Assignment()
-                        {
-                            Title = "Assignment 2",
-                            Date = DateTime.Now.AddDays(-5), // Example date
-                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
-                            GroupId = 3
-                        },
-                        new Assignment()
-                        {
-                            Title = "Assignment 3",
-                            Date = DateTime.Now.AddDays(-3), // Example date
-                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
-                            GroupId = 3
-                        }
-                    });
+                //}
+                //context.SaveChanges();
+                //#endregion
 
-                }
-                context.SaveChanges();
-                #endregion
+                //#region Assignments
+                //if (!context.Assignments.Any())
+                //{
+                //    context.Assignments.AddRange(new List<Assignment>()
+                //    {
+                //        new Assignment()
+                //        {
+                //            Title = "Assignment 1",
+                //            Date = DateTime.Now.AddDays(-7), // Example date
+                //            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) },
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                //            GroupId = 1,
+                //        },
+                //        new Assignment()
+                //        {
+                //            Title = "Assignment 2",
+                //            Date = DateTime.Now.AddDays(-5), // Example date
+                //            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) },
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                //            GroupId = 3
+                //        },
+                //        new Assignment()
+                //        {
+                //            Title = "Assignment 3",
+                //            Date = DateTime.Now.AddDays(-3), // Example date
+                //            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) },
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                //            GroupId = 3
+                //        }
+                //    });
+
+                //}
+                //context.SaveChanges();
+                //#endregion
 
                 /*
                 #region Surveys
