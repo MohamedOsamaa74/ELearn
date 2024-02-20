@@ -10,6 +10,7 @@ namespace ELearn.Domain.Interfaces.Base
     public interface IBaseRepo<T> where T : class
     {
         Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(string id);
         Task<IEnumerable<object>> GetAllAsync(Expression<Func<T, object>> Selected);
         Task<bool> FindIfExistAsync(Expression<Func<T, bool>> Condition);
         Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> expression);

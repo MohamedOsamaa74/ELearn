@@ -51,7 +51,7 @@ namespace ELearn.Api.Controllers
                 issuer: _config["JWT:Issuer"],
                 audience: _config["JWT:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: signingCred
             );
             #endregion
