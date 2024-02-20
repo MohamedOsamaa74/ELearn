@@ -13,8 +13,8 @@ namespace ELearn.Domain.Entities
       
         public string FilePath { get; set; }
         //UserId
-        [Required]
-        public required string UserId { get; set; }//CreatorId
+       // [Required]
+        public  string UserId { get; set; }//CreatorId
 
         public virtual ApplicationUser User { get; set; }
 

@@ -75,7 +75,7 @@ namespace ELearn.InfraStructure.Repositories.Base
         public virtual async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+             await _context.SaveChangesAsync();
         }
 
 
@@ -85,16 +85,16 @@ namespace ELearn.InfraStructure.Repositories.Base
                 if (file == null || file.Length == 0)
                     throw new ArgumentException("File not selected or empty.");
 
-                // Create the folder if it doesn't exist
+               
                 if (!Directory.Exists(folderPath))
                 {
                     Directory.CreateDirectory(folderPath);
                 }
 
-                // Define the file path within the folder
+              
                 var filePath = Path.Combine(folderPath, file.FileName);
 
-                // Save the file
+               
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
