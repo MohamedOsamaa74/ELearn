@@ -12,9 +12,9 @@ namespace ELearn.Application.DTOs
     public class AssignmentDTO
     {
         public int Id { get; set; }
-        public required string Title { get; set; }
-        public required DateTime Date { get; set; }
-        public required Duration Duration { get; set; }
+        public  string Title { get; set; }
+        public  DateTime Date { get; set; }
+        public  Duration Duration { get; set; }
        
         public required IFormFile File { get; set; }
 

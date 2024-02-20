@@ -87,26 +87,26 @@ namespace ELearn.Api.Controllers
 
 
 
-        //#region DownloadAssignment
-        //[HttpGet]
-        //[Route("DownloadFile")]
-        //public async Task<IActionResult> DownloadFile(string filename)
-        //{
-        //    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
-        //    if (!System.IO.File.Exists(filepath))
-        //    {
-        //        return NotFound();
-        //    }
-        //    var provider = new FileExtensionContentTypeProvider();
-        //    if (!provider.TryGetContentType(filepath, out var contenttype))
-        //    {
-        //        contenttype = "application/octet-stream";
-        //    }
+        #region DownloadAssignment
+        [HttpGet]
+        [Route("DownloadFile")]
+        public async Task<IActionResult> DownloadFile(string filename)
+        {
+            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
+            if (!System.IO.File.Exists(filepath))
+            {
+                return NotFound();
+            }
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filepath, out var contenttype))
+            {
+                contenttype = "application/octet-stream";
+            }
 
-        //    var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-        //    return File(bytes, contenttype, Path.GetFileName(filepath));
-        //}
-        //#endregion
+            var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+            return File(bytes, contenttype, Path.GetFileName(filepath));
+        }
+        #endregion
 
 
         #region UploadAssignment
