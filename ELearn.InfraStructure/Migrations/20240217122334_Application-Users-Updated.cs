@@ -11,9 +11,7 @@ namespace ELearn.InfraStructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "CreationDate",
-                table: "Groups");
+
 
             migrationBuilder.RenameColumn(
                 name: "Religion",

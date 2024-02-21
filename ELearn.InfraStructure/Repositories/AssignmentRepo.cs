@@ -2,6 +2,7 @@
 using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces;
 using ELearn.InfraStructure.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
