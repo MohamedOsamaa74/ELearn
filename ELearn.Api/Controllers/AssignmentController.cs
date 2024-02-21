@@ -60,7 +60,7 @@ namespace ELearn.Api.Controllers
                 if (AssignmentToUpdate == null)
                 {
                     return NotFound($"Assignment with ID {AssignmentId} not found");
-                }
+                }  
 
                 // Update properties from the DTO
                 AssignmentToUpdate.Title = updateDto.Title;
@@ -88,31 +88,32 @@ namespace ELearn.Api.Controllers
 
 
 
-        //#region DownloadAssignment
-        //[HttpGet]
-        //[Route("DownloadFile")]
-        //public async Task<IActionResult> DownloadFile(string filename)
-        //{
-        //    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
-        //    if (!System.IO.File.Exists(filepath))
-        //    {
-        //        return NotFound();
-        //    }
-        //    var provider = new FileExtensionContentTypeProvider();
-        //    if (!provider.TryGetContentType(filepath, out var contenttype))
-        //    {
-        //        contenttype = "application/octet-stream";
-        //    }
+        #region DownloadAssignment
+        [HttpGet]
+        [Route("DownloadFile")]
+        public async Task<IActionResult> DownloadFile(string filename)
+        {
+            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
+            if (!System.IO.File.Exists(filepath))
+            {
+                return NotFound();
+            }
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filepath, out var contenttype))
+            {
+                contenttype = "application/octet-stream";
+            }
 
-        //    var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-        //    return File(bytes, contenttype, Path.GetFileName(filepath));
-        //}
-        //#endregion
+            var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+            return File(bytes, contenttype, Path.GetFileName(filepath));
+        }
+        #endregion
 
 
         #region UploadAssignment
         [HttpPost("UploadAssignment")]
         [Authorize(Roles = "Admin , Staff, Student")]
+       
         public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
         {
             try
@@ -120,26 +121,35 @@ namespace ELearn.Api.Controllers
                 if (assignmentDTO == null || assignmentDTO.File == null)
                     return BadRequest("Assignment data or file not provided.");
 
-                // Define the folder path where assignments will be stored
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "AssignmentUpload");
+                var uploadFolder = "UploadAssignment"; // Folder where assignments will be uploaded
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
 
-                // Call the file upload service to save the assignment file
-                var filePath = await _unitOfWork.Assignments.UploadFileAsync(assignmentDTO.File, folderPath);
+                // Ensure the upload folder exists
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
 
-                // Map DTO to Entity
+                // Generate a unique file name to prevent overwriting existing files
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
+                var filePath = Path.Combine(folderPath, uniqueFileName);
+
+                // Save the uploaded assignment file to the upload folder
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await assignmentDTO.File.CopyToAsync(stream);
+                }
+
+                // Save the file path to the database
                 var assignment = new Assignment
                 {
                     Title = assignmentDTO.Title,
                     Date = assignmentDTO.Date,
                     Duration = assignmentDTO.Duration,
-                    UserId = assignmentDTO.UserId,
-                    GroupId = assignmentDTO.GroupId,
+                  
                     FilePath = filePath // Save the file path in the database
                 };
 
                 // Add assignment to database
                 await _unitOfWork.Assignments.AddAsync(assignment);
-               
                 await _context.SaveChangesAsync();
 
                 return Ok("Assignment uploaded successfully!");
@@ -151,12 +161,13 @@ namespace ELearn.Api.Controllers
         }
 
 
+
         #endregion
 
 
 
-       
-      
+
+
 
 
 

@@ -76,7 +76,7 @@ namespace ELearn.InfraStructure.Repositories.Base
         public virtual async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+             await _context.SaveChangesAsync();
         }
        
         public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
@@ -97,8 +97,20 @@ namespace ELearn.InfraStructure.Repositories.Base
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
-            }
+            }               
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
 
+              
+                var filePath = Path.Combine(folderPath, file.FileName);
+
+               
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
             return filePath;
         }
 
@@ -107,7 +119,6 @@ namespace ELearn.InfraStructure.Repositories.Base
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File not selected or empty.");
-
 
             if (!Directory.Exists(folderPath))
             {
