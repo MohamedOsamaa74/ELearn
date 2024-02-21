@@ -193,16 +193,16 @@ namespace ELearn.Api.Controllers
                 foreach (var groupId in Model.Groups)
                 {
                     var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
-                    if(!await _unitOfWork.GroupAnnouncments.FindIfExistAsync(ga => ga.GroupId == groupId && ga.AnnouncementId == AnnouncementId))
+                    if (!await _unitOfWork.GroupAnnouncments.FindIfExistAsync(ga => ga.GroupId == groupId && ga.AnnouncementId == AnnouncementId))
                     {
-                         await _unitOfWork.GroupAnnouncments.AddAsync(new GroupAnnouncment() { AnnouncementId = AnnouncementId, GroupId = groupId});
+                        await _unitOfWork.GroupAnnouncments.AddAsync(new GroupAnnouncment() { AnnouncementId = AnnouncementId, GroupId = groupId });
                     }
                 }
                 await _unitOfWork.Announcments.UpdateAsync(announcement);
                 return Ok("Updated Successfully");
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
             }
