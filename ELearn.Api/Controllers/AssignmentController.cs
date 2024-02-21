@@ -188,7 +188,7 @@ namespace ELearn.Api.Controllers
                     Date = assignmentDTO.Date,
                     Duration = assignmentDTO.Duration,
 
-                    FilePath = filePath 
+                   // FilePath = assignmentDTO.filePath
                 };
 
                 // Add assignment to database
