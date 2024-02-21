@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 namespace ELearn.InfraStructure.Repositories
 {
     public class AssignmentRepository : BaseRepo<Assignment>, IAssignmentRepo
-
     {
         private readonly AppDbContext _context;
 
