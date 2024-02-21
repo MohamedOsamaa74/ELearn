@@ -70,6 +70,7 @@ namespace ELearn.Api.Controllers
             var UserGroups = _context.UserGroups
                 .Where(u => u.UserId == CurrentUser.Id)
                 .Select(ug => new { ug.GroupId, ug.UserId }).ToList();
+
             if(UserGroups == null)
             {
                 return BadRequest("You are not in Any Groups");
