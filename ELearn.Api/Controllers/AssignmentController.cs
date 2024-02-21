@@ -115,43 +115,100 @@ namespace ELearn.Api.Controllers
 
         #endregion
 
-        #region Upload Assignment
+        //#region Upload Assignment marwan
 
-        [HttpPost("UploadAssignment{groupId:int}")]
-        [Authorize(Roles = "Admin , Staff")]
-        public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
+        //[HttpPost("UploadAssignment{groupId:int}")]
+        //[Authorize(Roles = "Admin , Staff")]
+        //public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
+        //{
+        //    try
+        //    { 
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest();
+
+        //        }
+        //        else
+        //        {
+
+        //            var assignment = new Assignment
+        //            {
+        //                Date = assignmentDTO.Date,
+        //                Duration = assignmentDTO.Duration,
+        //                UserId = _userManager.GetUserId(User),
+        //                Title = assignmentDTO.Title,
+        //                GroupId=groupId
+
+        //            };
+        //            await _unitOfWork.Assignments.AddAsync(assignment);
+        //            return Ok();
+
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
+        //    }
+        //}
+        //#endregion
+
+        #region UploadAssignment
+        [HttpPost("UploadAssignment")]
+        [Authorize(Roles = "Admin , Staff, Student")]
+
+        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
         {
             try
-            { 
-                if (!ModelState.IsValid)
+            {
+                if (assignmentDTO == null || assignmentDTO.File == null)
+                    return BadRequest("Assignment data or file not provided.");
+
+                var uploadFolder = "UploadAssignment"; 
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
+
+               
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
+                var filePath = Path.Combine(folderPath, uniqueFileName);
+
+               
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    return BadRequest();
-
+                    await assignmentDTO.File.CopyToAsync(stream);
                 }
-                else
+
+                
+                var assignment = new Assignment
                 {
+                    Title = assignmentDTO.Title,
+                    Date = assignmentDTO.Date,
+                    Duration = assignmentDTO.Duration,
 
-                    var assignment = new Assignment
-                    {
-                        Date = assignmentDTO.Date,
-                        Duration = assignmentDTO.Duration,
-                        UserId = _userManager.GetUserId(User),
-                        Title = assignmentDTO.Title,
-                        GroupId=groupId
+                    FilePath = filePath 
+                };
 
-                    };
-                    await _unitOfWork.Assignments.AddAsync(assignment);
-                    return Ok();
-            
+                // Add assignment to database
+                await _unitOfWork.Assignments.AddAsync(assignment);
+                await _context.SaveChangesAsync();
 
-                }
+                return Ok("Assignment uploaded successfully!");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
+
         #endregion
+
+
+
 
     }
 }
