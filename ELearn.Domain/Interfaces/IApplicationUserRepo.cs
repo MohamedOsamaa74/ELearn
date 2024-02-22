@@ -12,5 +12,6 @@ namespace ELearn.Domain.Interfaces
     public interface IApplicationUserRepo : IBaseRepo<ApplicationUser>
     {
         public Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file);
+        public Task<bool> CreateNewUser(object user);
     }
 }
