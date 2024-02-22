@@ -61,7 +61,7 @@ namespace ELearn.Api.Controllers
             /*await _unitOfWork.Groups.GetAllAsync()*/
             return Ok(await _unitOfWork.Groups.GetAllAsync(p => new { p.GroupName, p.Description, p.DepartmentId }));
         }
-
+        //Refactor
         [HttpGet("GetUserGroups")]
         [Authorize(Roles ="Staff, Student")]
         public async Task<IActionResult> GetUserGroups()
@@ -73,7 +73,7 @@ namespace ELearn.Api.Controllers
 
             if(UserGroups == null)
             {
-                return BadRequest("You are not in Any Groups");
+                return NoContent();
             }
             else return Ok(UserGroups);
         }
@@ -85,7 +85,7 @@ namespace ELearn.Api.Controllers
             var Group = await _unitOfWork.Groups.GetByIdAsync(GroupId);
             if(Group == null)
             {
-                return BadRequest("There Is No Such Group");
+                return NoContent();
             }
             else
             {

@@ -27,9 +27,6 @@ namespace ELearn.Api.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _context = appDbContext;
-
-
-
         }
         #region Delete Assignment
         [HttpDelete("Delete/{AssignmentId:int}")]
@@ -86,8 +83,6 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-
-
         #region DownloadAssignment
         [HttpGet]
         [Route("DownloadFile")]
@@ -110,6 +105,41 @@ namespace ELearn.Api.Controllers
         #endregion
 
 
+        #region GetAll Assiguments
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title,m.Date }));
+        }
+
+        #endregion
+
+        #region Get assignment By ID
+        [HttpGet("GetAssignmentById/{AssignmentId:int}")]
+        [Authorize(Roles = "Admin , Staff")]
+        public async Task<IActionResult> GetAssignmentById(int AssignmentId)
+        {
+            try
+            {
+                var Assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+                if (Assignment == null)
+                {
+                    return NotFound($"Assignment with ID {AssignmentId} not found");
+                }
+                return Ok(Assignment);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+
+        }
+
+        #endregion
+
+        /*
         #region UploadAssignment
         [HttpPost("UploadAssignment")]
         [Authorize(Roles = "Admin , Staff, Student")]
@@ -161,47 +191,6 @@ namespace ELearn.Api.Controllers
         }
 
 
-
-        #endregion
-
-
-
-
-
-
-
-
-        #region GetAll Assiguments
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
-        {
-            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title,m.Date }));
-        }
-
-        #endregion
-
-        #region Get assignment By ID
-        [HttpGet("GetAssignmentById/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin , Staff")]
-        public async Task<IActionResult> GetAssignmentById(int AssignmentId)
-        {
-            try
-            {
-                var Assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
-                if (Assignment == null)
-                {
-                    return NotFound($"Assignment with ID {AssignmentId} not found");
-                }
-                return Ok(Assignment);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
-        }
 
         #endregion
 
@@ -289,7 +278,7 @@ namespace ELearn.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"An Error Occurred While Proccessing th request: {ex.Message}");
             }
         }
 
@@ -299,7 +288,7 @@ namespace ELearn.Api.Controllers
 
 
 
-
+        */
     }
 }
 
