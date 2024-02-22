@@ -18,12 +18,11 @@ namespace ELearn.Api.Controllers
     public class AnnouncementController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAnnouncementRepo announcementService;
         private readonly AppDbContext _context;
-        public AnnouncementController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext context)
+        public AnnouncementController(IUnitOfWork unitOfWork, AppDbContext context)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _context = context;
         }
 
@@ -63,19 +62,19 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        #region Get Announcements for student
         // لسه
+        #region Get Announcements for student
         [HttpGet("Get-All-From-Groups")]
             [Authorize(Roles = "Staff, Student")]
             public async Task<IActionResult> GetAllFromGroups()
             {
-                var currentUserId = _userManager.GetUserId(User);
+                var currentUser = await _unitOfWork.Announcments.GetCurrentUserAsync(User);
 
                 var announcements = await _context.Announcements
                     .Include(a => a.GroupAnnouncements)
                     .Where(a => a.GroupAnnouncements.Any(ga =>
                         ga.GroupId == ga.Group.Id &&
-                        ga.Group.UsersInGroup.Any(ug => ug.Id == currentUserId)))
+                        ga.Group.UsersInGroup.Any(ug => ug.Id == currentUser.Id)))
                     .Select(a => a.Text)
                     .ToListAsync();
 
@@ -97,7 +96,8 @@ namespace ELearn.Api.Controllers
             {
                 return BadRequest("No Such User Exist");
             }
-            if (User.IsInRole("Staff") && StaffId != _userManager.GetUserId(User))
+            var user = await _unitOfWork.Announcments.GetCurrentUserAsync(User);
+            if (User.IsInRole("Staff") && StaffId != user.Id)
                 return Unauthorized();
 
             return Ok(await _unitOfWork.Announcments.GetWhereSelectAsync
@@ -112,24 +112,14 @@ namespace ELearn.Api.Controllers
         {
             try
             {
-                var CurrentUser = await _userManager.FindByNameAsync(User.Identity.Name);
-                Announcement NewAnnouncement = new Announcement()
-                {
-                    UserId = CurrentUser.Id,
-                    Text = Model.text
-                };
+                var CurrentUser = await _unitOfWork.Announcments.GetCurrentUserAsync(User);
+                var NewAnnouncement = await announcementService.CreateNew(CurrentUser.Id, Model.text);
                 await _unitOfWork.Announcments.AddAsync(NewAnnouncement);
-                foreach (var groupId in Model.Groups)
-                {
-                    var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
-                    GroupAnnouncment NewGroupAnnouncement = new GroupAnnouncment()
-                    {
-                        GroupId = groupId,
-                        AnnouncementId = NewAnnouncement.Id
-                    };
-                    await _unitOfWork.GroupAnnouncments.AddAsync(NewGroupAnnouncement);
-                }
-                return Ok("Announcement Sent Succesfully");
+
+                var GroupAnnouncements = await announcementService.SendToGroups(Model.Groups, NewAnnouncement.Id);
+                await _unitOfWork.GroupAnnouncments.AddRangeAsync(GroupAnnouncements);
+
+                return Created();
             }
             catch (Exception ex)
             {
@@ -146,7 +136,7 @@ namespace ELearn.Api.Controllers
             var announce = await _unitOfWork.Announcments.GetByIdAsync(AnnouncementId);
             if (announce == null)
             {
-                return BadRequest("There Is No Such Announcement");
+                return NotFound();
             }
             else
             {
@@ -166,14 +156,9 @@ namespace ELearn.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            List<Announcement> announcements = new List<Announcement>();
-            foreach(var Id in Ids)
-            {
-                var entity = await _unitOfWork.Announcments.GetByIdAsync(Id);
-                announcements.Add(entity);
-            }
+            var announcements = await announcementService.GetAnnouncements(Ids);
             await _unitOfWork.Announcments.DeleteRangeAsync(announcements);
-            return NoContent();
+            return Ok("The Selected Announcements Was Deleted Successfully");
         }
         #endregion
         

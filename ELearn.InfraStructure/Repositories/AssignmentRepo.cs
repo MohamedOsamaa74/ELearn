@@ -2,6 +2,7 @@
 using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces;
 using ELearn.InfraStructure.Repositories.Base;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,9 @@ namespace ELearn.InfraStructure.Repositories
     public class AssignmentRepository : BaseRepo<Assignment>, IAssignmentRepo
     {
         private readonly AppDbContext _context;
-
-        public AssignmentRepository(AppDbContext context) : base(context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public AssignmentRepository(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
-            _context = context;
         }
     }
 }

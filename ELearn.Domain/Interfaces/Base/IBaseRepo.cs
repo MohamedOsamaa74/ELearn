@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ELearn.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,10 +21,9 @@ namespace ELearn.Domain.Interfaces.Base
         // Get By Department Id   
         // Get X from Multiple Groups 1
         // Get x From Group Y
+        Task<ApplicationUser> GetCurrentUserAsync(ClaimsPrincipal User);
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
-        //Create x To Multiple Groups 2
-        //Task AddToGroupsAsync(ICollection<T> Groups, T Entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task DeleteRangeAsync(ICollection<T> entities);

@@ -4,6 +4,7 @@ using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.Base;
 using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure.Repositories.Base;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
     {
         #region props
         private readonly AppDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
         public IBaseRepo<ApplicationUser> Users { get; private set; }
         public IBaseRepo<Announcement> Announcments { get; private set; }
         public IBaseRepo<Assignment> Assignments { get; private set; }
@@ -42,31 +44,32 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
 
         #endregion
 
-        public UnitOfWork(AppDbContext context)
+        public UnitOfWork(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
-            Users = new BaseRepo<ApplicationUser>(context);
-            Announcments = new BaseRepo<Announcement>(context);
-            Assignments = new BaseRepo<Assignment>(context);
-            Comments = new BaseRepo<Comment>(context);
-            Departments = new BaseRepo<Department>(context);
-            Groups = new BaseRepo<Group>(context);
-            GroupAnnouncments = new BaseRepo<GroupAnnouncment>(context);
-            GroupSurveys = new BaseRepo<GroupSurvey>(context);
-            GroupVotings = new BaseRepo<GroupVoting>(context);
-            Materials = new BaseRepo<Material>(context);
-            Messages = new BaseRepo<Message>(context);
-            Options = new BaseRepo<Option>(context);
-            Posts = new BaseRepo<Post>(context);
-            Questions = new BaseRepo<Question>(context);
-            Quizziz = new BaseRepo<Quiz>(context);
-            Reacts = new BaseRepo<React>(context);
-            Surveys = new BaseRepo<Survey>(context);
-            UserAssignments = new BaseRepo<UserAssignment>(context);
-            UserSurveys = new BaseRepo<UserSurvey>(context);
-            UserSurveys = new BaseRepo<UserSurvey>(context);
-            UserVotings = new BaseRepo<UserVoting>(context);
-            Votings = new BaseRepo<Voting>(context);
+            _userManager = userManager;
+            Users = new BaseRepo<ApplicationUser>(context, userManager);
+            Announcments = new BaseRepo<Announcement>(context, userManager);
+            Assignments = new BaseRepo<Assignment>(context, userManager);
+            Comments = new BaseRepo<Comment>(context, userManager);
+            Departments = new BaseRepo<Department>(context, userManager);
+            Groups = new BaseRepo<Group>(context, userManager);
+            GroupAnnouncments = new BaseRepo<GroupAnnouncment>(context, userManager);
+            GroupSurveys = new BaseRepo<GroupSurvey>(context, userManager);
+            GroupVotings = new BaseRepo<GroupVoting>(context, userManager);
+            Materials = new BaseRepo<Material>(context, userManager);
+            Messages = new BaseRepo<Message>(context, userManager);
+            Options = new BaseRepo<Option>(context, userManager);
+            Posts = new BaseRepo<Post>(context, userManager);
+            Questions = new BaseRepo<Question>(context, userManager);
+            Quizziz = new BaseRepo<Quiz>(context, userManager);
+            Reacts = new BaseRepo<React>(context, userManager);
+            Surveys = new BaseRepo<Survey>(context, userManager);
+            UserAssignments = new BaseRepo<UserAssignment>(context, userManager);
+            UserSurveys = new BaseRepo<UserSurvey>(context, userManager);
+            UserSurveys = new BaseRepo<UserSurvey>(context, userManager);
+            UserVotings = new BaseRepo<UserVoting>(context, userManager);
+            Votings = new BaseRepo<Voting>(context, userManager);
         }
 
         int IUnitOfWork.complete() => _context.SaveChanges();

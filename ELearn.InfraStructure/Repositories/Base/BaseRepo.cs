@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,10 +20,10 @@ namespace ELearn.InfraStructure.Repositories.Base
         #region props and constructures
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        public BaseRepo(AppDbContext context)
+        public BaseRepo(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         #endregion
 
@@ -79,7 +80,7 @@ namespace ELearn.InfraStructure.Repositories.Base
              await _context.SaveChangesAsync();
         }
        
-        public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
+        /*public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File not selected or empty.");
@@ -114,7 +115,7 @@ namespace ELearn.InfraStructure.Repositories.Base
             return filePath;
         }
 
-      
+      */
         public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
         {
             if (file == null || file.Length == 0)
@@ -139,6 +140,11 @@ namespace ELearn.InfraStructure.Repositories.Base
         public void Commit() => _context.Database.CommitTransaction();
 
         public void RollBack() => _context.Database.RollbackTransaction();
+
+        public async Task<ApplicationUser> GetCurrentUserAsync(ClaimsPrincipal User)
+        {
+            return await _userManager.FindByNameAsync(User.Identity.Name);
+        }
 
         #endregion
     }
