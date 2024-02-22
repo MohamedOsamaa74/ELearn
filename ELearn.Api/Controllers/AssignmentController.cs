@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
 
 namespace ELearn.Api.Controllers
 {
@@ -31,14 +32,14 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAssignment(int AssignmentId)
         {
-            var Assignment = await _unitOfWork.Materials.GetByIdAsync(AssignmentId);
-            if (Assignment == null)
+            var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+            if (assignment == null)
             {
                 return BadRequest("Assignment not found.");
             }
             else
             {
-                await _unitOfWork.Materials.DeleteAsync(Assignment);
+                await _unitOfWork.Assignments.DeleteAsync(assignment);
                 return Ok("Assignment Deleted Successfully");
             }
         }
@@ -151,6 +152,99 @@ namespace ELearn.Api.Controllers
             }
         }
         #endregion
+
+        #region Get assignment By StaffID (for admin)
+        [HttpGet("Staff")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAssignmentByStaffId(string StaffID)
+        {
+            try
+            {
+                var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.UserId==StaffID);
+                if (Assignment == null)
+                {
+                    return NotFound($"The Staff with ID {StaffID} has no assignments");
+                }
+                return Ok(Assignment);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+
+        }
+
+        #endregion
+
+        #region Get all assignment By my StaffID (for staff)
+        [HttpGet("current-Staff")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> GetAssignmentByCurrentStaffId()
+        {
+            try
+            {
+                var CurrentUserId = _userManager.GetUserId(User);
+                var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a => a.UserId == CurrentUserId);
+                if (Assignment == null)
+                {
+                    return NotFound($"This Staff has no assignments");
+                }
+               
+                return Ok(Assignment);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+
+        }
+
+        #endregion
+
+        #region Get assignment By GroupID
+        [HttpGet("GetAssignmentByGroupId/{groupID:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAssignmentByGroupId(int groupID)
+        {
+            try
+            {
+                var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.GroupId == groupID);
+                if (Assignment == null)
+                {
+                    return NotFound($"This group has no assignments");
+                }
+                return Ok(Assignment);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "An error occurred while processing your request");
+            }
+
+        }
+
+        #endregion
+
+        #region Delete All Assignments
+        [HttpDelete("Delete All")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAllAssignments()
+        {
+            var assignments = await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title, m.Date });
+            if (assignments == null)
+            {
+                return BadRequest("Assignment not found.");
+            }
+            else
+            {
+                await _unitOfWork.Assignments.DeleteRangeAsync(assignments as ICollection<Assignment>);
+                return Ok("Assignment Deleted Successfully");
+            }
+        }
+        #endregion
+
 
     }
 }
