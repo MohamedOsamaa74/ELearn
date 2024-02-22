@@ -20,10 +20,11 @@ namespace ELearn.Api.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAnnouncementRepo announcementService;
         private readonly AppDbContext _context;
-        public AnnouncementController(IUnitOfWork unitOfWork, AppDbContext context)
+        public AnnouncementController(IUnitOfWork unitOfWork, AppDbContext context, IAnnouncementRepo AnnouncementService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
+            announcementService = AnnouncementService;
         }
 
         #region Get By Id
@@ -62,21 +63,18 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        // لسه
-        #region Get Announcements for student
+        #region Get Announcements from user groups
         [HttpGet("Get-All-From-Groups")]
-            [Authorize(Roles = "Staff, Student")]
+            [Authorize]
             public async Task<IActionResult> GetAllFromGroups()
             {
+                if(User.IsInRole("Admin"))
+                {
+                    return RedirectToAction("GetAll");
+                }
                 var currentUser = await _unitOfWork.Announcments.GetCurrentUserAsync(User);
 
-                var announcements = await _context.Announcements
-                    .Include(a => a.GroupAnnouncements)
-                    .Where(a => a.GroupAnnouncements.Any(ga =>
-                        ga.GroupId == ga.Group.Id &&
-                        ga.Group.UsersInGroup.Any(ug => ug.Id == currentUser.Id)))
-                    .Select(a => a.Text)
-                    .ToListAsync();
+                var announcements =await announcementService.GetFromGroups(currentUser.Id);
 
                 if (announcements == null)
                 {

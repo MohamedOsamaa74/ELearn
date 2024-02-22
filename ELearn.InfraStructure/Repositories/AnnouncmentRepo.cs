@@ -4,6 +4,7 @@ using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.Base;
 using ELearn.InfraStructure.Repositories.Base;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +13,15 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Repositories
 {
-    public class AnnouncementRepository : BaseRepo<Announcement>, IAnnouncementRepo
+    public class AnnouncementRepo : BaseRepo<Announcement>, IAnnouncementRepo
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AnnouncementRepository(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
+        public AnnouncementRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         public async Task<Announcement> CreateNew(string Creator, string Text)
@@ -38,15 +41,28 @@ namespace ELearn.InfraStructure.Repositories
             }
         }
 
-        public async Task<ICollection<Announcement>> GetAnnouncements(List<int> Ids)
+        public async Task<ICollection<Announcement>> GetAnnouncements(IEnumerable<int> Ids)
         {
             List<Announcement> announcements = new List<Announcement>();
             foreach (var Id in Ids)
             {
-                var entity = await _context.FindAsync<Announcement>(Id);
-                announcements.Add(entity);
+                var entity = await _context.Announcements.FirstOrDefaultAsync(a => a.Id == Id);
+                if (entity != null) 
+                    announcements.Add(entity);
             }
             return announcements;
+        }
+
+        public async Task<ICollection<Announcement>> GetFromGroups(string UserId)
+        {
+            var announcements = await _context.Announcements
+                .Include(a => a.GroupAnnouncements)
+                .Where(a => a.GroupAnnouncements.Any(ga =>
+                        ga.GroupId == ga.Group.Id &&
+                        ga.Group.UsersInGroup.Any(ug => ug.Id == UserId)))
+                .Select(a => a.Text)
+                .ToListAsync();
+            return (ICollection<Announcement>)announcements;
         }
 
         public async Task<IEnumerable<GroupAnnouncment>> SendToGroups(ICollection<int> Groups, int announcementId)

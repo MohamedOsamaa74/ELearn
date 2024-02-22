@@ -30,7 +30,7 @@ namespace ELearn.Domain.Interfaces.Base
         Task DeleteRangeAsync(ICollection<T> entities);
         Task<string> UploadFileAsync(IFormFile file, string folderPath);
         Task SaveChangesAsync();
-        Task<string> UploadFile(IFormFile formFile, string x);
+        //Task<string> UploadFile(IFormFile formFile, string x);
         void Commit();
         void RollBack();
     }

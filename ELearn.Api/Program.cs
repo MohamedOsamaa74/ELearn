@@ -27,6 +27,7 @@ var db = builder.Configuration.GetConnectionString("Default Connection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserRepo>();
+builder.Services.AddTransient<IAnnouncementRepo, AnnouncementRepo>();
 //builder.Services.AddCors();
 #endregion
 
