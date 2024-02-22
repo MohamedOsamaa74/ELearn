@@ -4,6 +4,7 @@ using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.Base;
 using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure.Repositories.Base;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
     {
         #region props
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         public IBaseRepo<ApplicationUser> Users { get; private set; }
         public IBaseRepo<Announcement> Announcments { get; private set; }
         public IBaseRepo<Assignment> Assignments { get; private set; }
@@ -47,7 +49,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
             _context = context;
             Users = new BaseRepo<ApplicationUser>(context);
             Announcments = new BaseRepo<Announcement>(context);
-            Assignments = new BaseRepo<Assignment>(context);
+           // Assignments = new BaseRepo<Assignment>(context);
             Comments = new BaseRepo<Comment>(context);
             Departments = new BaseRepo<Department>(context);
             Groups = new BaseRepo<Group>(context);
@@ -68,9 +70,22 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
             UserVotings = new BaseRepo<UserVoting>(context);
             Votings = new BaseRepo<Voting>(context);
         }
+       
 
         int IUnitOfWork.complete() => _context.SaveChanges();
 
         public void Dispose() => _context.Dispose();
+
+        public UnitOfWork(AppDbContext context, IWebHostEnvironment webHostEnvironment)
+        {
+            _context = context;
+            _webHostEnvironment = webHostEnvironment;
+
+            Assignments = new BaseRepo<Assignment>(context, webHostEnvironment);
+        }
+      
+
+
     }
+   
 }

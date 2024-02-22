@@ -7,10 +7,10 @@ namespace ELearn.Domain.Entities
         public int Id { get; set; }
         public required string Title { get; set; }
         public required DateTime Date { get; set; }
-        public required Duration Duration { get; set; }
+       // public required Duration Duration { get; set; }
         //UserId
-        [Required]
-        public required string UserId { get; set; }//CreatorId
+        
+        public  string UserId { get; set; }//CreatorId
 
         public virtual ApplicationUser User { get; set; }
 
@@ -21,6 +21,7 @@ namespace ELearn.Domain.Entities
         public List<UserAssignment> UserAssignment { get; set; }
 
         public ICollection<ApplicationUser> users { get; set; }
+        public string FilePath { get; set; }
 
     }
 }
