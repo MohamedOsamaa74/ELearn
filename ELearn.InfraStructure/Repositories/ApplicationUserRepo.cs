@@ -21,10 +21,8 @@ namespace ELearn.InfraStructure.Repositories
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public ApplicationUserRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context)
+        public ApplicationUserRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
-            _context = context;
-            _userManager = userManager;
         }
 
         public async Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file)
