@@ -1,4 +1,4 @@
-﻿using ELearn.Data;
+using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces;
 using ELearn.Domain.Interfaces.Base;

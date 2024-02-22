@@ -1,4 +1,5 @@
-﻿using ELearn.Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using ELearn.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace ELearn.Domain.Interfaces.Base
         Task DeleteRangeAsync(ICollection<T> entities);
         Task<string> UploadFileAsync(IFormFile file, string folderPath);
         Task SaveChangesAsync();
+        Task<string> UploadFile(IFormFile formFile, string x);
         void Commit();
         void RollBack();
     }

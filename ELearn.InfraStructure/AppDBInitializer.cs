@@ -181,7 +181,9 @@ namespace ELearn.InfraStructure
                 //            DepartmentId = 2
                 //        }
                 //    });
-
+                //}
+                //context.SaveChanges();
+                //#endregion
                 //}
                 //context.SaveChanges();
                 //#endregion

@@ -10,11 +10,8 @@ namespace ELearn.Domain.Entities
         public  string Title { get; set; }
         public  DateTime Date { get; set; }
         public  Duration Duration { get; set; }
-      
         public string FilePath { get; set; }
-        //UserId
-        [Required]
-        public  string UserId { get; set; }//CreatorId
+        public  required string UserId { get; set; }//CreatorId
 
         public virtual ApplicationUser User { get; set; }
 
@@ -25,6 +22,7 @@ namespace ELearn.Domain.Entities
         public List<UserAssignment> UserAssignment { get; set; }
 
         public ICollection<ApplicationUser> users { get; set; }
+
         [NotMapped]
         public IFormFile File { get; set; }
 

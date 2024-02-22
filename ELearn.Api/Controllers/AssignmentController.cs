@@ -1,294 +1,302 @@
-﻿using ELearn.Application.DTOs;
-using ELearn.Data;
-using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces.UnitOfWork;
-using ELearn.InfraStructure.Repositories.UnitOfWork;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ELearn.Api.Controllers
+using ELearn.Domain.Const;
+using ELearn.Domain.Entities;
+using ELearn.Data;
+using System.Text.RegularExpressions;
+using Group = ELearn.Domain.Entities.Group;
+
+namespace ELearn.InfraStructure
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AssignmentController : ControllerBase
+    public  class AppDbInitializer
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AppDbContext _context;
+        public static async Task SeedUsersAndRolesAsync(IApplicationBuilder builder)
+        {
+            using(var ServiceScope = builder.ApplicationServices.CreateScope())
+            {
 
-        public AssignmentController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
-        {
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _context = appDbContext;
-        }
-        #region Delete Assignment
-        [HttpDelete("Delete/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAssignment(int AssignmentId)
-        {
-            var Assignment = await _unitOfWork.Materials.GetByIdAsync(AssignmentId);
-            if (Assignment == null)
-            {
-                return BadRequest("Assignment not found.");
-            }
-            else
-            {
-                await _unitOfWork.Materials.DeleteAsync(Assignment);
-                return Ok("Assignment Deleted Successfully");
-            }
-        }
-        #endregion
+                var context = ServiceScope.ServiceProvider.GetService<AppDbContext>();
+                context.Database.EnsureCreated();
 
-        #region update Assignment
-        [HttpPut("UpdateAssignment/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] AssignmentDTO updateDto)
-        {
-            try
-            {
-                var AssignmentToUpdate = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
-                if (AssignmentToUpdate == null)
+                #region roles
+                var RoleManager = ServiceScope.ServiceProvider
+                    .GetRequiredService<RoleManager<IdentityRole>>();
+                if(!await RoleManager.RoleExistsAsync(UserRoles.Admin))
+                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+                if (!await RoleManager.RoleExistsAsync(UserRoles.Staff))
+                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Staff));
+                if (!await RoleManager.RoleExistsAsync(UserRoles.Student))
+                    await RoleManager.CreateAsync(new IdentityRole(UserRoles.Student));
+                #endregion
+
+                #region Departments
+                if(!context.Departments.Any())
                 {
-                    return NotFound($"Assignment with ID {AssignmentId} not found");
-                }  
-
-                // Update properties from the DTO
-                AssignmentToUpdate.Title = updateDto.Title;
-                AssignmentToUpdate.Date = updateDto.Date;
-                AssignmentToUpdate.Duration = updateDto.Duration;
-
-
-
-                _unitOfWork.Assignments.UpdateAsync(AssignmentToUpdate);
-
-
-                return Ok(AssignmentToUpdate);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
-
-
-
-        }
-        #endregion
-
-        #region DownloadAssignment
-        [HttpGet]
-        [Route("DownloadFile")]
-        public async Task<IActionResult> DownloadFile(string filename)
-        {
-            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
-            if (!System.IO.File.Exists(filepath))
-            {
-                return NotFound();
-            }
-            var provider = new FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(filepath, out var contenttype))
-            {
-                contenttype = "application/octet-stream";
-            }
-
-            var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-            return File(bytes, contenttype, Path.GetFileName(filepath));
-        }
-        #endregion
-
-
-        #region GetAll Assiguments
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
-        {
-            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title,m.Date }));
-        }
-
-        #endregion
-
-        #region Get assignment By ID
-        [HttpGet("GetAssignmentById/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin , Staff")]
-        public async Task<IActionResult> GetAssignmentById(int AssignmentId)
-        {
-            try
-            {
-                var Assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
-                if (Assignment == null)
-                {
-                    return NotFound($"Assignment with ID {AssignmentId} not found");
+                     context.Departments.AddRange(new List<Department>()
+                    {
+                        new Department()
+                        {
+                            title = "Dept1",
+                        },
+                        new Department()
+                        {
+                            title = "Dept2",
+                        },
+                        new Department()
+                        {
+                            title = "Dept3",
+                        }
+                    });
+                    
                 }
-                return Ok(Assignment);
-            }
-            catch (Exception ex)
-            {
+                context.SaveChanges();
+                #endregion
 
-                return StatusCode(500, "An error occurred while processing your request");
-            }
+                #region Users
+                var UserManager = ServiceScope.ServiceProvider
+                    .GetRequiredService<UserManager<ApplicationUser>>();
 
-        }
-
-        #endregion
-
-        /*
-        #region UploadAssignment
-        [HttpPost("UploadAssignment")]
-        [Authorize(Roles = "Admin , Staff, Student")]
-       
-        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
-        {
-            try
-            {
-                if (assignmentDTO == null || assignmentDTO.File == null)
-                    return BadRequest("Assignment data or file not provided.");
-
-                var uploadFolder = "UploadAssignment"; // Folder where assignments will be uploaded
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
-
-                // Ensure the upload folder exists
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                // Generate a unique file name to prevent overwriting existing files
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
-                var filePath = Path.Combine(folderPath, uniqueFileName);
-
-                // Save the uploaded assignment file to the upload folder
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                #region Admin
+                string AdminUserName = "0000000000";
+                var AdminUser = await UserManager.FindByNameAsync(AdminUserName);
+                if (AdminUser == null)
                 {
-                    await assignmentDTO.File.CopyToAsync(stream);
+                    var newAdminUser = new ApplicationUser()
+                    {
+                        UserName = AdminUserName,
+                        DepartmentId = 1,
+                        FirstName = "Admin",
+                        LastName = "Test",
+                        Address = "test address",
+                        Nationality = "test",
+                        NId = "test",
+                    };
+                    await UserManager.CreateAsync(newAdminUser, "Admin@123");
+                    await UserManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
                 }
+                #endregion
 
-                // Save the file path to the database
-                var assignment = new Assignment
+                #region Staff
+                string StaffUserName = "123456789";
+                var StaffUser = await UserManager.FindByNameAsync(StaffUserName);
+                if (StaffUser == null)
                 {
-                    Title = assignmentDTO.Title,
-                    Date = assignmentDTO.Date,
-                    Duration = assignmentDTO.Duration,
-                  
-                    FilePath = filePath // Save the file path in the database
-                };
+                    var newStaffUser = new ApplicationUser()
+                    {
+                        UserName = StaffUserName,
+                        DepartmentId = 2,
+                        FirstName = "Staff",
+                        LastName = "Test",
+                        BirthDate = DateTime.Parse("6/5/2001"),
+                        Address = "Test Address",
+                        Nationality = "test",
+                        NId = "test",
+                    };
+                    await UserManager.CreateAsync(newStaffUser, "Staff@123");
+                    await UserManager.AddToRoleAsync(newStaffUser, UserRoles.Staff);
+                }
+                #endregion
 
-                // Add assignment to database
-                await _unitOfWork.Assignments.AddAsync(assignment);
-                await _context.SaveChangesAsync();
+                #region Student
+                string StudentUserName = "12345678901234";
+                var StudentUser = await UserManager.FindByNameAsync(StudentUserName);
+                if (StudentUser == null)
+                {
+                    var newStudentUser = new ApplicationUser()
+                    {
+                        UserName = StudentUserName,
+                        DepartmentId = 3,
+                        FirstName = "student",
+                        LastName = "Test",
+                        BirthDate = DateTime.Parse("6/5/2001"),
+                        Address = "test address",
+                        Nationality = "test",
+                        NId = "test",
+                    };
+                    await UserManager.CreateAsync(newStudentUser, "Student@123");
+                    await UserManager.AddToRoleAsync(newStudentUser, UserRoles.Student);
+                }
+                #endregion
 
-                return Ok("Assignment uploaded successfully!");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+                #endregion
 
+                //#region Announcements
+                //if (!context.Announcements.Any())
+                //{
+                //    context.Announcements.AddRange(new List<Announcement>()
+                //    {
+                //        new Announcement()
+                //        {
+                //            Text="First announcement text",
+                //            UserId="925eda7d-288d-419c-ac7f-bcdc64b45187"
 
+                //        },
+                //        new Announcement()
+                //        {
+                //            Text = "Second announcement text",
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
+                //        },
+                //        new Announcement()
+                //        {
+                //            Text = "Third announcement text",
+                //            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
+                //        }
+                //    });
 
-        #endregion
+                //}
+                //context.SaveChanges();
+                //#endregion
 
-        //#region Upload Assignment marwan
+                //#region Groups
+                //if (!context.Groups.Any())
+                //{
+                //    context.Groups.AddRange(new List<Group>()
+                //    {
+                //        new Group()
+                //        {
+                //            GroupName = "Group 1",
+                //            Description = "Description for Group 1",
+                //            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
+                //            DepartmentId = 1
+                //        },
+                //        new Group()
+                //        {
+                //            GroupName = "Group 2",
+                //            Description = "Description for Group 2",
+                //            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
+                //            DepartmentId = 1
+                //        },
+                //        new Group()
+                //        {
+                //            GroupName = "Group 3",
+                //            Description = "Description for Group 3",
+                //            CreatorId = "925eda7d-288d-419c-ac7f-bcdc64b45187",
+                //            DepartmentId = 2
+                //        }
+                //    });
 
-        //[HttpPost("UploadAssignment{groupId:int}")]
-        //[Authorize(Roles = "Admin , Staff")]
-        //public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
-        //{
-        //    try
-        //    { 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest();
+                //}
+                //context.SaveChanges();
+                //#endregion
 
-        //        }
-        //        else
-        //        {
-
-        //            var assignment = new Assignment
-        //            {
-        //                Date = assignmentDTO.Date,
-        //                Duration = assignmentDTO.Duration,
-        //                UserId = _userManager.GetUserId(User),
-        //                Title = assignmentDTO.Title,
-        //                GroupId=groupId
-
-        //            };
-        //            await _unitOfWork.Assignments.AddAsync(assignment);
-        //            return Ok();
-
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
-        //    }
-        //}
-        //#endregion
-
-        #region UploadAssignment
-        [HttpPost("UploadAssignment")]
-        [Authorize(Roles = "Admin , Staff, Student")]
-
-        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
-        {
-            try
-            {
-                if (assignmentDTO == null || assignmentDTO.File == null)
-                    return BadRequest("Assignment data or file not provided.");
-
-                var uploadFolder = "UploadAssignment"; 
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
-
-               
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
+/*
+                #region Assignments
+                if (!context.Assignments.Any())
+                {
+                    context.Assignments.AddRange(new List<Assignment>()
+                    {
+                        new Assignment()
+                        {
+                            Title = "Assignment 1",
+                            Date = DateTime.Now.AddDays(-7), // Example date
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
+                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                            GroupId = 1,
+                        },
+                        new Assignment()
+                        {
+                            Title = "Assignment 2",
+                            Date = DateTime.Now.AddDays(-5), // Example date
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
+                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                            GroupId = 3
+                        },
+                        new Assignment()
+                        {
+                            Title = "Assignment 3",
+                            Date = DateTime.Now.AddDays(-3), // Example date
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2).AddMinutes(30) }, 
+                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                            GroupId = 3
+                        }
+                    });
 
                 
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
-                var filePath = Path.Combine(folderPath, uniqueFileName);
-
-               
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                #region Surveys
+                if (!context.Surveys.Any())
                 {
-                    await assignmentDTO.File.CopyToAsync(stream);
+                    context.Surveys.AddRange(new List<Survey>()
+                    {
+                        new Survey
+                        {
+                            Text = "Survey 1 Text",
+                            Date = DateTime.Now.AddDays(-7), 
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) }, 
+                            ApplicationUserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 1, Text = "Option 1 for Survey 1" },
+                                new Option { Id = 2, Text = "Option 2 for Survey 1" },
+                                new Option { Id = 3, Text = "Option 3 for Survey 1" },
+                                new Option { Id = 4, Text = "Option 4 for Survey 1" }
+                            }
+                        },
+                        new Survey
+                        {
+                            Text = "Survey 2 Text",
+                            Date = DateTime.Now.AddDays(-5),
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2) },
+                            ApplicationUserId = "786ff688-6ef9-4e49-b7df-2ea5418ea2c5",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 3, Text = "Option 1 for Survey 2" },
+                                new Option { Id = 4, Text = "Option 2 for Survey 2" }
+                            }
+                        }
+                    });
+
                 }
+                context.SaveChanges();
+                #endregion
 
-                
-                var assignment = new Assignment
+                #region Votings
+                if (!context.Votings.Any())
                 {
-                    Title = assignmentDTO.Title,
-                    Date = assignmentDTO.Date,
-                    Duration = assignmentDTO.Duration,
+                    context.Votings.AddRange(new List<Voting>()
+                    {
+                        new Voting
+                        {
+                            Id = 1,
+                            Text = "Voting 1 Text",
+                            CreateDate = DateTime.Now.AddDays(-7),
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) }, 
+                            ApplicationUserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 1, Text = "Option 1 for Voting 1" },
+                                new Option { Id = 2, Text = "Option 2 for Voting 1" }
+                                
+                            }
+                            
+                        },
+                        new Voting
+                        {
+                            Id = 2,
+                            Text = "Voting 2 Text",
+                            CreateDate = DateTime.Now.AddDays(-5), 
+                            Duration = new Duration { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2) }, 
+                            ApplicationUserId = "2eb94dab-3a56-4694-8691-6a880a40cc25",
+                            Options = new List<Option>
+                            {
+                                new Option { Id = 3, Text = "Option 1 for Voting 2" },
+                                new Option { Id = 4, Text = "Option 2 for Voting 2" }
+                                
+                            }
+                            
+                        }
+                    });
 
-                   // FilePath = assignmentDTO.filePath
-                };
-
-                // Add assignment to database
-                await _unitOfWork.Assignments.AddAsync(assignment);
-                await _context.SaveChangesAsync();
-
-                return Ok("Assignment uploaded successfully!");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An Error Occurred While Proccessing th request: {ex.Message}");
+                }
+                context.SaveChanges();
+                #endregion*/
             }
         }
-
-
-
-        #endregion
-
-
-
-        */
     }
 }
-
