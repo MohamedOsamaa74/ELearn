@@ -1,8 +1,8 @@
-﻿using ELearn.Data;
-using ELearn.Domain.Const;
+﻿using CsvHelper.Configuration;
+using CsvHelper;
+using ELearn.Data;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces;
-using ELearn.InfraStructure.Repositories.Base;
+using ELearn.InfraStructure.CSV_Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -11,17 +11,15 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CsvHelper.Configuration;
-using CsvHelper;
-using ELearn.InfraStructure.CSV_Validation;
+using ELearn.Application.Interfaces;
 
-namespace ELearn.InfraStructure.Repositories
+namespace ELearn.Application.Services
 {
-    public class ApplicationUserRepo : BaseRepo<ApplicationUser>, IApplicationUserRepo
+    public class UserService : IUserService
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public ApplicationUserRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
+        public UserService(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -67,13 +65,13 @@ namespace ELearn.InfraStructure.Repositories
 
         private bool IsValidUser(ApplicationUser user)
         {
-            if(string.IsNullOrEmpty(user.FirstName)) return false;
-            if(string.IsNullOrEmpty(user.LastName)) return false;
-            if(string.IsNullOrEmpty(user.Address)) return false;
-            if(string.IsNullOrEmpty(user.Nationality)) return false;
-            if(string.IsNullOrEmpty(user.UserName)) return false;
-            if(string.IsNullOrEmpty(user.NId)) return false;
-            if(string.IsNullOrEmpty(user.PhoneNumber)) return false;
+            if (string.IsNullOrEmpty(user.FirstName)) return false;
+            if (string.IsNullOrEmpty(user.LastName)) return false;
+            if (string.IsNullOrEmpty(user.Address)) return false;
+            if (string.IsNullOrEmpty(user.Nationality)) return false;
+            if (string.IsNullOrEmpty(user.UserName)) return false;
+            if (string.IsNullOrEmpty(user.NId)) return false;
+            if (string.IsNullOrEmpty(user.PhoneNumber)) return false;
             return true;
         }
     }

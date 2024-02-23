@@ -1,6 +1,5 @@
 using ELearn.Data;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Repositories.Base
 {
-    public class BaseRepo<T> : IBaseRepo<T> where T : class
+    public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         #region props and constructures
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public BaseRepo(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public BaseRepository(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;

@@ -1,5 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using ELearn.Domain.Entities;
+﻿using ELearn.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ELearn.Domain.Interfaces.Base
+namespace ELearn.InfraStructure.Repositories.Base
 {
-    public interface IBaseRepo<T> where T : class
+    public interface IBaseRepository<T> where T : class
     {
         Task<T> GetByIdAsync(int id);
         Task<T> GetByIdAsync(string id);

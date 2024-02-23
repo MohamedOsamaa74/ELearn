@@ -1,9 +1,9 @@
 using ELearn.Application.DTOs;
+using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces;
-using ELearn.Domain.Interfaces.UnitOfWork;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,9 +18,9 @@ namespace ELearn.Api.Controllers
     public class AnnouncementController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IAnnouncementRepo announcementService;
+        private readonly IAnnouncementService announcementService;
         private readonly AppDbContext _context;
-        public AnnouncementController(IUnitOfWork unitOfWork, AppDbContext context, IAnnouncementRepo AnnouncementService)
+        public AnnouncementController(IUnitOfWork unitOfWork, AppDbContext context, IAnnouncementService AnnouncementService)
         {
             _unitOfWork = unitOfWork;
             _context = context;

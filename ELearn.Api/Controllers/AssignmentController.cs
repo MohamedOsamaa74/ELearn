@@ -1,7 +1,6 @@
 using ELearn.Application.DTOs;
 using ELearn.Data;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -28,10 +27,8 @@ namespace ELearn.Api.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _context = appDbContext;
-
-
-
         }
+        /*
         #region Delete Assignment
         [HttpDelete("Delete/{AssignmentId:int}")]
         [Authorize(Roles = "Admin")]
@@ -87,8 +84,6 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-
-
         #region DownloadAssignment
         [HttpGet]
         [Route("DownloadFile")]
@@ -140,7 +135,7 @@ namespace ELearn.Api.Controllers
                 }
 
                 // Save the file path to the database
-                var assignment = new Assignment
+                var assignment = new Assignment()
                 {
                     Title = assignmentDTO.Title,
                     Date = assignmentDTO.Date,
@@ -164,12 +159,6 @@ namespace ELearn.Api.Controllers
 
 
         #endregion
-
-
-
-
-
-
 
 
         #region GetAll Assiguments
@@ -389,6 +378,6 @@ namespace ELearn.Api.Controllers
             }
         }
         #endregion
-
+        */
     }
 }

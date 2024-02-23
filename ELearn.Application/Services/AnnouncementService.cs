@@ -1,8 +1,6 @@
-﻿using ELearn.Data;
+﻿using ELearn.Application.Interfaces;
+using ELearn.Data;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces;
-using ELearn.Domain.Interfaces.Base;
-using ELearn.InfraStructure.Repositories.Base;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,14 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ELearn.InfraStructure.Repositories
+namespace ELearn.Application.Services
 {
-    public class AnnouncementRepo : BaseRepo<Announcement>, IAnnouncementRepo
+    public class AnnouncementService : IAnnouncementService
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AnnouncementRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
+        public AnnouncementService(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -35,7 +33,7 @@ namespace ELearn.InfraStructure.Repositories
                 };
                 return announcement;
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -47,7 +45,7 @@ namespace ELearn.InfraStructure.Repositories
             foreach (var Id in Ids)
             {
                 var entity = await _context.Announcements.FirstOrDefaultAsync(a => a.Id == Id);
-                if (entity != null) 
+                if (entity != null)
                     announcements.Add(entity);
             }
             return announcements;

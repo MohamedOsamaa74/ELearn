@@ -1,6 +1,4 @@
-﻿using ELearn.Domain.Interfaces;
-using ELearn.Domain.Interfaces.UnitOfWork;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

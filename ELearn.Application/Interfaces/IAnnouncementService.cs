@@ -1,15 +1,13 @@
 ﻿using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces.Base;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ELearn.Domain.Interfaces
+namespace ELearn.Application.Interfaces
 {
-    public interface IAnnouncementRepo : IBaseRepo<Announcement>
+    public interface IAnnouncementService
     {
         public Task<Announcement> CreateNew(string Creator, string Text);
         public Task<IEnumerable<GroupAnnouncment>> SendToGroups(ICollection<int> Groups, int announcementId);

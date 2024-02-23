@@ -1,7 +1,7 @@
+using ELearn.Application.Interfaces;
+using ELearn.Application.Services;
 using ELearn.Data;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces;
-using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure;
 using ELearn.InfraStructure.Repositories;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
@@ -26,8 +26,8 @@ builder.Services.AddSwaggerGen();
 var db = builder.Configuration.GetConnectionString("Default Connection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddTransient<IApplicationUserRepo, ApplicationUserRepo>();
-builder.Services.AddTransient<IAnnouncementRepo, AnnouncementRepo>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 //builder.Services.AddCors();
 #endregion
 

@@ -1,5 +1,5 @@
 ﻿using ELearn.Application.DTOs;
-using ELearn.Domain.Interfaces.UnitOfWork;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

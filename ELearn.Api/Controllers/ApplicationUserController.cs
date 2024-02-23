@@ -1,9 +1,9 @@
 ﻿using ELearn.Application.DTOs;
+using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
-using ELearn.Domain.Interfaces;
-using ELearn.Domain.Interfaces.UnitOfWork;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -17,12 +17,12 @@ namespace ELearn.Api.Controllers
     public class ApplicationUserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IApplicationUserRepo _userRepo;
+        private readonly IUserService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public ApplicationUserController(IUnitOfWork unitOfWork, IApplicationUserRepo userRepo, UserManager<ApplicationUser> userManager)
+        public ApplicationUserController(IUnitOfWork unitOfWork, IUserService userService, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
-            _userRepo = userRepo;
+            _userService = userService;
             _userManager = userManager;
         }
 
@@ -75,7 +75,7 @@ namespace ELearn.Api.Controllers
             }
             try
             {
-                var NewUsers = await _userRepo.UploadCSV(file);
+                var NewUsers = await _userService.UploadCSV(file);
                 if(NewUsers.IsNullOrEmpty())
                 {
                     return BadRequest("No Users");
