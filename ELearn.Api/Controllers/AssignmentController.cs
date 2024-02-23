@@ -1,13 +1,17 @@
-﻿using ELearn.Application.DTOs;
+using ELearn.Application.DTOs;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces.UnitOfWork;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace ELearn.Api.Controllers
 {
@@ -24,6 +28,7 @@ namespace ELearn.Api.Controllers
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _context = appDbContext;
+
 
 
         }
@@ -80,14 +85,99 @@ namespace ELearn.Api.Controllers
 
 
         }
-        #endregion       
+        #endregion
+
+
+
+        #region DownloadAssignment
+        [HttpGet]
+        [Route("DownloadFile")]
+        public async Task<IActionResult> DownloadFile(string filename)
+        {
+            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
+            if (!System.IO.File.Exists(filepath))
+            {
+                return NotFound();
+            }
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filepath, out var contenttype))
+            {
+                contenttype = "application/octet-stream";
+            }
+
+            var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
+            return File(bytes, contenttype, Path.GetFileName(filepath));
+        }
+        #endregion
+
+
+        #region UploadAssignment
+        [HttpPost("UploadAssignment")]
+        [Authorize(Roles = "Admin , Staff, Student")]
+
+        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
+        {
+            try
+            {
+                if (assignmentDTO == null || assignmentDTO.File == null)
+                    return BadRequest("Assignment data or file not provided.");
+
+                var uploadFolder = "UploadAssignment"; // Folder where assignments will be uploaded
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
+
+                // Ensure the upload folder exists
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                // Generate a unique file name to prevent overwriting existing files
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
+                var filePath = Path.Combine(folderPath, uniqueFileName);
+
+                // Save the uploaded assignment file to the upload folder
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await assignmentDTO.File.CopyToAsync(stream);
+                }
+
+                // Save the file path to the database
+                var assignment = new Assignment
+                {
+                    Title = assignmentDTO.Title,
+                    Date = assignmentDTO.Date,
+                    Duration = assignmentDTO.Duration,
+
+                    FilePath = filePath // Save the file path in the database
+                };
+
+                // Add assignment to database
+                await _unitOfWork.Assignments.AddAsync(assignment);
+                await _context.SaveChangesAsync();
+
+                return Ok("Assignment uploaded successfully!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
+        #endregion
+
+
+
+
+
+
+
 
         #region GetAll Assiguments
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title,m.Date }));
+            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title, m.Date }));
         }
 
         #endregion
@@ -116,41 +206,96 @@ namespace ELearn.Api.Controllers
 
         #endregion
 
-        #region Upload Assignment
+        //#region Upload Assignment marwan
 
-        [HttpPost("UploadAssignment{groupId:int}")]
-        [Authorize(Roles = "Admin , Staff")]
-        public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
+        //[HttpPost("UploadAssignment{groupId:int}")]
+        //[Authorize(Roles = "Admin , Staff")]
+        //public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
+        //{
+        //    try
+        //    { 
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest();
+
+        //        }
+        //        else
+        //        {
+
+        //            var assignment = new Assignment
+        //            {
+        //                Date = assignmentDTO.Date,
+        //                Duration = assignmentDTO.Duration,
+        //                UserId = _userManager.GetUserId(User),
+        //                Title = assignmentDTO.Title,
+        //                GroupId=groupId
+
+        //            };
+        //            await _unitOfWork.Assignments.AddAsync(assignment);
+        //            return Ok();
+
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
+        //    }
+        //}
+        //#endregion
+
+        #region UploadAssignment
+        [HttpPost("UploadAssignment")]
+        [Authorize(Roles = "Admin , Staff, Student")]
+
+        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
         {
             try
-            { 
-                if (!ModelState.IsValid)
+            {
+                if (assignmentDTO == null || assignmentDTO.File == null)
+                    return BadRequest("Assignment data or file not provided.");
+
+                var uploadFolder = "UploadAssignment";
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
+
+
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
+                var filePath = Path.Combine(folderPath, uniqueFileName);
+
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    return BadRequest();
+                    await assignmentDTO.File.CopyToAsync(stream);
                 }
-                else
+
+
+                Assignment assignment = new Assignment
                 {
+                    Title = assignmentDTO.Title,
+                    Date = assignmentDTO.Date,
+                    Duration = assignmentDTO.Duration,
 
-                    var assignment = new Assignment
-                    {
-                        Date = assignmentDTO.Date,
-                        Duration = assignmentDTO.Duration,
-                        UserId = _userManager.GetUserId(User),
-                        Title = assignmentDTO.Title,
-                        GroupId=groupId
+                    // FilePath = assignmentDTO.filePath
+                };
 
-                    };
-                    await _unitOfWork.Assignments.AddAsync(assignment);
-                    return Ok();
-            
+                // Add assignment to database
+                await _unitOfWork.Assignments.AddAsync(assignment);
+                await _context.SaveChangesAsync();
 
-                }
+                return Ok("Assignment uploaded successfully!");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
+
         #endregion
 
         #region Get assignment By StaffID (for admin)
@@ -245,7 +390,5 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-
     }
 }
-

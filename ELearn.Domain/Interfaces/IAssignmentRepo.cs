@@ -1,6 +1,10 @@
 ﻿using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces.Base;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +13,7 @@ using System.Threading.Tasks;
 
 namespace ELearn.Domain.Interfaces
 {
-    public interface IAnnouncmentRepo : IBaseRepo<Announcement>
-    {        
-        //Send Announcement To Multiple Users (Not Deecided)
+    public interface IAssignmentRepo : IBaseRepo<Assignment>
+    {
     }
 }

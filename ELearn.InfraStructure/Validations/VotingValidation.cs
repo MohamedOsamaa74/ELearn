@@ -25,8 +25,6 @@ namespace ELearn.InfraStructure.Validations
             RuleForEach(v => v.GroupVoting).NotNull();
             RuleFor(v => v.Group).NotNull();
             RuleForEach(v => v.Group).NotNull();
-            RuleFor(v => v.QuestionId).NotEmpty();
-            RuleFor(v => v.Question).NotNull();
         }
     }
 }

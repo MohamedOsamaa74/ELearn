@@ -21,10 +21,15 @@ namespace ELearn.InfraStructure.Repositories
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public ApplicationUserRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context)
+        public ApplicationUserRepo(AppDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
-            _context = context;
-            _userManager = userManager;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        }
+
+        public async Task<bool> CreateNewUser(object user)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file)

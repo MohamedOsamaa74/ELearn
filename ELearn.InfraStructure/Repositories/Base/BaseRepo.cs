@@ -1,4 +1,4 @@
-﻿using ELearn.Data;
+using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.Domain.Interfaces.Base;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,10 +20,10 @@ namespace ELearn.InfraStructure.Repositories.Base
         #region props and constructures
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        public BaseRepo(AppDbContext context)
+        public BaseRepo(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         #endregion
 
@@ -76,12 +77,74 @@ namespace ELearn.InfraStructure.Repositories.Base
         public virtual async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+             await _context.SaveChangesAsync();
+        }
+       
+        /*public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("File not selected or empty.");
+
+            // Create the folder if it doesn't exist
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // Define the file path within the folder
+            var filePath = Path.Combine(folderPath, file.FileName);
+
+            // Save the file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }               
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+              
+                var filePath = Path.Combine(folderPath, file.FileName);
+
+               
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            return filePath;
         }
 
+      */
+        public async Task<string> UploadFileAsync(IFormFile file, string folderPath)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("File not selected or empty.");
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+
+            var filePath = Path.Combine(folderPath, file.FileName);
+
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return filePath;
+        }
         public void Commit() => _context.Database.CommitTransaction();
 
         public void RollBack() => _context.Database.RollbackTransaction();
+
+        public async Task<ApplicationUser> GetCurrentUserAsync(ClaimsPrincipal User)
+        {
+            return await _userManager.FindByNameAsync(User.Identity.Name);
+        }
 
         #endregion
     }
