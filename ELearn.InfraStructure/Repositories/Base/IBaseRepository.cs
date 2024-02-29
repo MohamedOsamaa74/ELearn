@@ -17,7 +17,7 @@ namespace ELearn.InfraStructure.Repositories.Base
         Task<IEnumerable<object>> GetAllAsync(Expression<Func<T, object>> Selected);
         Task<bool> FindIfExistAsync(Expression<Func<T, bool>> Condition);
         Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> expression);
-        Task<IEnumerable<object>> GetWhereSelectAsync(Expression<Func<T, bool>> Condition, Expression<Func<T, object>> expression);
+        Task<IEnumerable<TResult>> GetWhereSelectAsync<TResult>(Expression<Func<T, bool>> Condition, Expression<Func<T, TResult>> expression);
         // Get By Department Id   
         // Get X from Multiple Groups 1
         // Get x From Group Y

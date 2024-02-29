@@ -1,4 +1,6 @@
 ﻿using ELearn.Application.DTOs;
+using ELearn.Application.Helpers.Response;
+using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
@@ -17,15 +19,18 @@ namespace ELearn.Api.Controllers
     public class GroupController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGroupService _groupService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _context;
-        public GroupController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext context)
+        public GroupController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext context, IGroupService groupService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _context = context;
+            _groupService = groupService;
         }
 
+        #region Create
         [HttpPost("CreateNew")]
         [Authorize(Roles = "Staff, Admin")]
         public async Task<IActionResult> Create([FromBody] GroupDTO Group)
@@ -34,26 +39,22 @@ namespace ELearn.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            try
-            {
-                var CurrentUser = await _userManager.FindByNameAsync(User.Identity.Name);
-                Group NewGroup = new Group()
-                {
-                    GroupName = Group.Name,
-                    Description = Group.Description,
-                    CreatorId = CurrentUser.Id,
-                    DepartmentId = Group.DepartmentId,
-                    //CreationDate = Group.CreateDate
-                };
-                await _unitOfWork.Groups.AddAsync(NewGroup);
-                return Ok("Group Created Successfully");
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
-            }
+            var response = await _groupService.CreateAsync(Group);
+            return this.CreateResponse(response);
         }
+        #endregion
 
+        #region Delete
+        [HttpDelete("Delete/{GroupId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteGroup(int GroupId)
+        {
+            var response = await _groupService.DeleteAsync(GroupId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetAll
         [HttpGet("GetAll")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminGetAll()
@@ -61,6 +62,9 @@ namespace ELearn.Api.Controllers
             /*await _unitOfWork.Groups.GetAllAsync()*/
             return Ok(await _unitOfWork.Groups.GetAllAsync(p => new { p.GroupName, p.Description, p.DepartmentId }));
         }
+        #endregion
+
+        #region GetUserGroups
         //Refactor
         [HttpGet("GetUserGroups")]
         [Authorize(Roles ="Staff, Student")]
@@ -77,22 +81,7 @@ namespace ELearn.Api.Controllers
             }
             else return Ok(UserGroups);
         }
-
-        [HttpDelete("Delete/{GroupId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteGroup(int GroupId)
-        {
-            var Group = await _unitOfWork.Groups.GetByIdAsync(GroupId);
-            if(Group == null)
-            {
-                return NoContent();
-            }
-            else
-            {
-                await _unitOfWork.Groups.DeleteAsync(Group);
-                return Ok("Group Deleted Successfully");
-            }
-        }
+        #endregion
 
         //Update
     }

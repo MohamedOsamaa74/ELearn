@@ -10,7 +10,9 @@ namespace ELearn.Domain.Entities
         public required string GroupName { get; set; }
         //public DateTime CreationDate { get; set; }
         public required string Description { get; set; }
+        public int DepartmentId { get; set; }
 
+        public int? ParentGroupId { get; set; }
         //for create groups
         public required string CreatorId { get; set; }
         public virtual ApplicationUser Creator { get; set; }
@@ -22,7 +24,6 @@ namespace ELearn.Domain.Entities
         public ICollection<GroupVoting> GroupVoting { get; set; }
 
         //for self relation (subgroups)
-        public int? ParentGroupId { get; set; }
         public virtual Group? ParentGroup { get; set; }
         public virtual ICollection<Group>? SubGroups { get; set; }= new HashSet<Group>();
 
@@ -38,7 +39,6 @@ namespace ELearn.Domain.Entities
         public virtual ICollection<GroupAnnouncment>? GroupAnnouncments { get; set; }
 
         //dept has many groups
-        public int DepartmentId { get; set; }
         public virtual Department Department { get; set; }
 
     }

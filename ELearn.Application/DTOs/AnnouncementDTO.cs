@@ -12,7 +12,7 @@ namespace ELearn.Application.DTOs
         [Required]
         public required string text { get; set; }
         [Required]
-        public required ICollection<int> Groups { get; set; }
+        public required IEnumerable<int> Groups { get; set; }
         //public DateTime Time => DateTime.UtcNow.ToLocalTime();
     }
 }

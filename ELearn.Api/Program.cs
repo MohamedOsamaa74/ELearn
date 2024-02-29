@@ -27,7 +27,9 @@ var db = builder.Configuration.GetConnectionString("Default Connection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
+builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 //builder.Services.AddCors();
 #endregion
 
@@ -93,7 +95,6 @@ builder.Services.AddSwaggerGen(opt =>
         });
 });
 #endregion
-
 
 var app = builder.Build();
 AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();

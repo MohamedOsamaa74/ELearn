@@ -1,4 +1,5 @@
 using ELearn.Application.DTOs;
+using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Const;
@@ -18,13 +19,13 @@ namespace ELearn.Api.Controllers
     public class AnnouncementController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IAnnouncementService announcementService;
+        private readonly IAnnouncementService _announcementService;
         private readonly AppDbContext _context;
         public AnnouncementController(IUnitOfWork unitOfWork, AppDbContext context, IAnnouncementService AnnouncementService)
         {
             _unitOfWork = unitOfWork;
             _context = context;
-            announcementService = AnnouncementService;
+            _announcementService = AnnouncementService;
         }
 
         #region Get By Id
@@ -32,18 +33,42 @@ namespace ELearn.Api.Controllers
         [Authorize]
         public async Task<IActionResult>GetById(int Id)
         {
-            var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
-            if(announcement == null)
-                return NotFound();
-            try
-            {
-                return Ok(announcement.Text);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest($"An Error Occured While Proccessing The Request, {ex.Message}");
-            }
+            var response = await _announcementService.GetByIdAsync(Id);
+            return this.CreateResponse(response);
+        }
+        #endregion
 
+        #region Create
+        [HttpPost("CreateNew")]
+        [Authorize(Roles = "Admin ,Staff")]
+        public async Task<IActionResult> Create([FromBody] AnnouncementDTO Model)
+        {
+            var response = await _announcementService.CreateNewAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Delete One
+        [HttpDelete("Delete/{AnnouncementId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteAnnouncement(int AnnouncementId)
+        {
+            var response = await _announcementService.DeleteAsync(AnnouncementId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Edit
+        [HttpPut("EditAnnouncement/{AnnouncementId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateAnnouncement([FromBody] AnnouncementDTO Model, int AnnouncementId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _announcementService.UpdateAsync(Model, AnnouncementId);
+            return this.CreateResponse(response);
         }
         #endregion
 
@@ -74,7 +99,7 @@ namespace ELearn.Api.Controllers
                 }
                 var currentUser = await _unitOfWork.Announcments.GetCurrentUserAsync(User);
 
-                var announcements =await announcementService.GetFromGroups(currentUser.Id);
+                var announcements =await _announcementService.GetFromGroups(currentUser.Id);
 
                 if (announcements == null)
                 {
@@ -103,47 +128,6 @@ namespace ELearn.Api.Controllers
         }
         #endregion
         
-        #region Create
-        [HttpPost("CreateNew")]
-        [Authorize(Roles = "Admin ,Staff")]
-        public async Task<IActionResult> Create([FromBody] AnnouncementDTO Model)
-        {
-            try
-            {
-                var CurrentUser = await _unitOfWork.Announcments.GetCurrentUserAsync(User);
-                var NewAnnouncement = await announcementService.CreateNew(CurrentUser.Id, Model.text);
-                await _unitOfWork.Announcments.AddAsync(NewAnnouncement);
-
-                var GroupAnnouncements = await announcementService.SendToGroups(Model.Groups, NewAnnouncement.Id);
-                await _unitOfWork.GroupAnnouncments.AddRangeAsync(GroupAnnouncements);
-
-                return Created();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
-            }
-        }
-        #endregion
-
-        #region Delete One
-        [HttpDelete("Delete/{AnnouncementId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAnnouncement(int AnnouncementId)
-        {
-            var announce = await _unitOfWork.Announcments.GetByIdAsync(AnnouncementId);
-            if (announce == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                await _unitOfWork.Announcments.DeleteAsync(announce);
-                return Ok("Announcement Deleted Successfully");
-            }
-        }
-        #endregion
-        
         #region Delete Many Need Refactor
 
         [HttpDelete("DeleteMany")]
@@ -154,42 +138,11 @@ namespace ELearn.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var announcements = await announcementService.GetAnnouncements(Ids);
+            var announcements = await _announcementService.GetAnnouncements(Ids);
             await _unitOfWork.Announcments.DeleteRangeAsync(announcements);
             return Ok("The Selected Announcements Was Deleted Successfully");
         }
         #endregion
         
-        #region Edit
-        [HttpPut("EditAnnouncement/{AnnouncementId:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateAnnouncement([FromBody] AnnouncementDTO Model, int AnnouncementId)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            try
-            {
-                var announcement = await _unitOfWork.Announcments.GetByIdAsync(AnnouncementId);
-                announcement.Text = Model.text;
-                foreach (var groupId in Model.Groups)
-                {
-                    var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
-                    if (!await _unitOfWork.GroupAnnouncments.FindIfExistAsync(ga => ga.GroupId == groupId && ga.AnnouncementId == AnnouncementId))
-                    {
-                        await _unitOfWork.GroupAnnouncments.AddAsync(new GroupAnnouncment() { AnnouncementId = AnnouncementId, GroupId = groupId });
-                    }
-                }
-                await _unitOfWork.Announcments.UpdateAsync(announcement);
-                return Ok("Updated Successfully");
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
-            }
-        }
-        #endregion
     }
 }

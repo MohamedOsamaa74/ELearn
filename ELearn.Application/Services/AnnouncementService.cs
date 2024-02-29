@@ -1,6 +1,9 @@
-﻿using ELearn.Application.Interfaces;
+﻿using ELearn.Application.DTOs;
+using ELearn.Application.Helpers.Response;
+using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,30 +18,97 @@ namespace ELearn.Application.Services
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
 
-        public AnnouncementService(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public AnnouncementService(AppDbContext context, UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork, IUserService userService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _userService = userService ?? throw new ArgumentNullException(nameof(unitOfWork));
+        }
+        public async Task<Response<AnnouncementDTO>> GetByIdAsync(int id)
+        {
+            var announcement = await _unitOfWork.Announcments.GetByIdAsync(id);
+            if (announcement == null)
+                return ResponseHandler.NotFound<AnnouncementDTO>("Announcement Not Found");
+            try
+            {
+                AnnouncementDTO announcementDTO = new AnnouncementDTO()
+                {
+                    text = announcement.Text,
+                    Groups = await _unitOfWork.GroupAnnouncments.GetWhereSelectAsync(a => a.AnnouncementId == id, g => g.GroupId)
+                };
+                return ResponseHandler.Success(announcementDTO);
+            }
+            catch(Exception ex)
+            {
+                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {ex}");
+            }
         }
 
-        public async Task<Announcement> CreateNew(string Creator, string Text)
+        public async Task<Response<AnnouncementDTO>> CreateNewAsync(AnnouncementDTO Model)
         {
             try
             {
+                var user = await _userService.GetCurrentUserAsync();
                 Announcement announcement = new Announcement()
                 {
-                    UserId = Creator,
-                    Text = Text
+                    UserId = user.Id,
+                    Text = Model.text
                 };
-                return announcement;
+                await _unitOfWork.Announcments.AddAsync(announcement);
+                await SendToGroups((ICollection<int>)Model.Groups, announcement.Id);
+                return ResponseHandler.Created(Model);
             }
-            catch
+            catch(Exception Ex)
             {
-                return null;
+                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
             }
         }
 
+        public async Task<Response<AnnouncementDTO>> DeleteAsync(int Id)
+        {
+            var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
+            if (announcement is null)
+                return ResponseHandler.NotFound<AnnouncementDTO>();
+            try
+            {
+                await _unitOfWork.Announcments.DeleteAsync(announcement);
+                return ResponseHandler.Deleted<AnnouncementDTO>();
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+            }
+        }
+
+        public async Task<Response<AnnouncementDTO>> UpdateAsync(AnnouncementDTO Model, int Id)
+        {
+            var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
+            if(announcement is null)
+                return ResponseHandler.NotFound<AnnouncementDTO>();
+            try
+            {
+                announcement.Text = Model.text;
+                foreach (var groupId in Model.Groups)
+                {
+                    var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
+                    if (!await _unitOfWork.GroupAnnouncments.FindIfExistAsync(ga => ga.GroupId == groupId && ga.AnnouncementId == Id))
+                    {
+                        await _unitOfWork.GroupAnnouncments.AddAsync(new GroupAnnouncment() { AnnouncementId = Id, GroupId = groupId });
+                    }
+                }
+                await _unitOfWork.Announcments.UpdateAsync(announcement);
+                return ResponseHandler.Updated(Model);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+            }
+        }
+        
         public async Task<ICollection<Announcement>> GetAnnouncements(IEnumerable<int> Ids)
         {
             List<Announcement> announcements = new List<Announcement>();
@@ -63,9 +133,8 @@ namespace ELearn.Application.Services
             return (ICollection<Announcement>)announcements;
         }
 
-        public async Task<IEnumerable<GroupAnnouncment>> SendToGroups(ICollection<int> Groups, int announcementId)
+        private async Task SendToGroups(ICollection<int> Groups, int announcementId)
         {
-            List<GroupAnnouncment> GroupAnnouncments = new List<GroupAnnouncment>();
             foreach (var groupId in Groups)
             {
                 GroupAnnouncment NewGroupAnnouncement = new GroupAnnouncment()
@@ -73,9 +142,9 @@ namespace ELearn.Application.Services
                     GroupId = groupId,
                     AnnouncementId = announcementId
                 };
-                GroupAnnouncments.Add(NewGroupAnnouncement);
+                await _unitOfWork.GroupAnnouncments.AddAsync(NewGroupAnnouncement);
             }
-            return GroupAnnouncments;
         }
+
     }
 }

@@ -59,7 +59,7 @@ namespace ELearn.InfraStructure.Repositories.Base
         public virtual async Task<T> GetByIdAsync(int Id) => await _context.Set<T>().FindAsync(Id);
         public virtual async Task<T> GetByIdAsync(string Id) => await _context.Set<T>().FindAsync(Id);
 
-        public async Task<IEnumerable<object>> GetWhereSelectAsync(Expression<Func<T, bool>> Condition, Expression<Func<T, object>> expression)
+        public async Task<IEnumerable<TResult>> GetWhereSelectAsync<TResult>(Expression<Func<T, bool>> Condition, Expression<Func<T, TResult>> expression)
         => await _context.Set<T>().Where(Condition).Select(expression).ToListAsync();
 
         public virtual async Task<IEnumerable<object>> GetAllAsync(Expression<Func<T, object>> Selected)
