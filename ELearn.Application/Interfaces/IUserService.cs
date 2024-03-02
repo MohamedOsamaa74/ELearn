@@ -14,8 +14,10 @@ namespace ELearn.Application.Interfaces
     {
         public Task<ApplicationUser> GetCurrentUserAsync();
         public Task<Response<UserDTO>> CreateNewUserAsync(UserDTO user);
-        public Task<IEnumerable<Response<UserDTO>>> AddMultipleUsersAsync(IFormFile file);
-        public Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file);
-        public Task<IEnumerable<UserDTO>> GetAllAsync();
+        public Task<Response<ICollection<UserDTO>>> AddMultipleUsersAsync(IFormFile file);
+        public Task<Response<ICollection<UserDTO>>> GetAllAsync();
+        public Task<Response<UserDTO>> EditUserAsync(string id, EditUserDTO NewData);
+        public Task<Response<UserDTO>> DeleteUserAsync(string Id);
+        public Task<Response<ICollection<UserDTO>>> DeleteManyAsync(List<string> Ids);
     }
 }

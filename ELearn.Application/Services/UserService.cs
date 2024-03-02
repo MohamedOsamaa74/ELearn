@@ -17,50 +17,47 @@ using ELearn.Application.DTOs;
 using ELearn.Domain.Const;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Collections.ObjectModel;
+using AutoMapper;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
 
 namespace ELearn.Application.Services
 {
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(AppDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        private readonly IMapper _mapper;
+        public UserService(AppDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public IHttpContextAccessor Get_httpContextAccessor()
+        /*public IHttpContextAccessor Get_httpContextAccessor()
         {
             return _httpContextAccessor;
-        }
+        }*/
 
         public async Task<ApplicationUser> GetCurrentUserAsync()
         {
             ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
             return await _userManager.GetUserAsync(currentUser);
         }
+
         public async Task<Response<UserDTO>> CreateNewUserAsync(UserDTO Model)
         {
             if (Model == null)
                 return ResponseHandler.BadRequest<UserDTO>("Invalid User");
             try
             {
-                var NewUser = new ApplicationUser()
-                {
-                    FirstName = Model.FirstName,
-                    LastName = Model.LastName,
-                    BirthDate = Model.BirthDate,
-                    Address = Model.Address,
-                    Nationality = Model.Nationality,
-                    NId = Model.NId,
-                    UserName = Model.UserName,
-                    PhoneNumber = Model.PhoneNumber,
-                    DepartmentId = Model.DepartmentId,
-                    SecurityStamp = Guid.NewGuid().ToString(),
-                };
+                var NewUser = _mapper.Map<ApplicationUser>(Model);
+                NewUser.SecurityStamp = Guid.NewGuid().ToString();
                 var result = await _userManager.CreateAsync(NewUser, NewUser.NId);
                 if (!result.Succeeded)
                 {
@@ -70,69 +67,129 @@ namespace ELearn.Application.Services
                     return ResponseHandler.BadRequest<UserDTO>(errors);
                 }
                 await _userManager.AddToRoleAsync(NewUser, UserRoles.Student);
-                var UserData = new UserDTO()
-                {
-                    FirstName = NewUser.FirstName,
-                    LastName = NewUser.LastName,
-                    BirthDate = NewUser.BirthDate,
-                    Address = NewUser.Address,
-                    Nationality = NewUser.Nationality,
-                    NId = NewUser.NId,
-                    UserName = NewUser.UserName,
-                    PhoneNumber = NewUser.PhoneNumber,
-                };
-                return ResponseHandler.Created(UserData);
+                return ResponseHandler.Created(Model);
             }
-            catch(Exception Ex)
+            catch (Exception Ex)
             {
                 return ResponseHandler.BadRequest<UserDTO>(Ex.ToString());
             }
 
         }
-        public async Task<IEnumerable<Response<UserDTO>>>AddMultipleUsersAsync(IFormFile file)
+
+        public async Task<Response<ICollection<UserDTO>>> AddMultipleUsersAsync(IFormFile file)
         {
             if (file == null)
             {
-                return (IEnumerable<Response<UserDTO>>)ResponseHandler.BadRequest<UserDTO>("Invalid, Please Upload the File");
+                return ResponseHandler.BadRequest<ICollection<UserDTO>>("Invalid, Please Upload the File");
             }
             try
             {
-                var Responses = new List<Response<UserDTO>>();
                 var NewUsers = await UploadCSV(file);
                 if (NewUsers.IsNullOrEmpty())
-                    return (IEnumerable<Response<UserDTO>>)ResponseHandler.BadRequest<UserDTO>("The Uploaded File Doesn't Contain Any Data");
+                    return ResponseHandler.BadRequest<ICollection<UserDTO>>("The Uploaded File Doesn't Contain Any Data");
+                var users = new List<UserDTO>();
                 foreach (var user in NewUsers)
                 {
-                    var NewUser = new UserDTO()
+                    var NewUser = _mapper.Map<UserDTO>(user);
+                    if (IsValidUser(user))
                     {
-                        Address = user.Address,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        NId = user.NId,
-                        UserName = user.UserName,
-                        Nationality = user.Nationality,
-                        PhoneNumber = user.PhoneNumber,
-                        BirthDate = user.BirthDate,
-                    };
-                    if(!IsValidUser(user))
-                        return (IEnumerable<Response<UserDTO>>)ResponseHandler.BadRequest<UserDTO>();
-                    var response = await CreateNewUserAsync(NewUser);
-                    Responses.Add(response);
-                }
+                        await CreateNewUserAsync(NewUser);
+                        users.Add(NewUser);
+                    }
 
-                return (IEnumerable<Response<UserDTO>>)ResponseHandler.Created(Responses);
+                }
+                return ResponseHandler.ManyCreated(users);
             }
-            catch(Exception Ex)
+            catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<UserDTO>($"An Error Occured While Proccessing The Request, {Ex}") as IEnumerable<Response<UserDTO>>;
+                return ResponseHandler.BadRequest<ICollection<UserDTO>>($"An Error Occured While Proccessing The Request, {Ex}");
             }
 
         }
-        public async Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file)
+
+        public async Task<Response<ICollection<UserDTO>>> GetAllAsync()
+        {
+            var users = await _unitOfWork.Users.GetAllAsync();
+            if (users.IsNullOrEmpty())
+                return ResponseHandler.NotFound<ICollection<UserDTO>>("There Are No Users");
+            try
+            {
+                var usersDTO = new List<UserDTO>();
+                foreach (var item in users)
+                {
+                    var dto = _mapper.Map<UserDTO>(item);
+                    usersDTO.Add(dto);
+                }
+                return ResponseHandler.ManySuccess(usersDTO);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<UserDTO>>($"An Error Occurred,{Ex}");
+            }
+        }
+
+        public async Task<Response<UserDTO>> DeleteUserAsync(string Id)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(Id);
+            if (user == null)
+                return ResponseHandler.NotFound<UserDTO>();
+            try
+            {
+                await _unitOfWork.Users.DeleteAsync(user);
+                return ResponseHandler.Deleted<UserDTO>();
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserDTO>($"An Error Occurred, {Ex}");
+            }
+
+        }
+
+        public async Task<Response<UserDTO>> EditUserAsync(string id, EditUserDTO NewData)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            if (user is null)
+                return ResponseHandler.NotFound<UserDTO>("There is no such user");
+            try
+            {
+                if (NewData.FirstName != null) user.FirstName = NewData.FirstName;
+                if (NewData.LastName != null) user.LastName = NewData.LastName;
+                if (NewData.Nationality != null) user.Nationality = NewData.Nationality;
+                if (NewData.PhoneNumber != null) user.PhoneNumber = NewData.PhoneNumber;
+                if (NewData.Address != null) user.Address = NewData.Address;
+                if (NewData.BirthDate != null) user.BirthDate = (DateTime)NewData.BirthDate;
+                if (NewData.DepartmentId != 0) user.DepartmentId = NewData.DepartmentId;
+
+                await _unitOfWork.Users.UpdateAsync(user);
+                return ResponseHandler.Updated(_mapper.Map<UserDTO>(user));
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserDTO>($"An Error Occurred, {Ex}");
+            }
+        }
+
+        public async Task<Response<ICollection<UserDTO>>> DeleteManyAsync(List<string> Ids)
+        {
+            var users = await GetSelectedUsersAsync(Ids);
+            if(users.IsNullOrEmpty())
+                return ResponseHandler.NotFound<ICollection<UserDTO>>();
+            try
+            {
+                await _unitOfWork.Users.DeleteRangeAsync(users);
+                return ResponseHandler.Deleted<ICollection<UserDTO>>();
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<UserDTO>>($"An Error Occurred, {Ex}");
+            }
+        }
+
+        #region Private Methods
+        private async Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
-                // Handle the case where the file is null or empty
                 return Enumerable.Empty<ApplicationUser>();
             }
 
@@ -140,7 +197,6 @@ namespace ELearn.Application.Services
             {
                 if (stream == null)
                 {
-                    // Handle the case where the stream is null
                     return Enumerable.Empty<ApplicationUser>();
                 }
 
@@ -160,6 +216,18 @@ namespace ELearn.Application.Services
                 return ValidUsers;
             }
         }
+
+        private async Task<ICollection<ApplicationUser>> GetSelectedUsersAsync(List<string> Ids)
+        {
+            var users = new List<ApplicationUser>();
+            foreach(var id in Ids)
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(id);
+                if (user != null)
+                    users.Add(user);
+            }
+            return users;
+        }
         private bool IsValidUser(ApplicationUser user)
         {
             if (string.IsNullOrEmpty(user.FirstName)) return false;
@@ -171,11 +239,6 @@ namespace ELearn.Application.Services
             if (string.IsNullOrEmpty(user.PhoneNumber)) return false;
             return true;
         }
-
-        public Task<IEnumerable<UserDTO>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
+        #endregion
     }
 }

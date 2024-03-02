@@ -93,6 +93,18 @@ namespace ELearn.Application.Helpers.Response
                 Meta = Meta
             };
         }
+
+        public static Response<ICollection<T>> ManyCreated<T>(ICollection<T> entities, object meta = null)
+        {
+            return new Response<ICollection<T>>
+            {
+                Data = entities,
+                StatusCode = HttpStatusCode.Created,
+                Succeeded = true,
+                Message = "Entities Created",
+                Meta = meta
+            };
+        }
         public static IActionResult CreateResponse<T>(this ControllerBase controllerBase, Response<T> response)
         {
             return new ObjectResult(response)

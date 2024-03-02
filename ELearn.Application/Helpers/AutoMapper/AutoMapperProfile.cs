@@ -22,6 +22,14 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             CreateMap<AnnouncementDTO, Announcement>();
             #endregion
+
+            #region User Mapper
+            CreateMap<ApplicationUser, UserDTO>();
+
+            CreateMap<UserDTO, ApplicationUser>();
+
+            CreateMap<EditUserDTO, ApplicationUser>();
+            #endregion
         }
     }
 }

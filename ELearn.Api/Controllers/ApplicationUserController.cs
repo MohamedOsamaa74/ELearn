@@ -17,15 +17,12 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class ApplicationUserController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserService _userService;
-        public ApplicationUserController(IUnitOfWork unitOfWork, IUserService userService, UserManager<ApplicationUser> userManager)
+        public ApplicationUserController(IUserService userService)
         {
-            _unitOfWork = unitOfWork;
             _userService = userService;
-            _userManager = userManager;
         }
+
         #region Add Single User
         [HttpPost("AddSignleUser")]
         [Authorize(Roles = "Admin")]
@@ -33,29 +30,59 @@ namespace ELearn.Api.Controllers
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var response =  await _userService.CreateNewUserAsync(Model);
             return this.CreateResponse(response);
         }
         #endregion
 
-        #region Add Multiple Users From CSV (Need Refactor)
+        #region Add Multiple Users From CSV
         [HttpPost("AddMultipleUsers")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult>AddMultipleUsers(IFormFile file)
         {
             var responses = await _userService.AddMultipleUsersAsync(file);
-            return this.CreateResponse((Response<IEnumerable<Response<UserDTO>>>)responses);
+            return this.CreateResponse(responses);
         }
         #endregion
 
-        #region Get All (Need Refactor)
+        #region Get All
         [HttpGet("GetAll")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult>AdminGetAll()
         {
-            return Ok(await _unitOfWork.Users.GetAllAsync(u => 
-            new {u.FirstName, u.LastName, u.BirthDate, u.Address, u.DepartmentId, u.NId, u.PhoneNumber}
-            ));
+            var responses = await _userService.GetAllAsync();
+            return this.CreateResponse(responses);
+        }
+        #endregion
+
+        #region Delete One
+        [HttpDelete("DeleteUser{Id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult>DeleteUser(string Id)
+        {
+            var response = await _userService.DeleteUserAsync(Id);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Delete Many
+        [HttpDelete("DeleteManyUsers")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult>DeleteMany(List<string>Ids)
+        {
+            var response = await _userService.DeleteManyAsync(Ids);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Edit
+        [HttpPut("EditUser {Id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditUser(string Id, EditUserDTO Model)
+        {
+            var response = await _userService.EditUserAsync(Id, Model);
+            return this.CreateResponse(response);
         }
         #endregion
     }
