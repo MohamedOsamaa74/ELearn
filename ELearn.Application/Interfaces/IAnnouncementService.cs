@@ -15,9 +15,11 @@ namespace ELearn.Application.Interfaces
         public Task<Response<AnnouncementDTO>> CreateNewAsync(AnnouncementDTO Model);
         public Task<Response<AnnouncementDTO>> DeleteAsync(int Id);
         public Task<Response<AnnouncementDTO>> UpdateAsync(AnnouncementDTO Model, int Id);
-        public Task<ICollection<Announcement>> GetAnnouncements(IEnumerable<int> Ids);
-        public Task<ICollection<Announcement>> GetFromGroups(string UserId);
-
+        public Task<Response<ICollection<AnnouncementDTO>>> GetAllAnnouncementsAsync();
+        public Task<Response<ICollection<Announcement>>> GetFromGroupsAsync();
+        public Task<Response<ICollection<AnnouncementDTO>>> GetByCreatorAsync();
+        public Task<Response<ICollection<AnnouncementDTO>>> DeleteManyAsync(List<int>Ids);
+        //public Task<IEnumerable<int>> GetAnnouncementGroupsAsync(int AnnouncementId);
         //Send Announcement To Multiple Users (Not Deecided)
     }
 }

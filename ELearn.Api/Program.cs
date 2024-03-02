@@ -1,3 +1,4 @@
+using ELearn.Application.Helpers.AutoMapper;
 using ELearn.Application.Interfaces;
 using ELearn.Application.Services;
 using ELearn.Data;
@@ -30,6 +31,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 //builder.Services.AddCors();
 #endregion
 

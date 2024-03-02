@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,6 +41,18 @@ namespace ELearn.Application.Helpers.Response
                 Meta = Meta
             };
         }
+        public static Response<ICollection<T>> ManySuccess<T>(ICollection<T> entities, object meta = null)
+        {
+            return new Response<ICollection<T>>
+            {
+                Data = entities,
+                StatusCode = HttpStatusCode.OK,
+                Succeeded = true,
+                Message = "Success",
+                Meta = meta
+            };
+        }
+
         public static Response<T> Unauthorized<T>()
         {
             return new Response<T>()

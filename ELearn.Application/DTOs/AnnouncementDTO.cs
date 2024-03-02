@@ -13,6 +13,8 @@ namespace ELearn.Application.DTOs
         public required string text { get; set; }
         [Required]
         public required IEnumerable<int> Groups { get; set; }
+        /*[Required]
+        public required string User { get; set; }*/
         //public DateTime Time => DateTime.UtcNow.ToLocalTime();
     }
 }
