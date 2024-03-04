@@ -12,5 +12,11 @@ namespace ELearn.Application.Interfaces
     {
         public Task<Response<GroupDTO>> CreateAsync(GroupDTO Model);
         public Task<Response<GroupDTO>> DeleteAsync(int Id);
+        public Task<Response<GroupDTO>> DeleteManyAsync(ICollection<int> Ids);
+        public Task<Response<GroupDTO>> UpdateAsync(GroupDTO Model, int Id);
+        public Task<Response<ICollection<GroupDTO>>> GetAllAsync();
+        public Task<Response<GroupDTO>> GetByIdAsync(int Id);
+        public Task<Response<ICollection<GroupDTO>>> GetByNameAsync(string Name);
+        public Task<Response<ICollection<GroupDTO>>> GetUserGroupsAsync(string UserName = null);
     }
 }

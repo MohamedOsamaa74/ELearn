@@ -13,6 +13,7 @@ namespace ELearn.Application.Interfaces
     public interface IUserService
     {
         public Task<ApplicationUser> GetCurrentUserAsync();
+        public Task<ApplicationUser> GetByUserName(string UserName);
         public Task<Response<UserDTO>> CreateNewUserAsync(UserDTO user);
         public Task<Response<ICollection<UserDTO>>> AddMultipleUsersAsync(IFormFile file);
         public Task<Response<ICollection<UserDTO>>> GetAllAsync();

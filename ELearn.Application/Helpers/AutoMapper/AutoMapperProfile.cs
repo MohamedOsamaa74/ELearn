@@ -30,6 +30,14 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             CreateMap<EditUserDTO, ApplicationUser>();
             #endregion
+
+            #region Group Mapper
+            CreateMap<Group, GroupDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.GroupName));
+
+            CreateMap<GroupDTO, Group>()
+                .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Name));
+            #endregion
         }
     }
 }

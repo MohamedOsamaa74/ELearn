@@ -44,6 +44,46 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
+
+        #region GetById
+        [HttpGet("GetById{Id:int}")]
+        public async Task<IActionResult>GetById(int Id)
+        {
+            var response = await _groupService.GetByIdAsync(Id);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetByName
+        [HttpGet("GetByName{Name}")]
+        public async Task<IActionResult> GetByName(string Name)
+        {
+            var response = await _groupService.GetByNameAsync(Name);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetAll
+        [HttpGet("GetAll")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminGetAll()
+        {
+            var response = await _groupService.GetAllAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetUserGroups
+        [HttpGet("GetUserGroups")]
+        [Authorize(Roles ="Staff, Student")]
+        public async Task<IActionResult> GetUserGroups([FromRoute]string UserId = null)
+        {
+            var response = await _groupService.GetUserGroupsAsync(UserId);
+            return this.CreateResponse(response);
+
+        }
+        #endregion
+
         #region Delete
         [HttpDelete("Delete/{GroupId:int}")]
         [Authorize(Roles = "Admin")]
@@ -54,35 +94,25 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        #region GetAll
-        [HttpGet("GetAll")]
+        #region Delete Many
+        [HttpDelete("DeleteManyGroups")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AdminGetAll()
+        public async Task<IActionResult>DeleteMany(ICollection<int> Ids)
         {
-            /*await _unitOfWork.Groups.GetAllAsync()*/
-            return Ok(await _unitOfWork.Groups.GetAllAsync(p => new { p.GroupName, p.Description, p.DepartmentId }));
+            var response = await _groupService.DeleteManyAsync(Ids);
+            return this.CreateResponse(response);
         }
         #endregion
 
-        #region GetUserGroups
-        //Refactor
-        [HttpGet("GetUserGroups")]
-        [Authorize(Roles ="Staff, Student")]
-        public async Task<IActionResult> GetUserGroups()
+        #region Update
+        [HttpPut("EditGroup/{Id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditGroup([FromBody]GroupDTO Model, int Id)
         {
-            var CurrentUser = await _userManager.FindByNameAsync(User.Identity.Name);
-            var UserGroups = _context.UserGroups
-                .Where(u => u.UserId == CurrentUser.Id)
-                .Select(ug => new { ug.GroupId, ug.UserId }).ToList();
-
-            if(UserGroups == null)
-            {
-                return NoContent();
-            }
-            else return Ok(UserGroups);
+            var response = await _groupService.UpdateAsync(Model, Id);
+            return this.CreateResponse(response);
         }
         #endregion
 
-        //Update
     }
 }

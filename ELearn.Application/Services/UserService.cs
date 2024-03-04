@@ -50,6 +50,10 @@ namespace ELearn.Application.Services
             return await _userManager.GetUserAsync(currentUser);
         }
 
+        public async Task<ApplicationUser> GetByUserName(string UserName)
+        {
+            return await _userManager.FindByNameAsync(UserName);
+        }
         public async Task<Response<UserDTO>> CreateNewUserAsync(UserDTO Model)
         {
             if (Model == null)
