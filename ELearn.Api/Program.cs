@@ -29,6 +29,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db))
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
+builder.Services.AddTransient<IVotingService, VotingService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));

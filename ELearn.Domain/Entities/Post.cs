@@ -1,8 +1,12 @@
-﻿namespace ELearn.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ELearn.Domain.Entities
 {
     public class Post
     {
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
         public DateTime Date { get; set; }

@@ -13,7 +13,8 @@ namespace ELearn.InfraStructure.Configurations
     {
         public void Configure(EntityTypeBuilder<GroupSurvey> builder)
         {
-            builder.HasKey(us => new { us.GroupId, us.SurveyId });
+            builder.ToTable("GroupSurveys");
+            builder.HasKey(us => us.Id);
 
             builder
                 .HasOne(us => us.Group)

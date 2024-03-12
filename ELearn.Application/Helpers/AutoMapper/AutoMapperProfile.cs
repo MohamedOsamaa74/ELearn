@@ -33,10 +33,22 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             #region Group Mapper
             CreateMap<Group, GroupDTO>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.GroupName));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
             CreateMap<GroupDTO, Group>()
-                .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Name));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+            #endregion
+
+            #region Voting Mapper
+            CreateMap<Voting, VotingDTO>()
+                .ForMember(dest => dest.groups, opt => opt.Ignore())
+                .ForMember(dest => dest.Options, opt => opt.Ignore());
+
+            CreateMap<VotingDTO, Voting>()
+                .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
+                .ForMember(dest => dest.Options, opt => opt.Ignore())
+                .ForMember(dest => dest.Group, opt => opt.Ignore());
+
             #endregion
         }
     }

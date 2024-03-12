@@ -15,7 +15,6 @@ namespace ELearn.InfraStructure.Validations
             RuleFor(s => s.Text).NotEmpty();
             RuleFor(s => s.Options).NotEmpty().WithMessage("Survey must have at least one option.");
             RuleFor(s => s.Date).NotEmpty();
-            RuleFor(s => s.Duration).NotNull();
             RuleFor(s => s.ApplicationUserId).NotEmpty();
             RuleFor(s => s.ApplicationUser).NotNull();
             RuleFor(s => s.UserSurvey).NotNull();

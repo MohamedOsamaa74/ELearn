@@ -13,7 +13,8 @@ namespace ELearn.InfraStructure.Configurations
     {
         public void Configure(EntityTypeBuilder<UserAssignment> builder)
         {
-           builder.HasKey(ua => new { ua.UserId, ua.AssignmentId });
+            builder.ToTable("UserAssignments");
+            builder.HasKey(ua => ua.Id);
 
             builder
                 .HasOne(ua => ua.Users)

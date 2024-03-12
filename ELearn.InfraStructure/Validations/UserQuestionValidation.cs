@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public UserQuestionValidation() {
             RuleFor(uq => uq.QuestionId).NotEmpty();
-            RuleFor(uq => uq.ApplicationUserId).NotEmpty();
+            RuleFor(uq => uq.UserId).NotEmpty();
         }
     }
 }

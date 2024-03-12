@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELearn.InfraStructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240207052345_validation")]
-    partial class validation
+    [Migration("20240311234743_fixOptionsTable")]
+    partial class fixOptionsTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -32,6 +32,9 @@ namespace ELearn.InfraStructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -97,6 +100,10 @@ namespace ELearn.InfraStructure.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("NId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Nationality")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -115,10 +122,6 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Religion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -156,11 +159,21 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -247,7 +260,7 @@ namespace ELearn.InfraStructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("GroupName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -290,41 +303,28 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.GroupSurvey", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<int>("SurveyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("GroupId", "SurveyId");
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("SurveyId");
 
-                    b.ToTable("GroupSurveys");
+                    b.ToTable("GroupSurveys", (string)null);
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.GroupVoting", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VotingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.HasKey("GroupId", "VotingId");
-
-                    b.HasIndex("VotingId");
-
-                    b.ToTable("GroupVotings");
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.Material", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -335,17 +335,46 @@ namespace ELearn.InfraStructure.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
+                    b.Property<int>("VotingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("VotingId");
+
+                    b.ToTable("GroupVotings", (string)null);
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.Material", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Week")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -391,6 +420,7 @@ namespace ELearn.InfraStructure.Migrations
             modelBuilder.Entity("ELearn.Domain.Entities.Option", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int?>("QuestionId")
@@ -461,9 +491,6 @@ namespace ELearn.InfraStructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("VotingId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
@@ -481,11 +508,17 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -549,6 +582,12 @@ namespace ELearn.InfraStructure.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -562,32 +601,56 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AssignmentId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "AssignmentId");
+                    b.Property<DateTime>("DateAnswered")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");
 
-                    b.ToTable("UserAssignments");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserAssignments", (string)null);
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserGroup", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateJoined")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("GroupId", "UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserGroups");
+                    b.ToTable("UserGroups", (string)null);
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserQuestion", b =>
@@ -599,14 +662,20 @@ namespace ELearn.InfraStructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApplicationUserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateAnswered")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OptionId")
                         .HasColumnType("int");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -621,53 +690,87 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("SurveyId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateAnswered")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OptionId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "SurveyId");
+                    b.Property<int>("SurveyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OptionId");
 
                     b.HasIndex("SurveyId");
 
-                    b.ToTable("UserSurveys");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSurveys", (string)null);
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserVoting", b =>
                 {
-                    b.Property<string>("userId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("VotingId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateAnswered")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OptionsId")
                         .HasColumnType("int");
 
-                    b.HasKey("userId", "VotingId");
+                    b.Property<int>("VotingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OptionsId");
 
                     b.HasIndex("VotingId");
 
-                    b.ToTable("UserVotings");
+                    b.HasIndex("userId");
+
+                    b.ToTable("UserVotings", (string)null);
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Voting", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                    b.Property<string>("CreatorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -675,7 +778,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Votings");
                 });
@@ -894,7 +997,7 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.Group", b =>
                 {
-                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "Creator")
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
                         .WithMany("CreatedGroups")
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -910,11 +1013,11 @@ namespace ELearn.InfraStructure.Migrations
                         .WithMany("SubGroups")
                         .HasForeignKey("ParentGroupId");
 
-                    b.Navigation("Creator");
-
                     b.Navigation("Department");
 
                     b.Navigation("ParentGroup");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.GroupAnnouncment", b =>
@@ -1022,7 +1125,8 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasOne("ELearn.Domain.Entities.Question", "Question")
                         .WithMany("Options")
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ELearn.Domain.Entities.Survey", "Survey")
                         .WithMany("Options")
@@ -1148,9 +1252,7 @@ namespace ELearn.InfraStructure.Migrations
                 {
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("UserQuestion")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("ELearn.Domain.Entities.Option", "Option")
                         .WithMany()
@@ -1173,6 +1275,12 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
                 {
+                    b.HasOne("ELearn.Domain.Entities.Option", "Option")
+                        .WithMany()
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ELearn.Domain.Entities.Survey", "Survey")
                         .WithMany("UserSurvey")
                         .HasForeignKey("SurveyId")
@@ -1185,6 +1293,8 @@ namespace ELearn.InfraStructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Option");
+
                     b.Navigation("Survey");
 
                     b.Navigation("User");
@@ -1192,10 +1302,16 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserVoting", b =>
                 {
+                    b.HasOne("ELearn.Domain.Entities.Option", "Options")
+                        .WithMany()
+                        .HasForeignKey("OptionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ELearn.Domain.Entities.Voting", "Voting")
                         .WithMany("UserVoting")
                         .HasForeignKey("VotingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
@@ -1203,6 +1319,8 @@ namespace ELearn.InfraStructure.Migrations
                         .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Options");
 
                     b.Navigation("User");
 
@@ -1213,18 +1331,10 @@ namespace ELearn.InfraStructure.Migrations
                 {
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("Votings")
-                        .HasForeignKey("ApplicationUserId")
+                        .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
-                        .WithOne("Voting")
-                        .HasForeignKey("ELearn.Domain.Entities.Voting", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("GroupSurvey", b =>
@@ -1344,8 +1454,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("Options");
 
                     b.Navigation("UserQuestion");
-
-                    b.Navigation("Voting");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Quiz", b =>
