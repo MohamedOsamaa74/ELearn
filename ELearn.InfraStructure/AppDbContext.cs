@@ -18,7 +18,6 @@ namespace ELearn.Data
             builder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
             builder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
             builder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
-            builder.Ignore<Duration>();
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
         public DbSet<ApplicationUser> users { get; set; }

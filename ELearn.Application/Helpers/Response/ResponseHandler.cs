@@ -10,7 +10,6 @@ namespace ELearn.Application.Helpers.Response
 {
     public static class ResponseHandler
     {
-
         public static Response<T> Updated<T>(T entity)
         {
             return new Response<T>()
@@ -62,6 +61,7 @@ namespace ELearn.Application.Helpers.Response
                 Message = "UnAuthorized"
             };
         }
+
         public static Response<T> BadRequest<T>(string Message = null)
         {
             return new Response<T>()
@@ -105,6 +105,7 @@ namespace ELearn.Application.Helpers.Response
                 Meta = meta
             };
         }
+        
         public static IActionResult CreateResponse<T>(this ControllerBase controllerBase, Response<T> response)
         {
             return new ObjectResult(response)

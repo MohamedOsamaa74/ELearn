@@ -1,7 +1,12 @@
-﻿namespace ELearn.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace ELearn.Domain.Entities
 {
     public class Comment
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
         public DateTime Date { get; set; }

@@ -13,8 +13,8 @@ namespace ELearn.InfraStructure.Configurations
     {
         public void Configure(EntityTypeBuilder<UserVoting> builder)
         {
-            builder.HasKey(us => new { us.userId, us.VotingId });
-
+            builder.ToTable("UserVotings");
+            builder.HasKey(uv => uv.Id);
             builder
                 .HasOne(us => us.User)
                 .WithMany(u => u.UserVoting)
@@ -23,7 +23,8 @@ namespace ELearn.InfraStructure.Configurations
             builder
                 .HasOne(us => us.Voting)
                 .WithMany(s => s.UserVoting)
-                .HasForeignKey(us => us.VotingId);
+                .HasForeignKey(us => us.VotingId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

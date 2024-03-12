@@ -24,7 +24,7 @@ namespace ELearn.InfraStructure.Configurations
                 .IsRequired(false);
 
             //one user create many groups  
-            builder.HasOne(u => u.Creator)
+            builder.HasOne(u => u.User)
                 .WithMany(g => g.CreatedGroups)
                 .HasForeignKey(u => u.CreatorId);
 
