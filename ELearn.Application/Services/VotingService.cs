@@ -75,29 +75,31 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region Delete One
-        public async Task<Response<VotingDTO>> DeleteAsync(int Id)
+        #region GetFromGroups
+        public async Task<Response<ICollection<VotingDTO>>> GetFromGroups(int GroupId)
         {
-            var vote = await _unitOfWork.Votings.GetByIdAsync(Id);
-            if (vote is null)
-                return ResponseHandler.NotFound<VotingDTO>("There is no such Voting");
             try
             {
-                var options = await _unitOfWork.Options.GetWhereAsync(opt => opt.VotingId == Id);
-                foreach(var opt in options)
+                var votes = await _unitOfWork.GroupVotings.
+                    GetWhereSelectAsync(v => v.GroupId == GroupId, v => v.VotingId);
+                if (votes.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are no Votings yet");
+                ICollection<VotingDTO> votesDto = new List<VotingDTO>();
+                foreach(var vote in votes)
                 {
-                    await _unitOfWork.Options.DeleteAsync(opt);
+                    var votedto = await GetByIdAsync(vote);
+                    votesDto.Add(votedto.Data);
                 }
-                await _unitOfWork.Votings.DeleteAsync(vote);
-                return ResponseHandler.Deleted<VotingDTO>();
+                return ResponseHandler.Success(votesDto);
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
+        #region GetAll
         public async Task<Response<ICollection<VotingDTO>>> GetAllAsync()
         {
             try
@@ -121,6 +123,156 @@ namespace ELearn.Application.Services
                 return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
             }
         }
+        #endregion
+
+        #region Delete One
+        public async Task<Response<VotingDTO>> DeleteAsync(int Id)
+        {
+            var vote = await _unitOfWork.Votings.GetByIdAsync(Id);
+            if (vote is null)
+                return ResponseHandler.NotFound<VotingDTO>("There is no such Voting");
+            try
+            {
+                var options = await _unitOfWork.Options.GetWhereAsync(opt => opt.VotingId == Id);
+                foreach(var opt in options)
+                {
+                    await _unitOfWork.Options.DeleteAsync(opt);
+                }
+                await _unitOfWork.Votings.DeleteAsync(vote);
+                return ResponseHandler.Deleted<VotingDTO>();
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region Delete Many
+        public async Task<Response<VotingDTO>>DeleteManyAsync(ICollection<int>Id)
+        {
+            try
+            {
+                foreach(var id in Id)
+                {
+                    var vote = await _unitOfWork.Votings.GetByIdAsync(id);
+                    if (vote is null)
+                        return ResponseHandler.NotFound<VotingDTO>("There is no Votings");
+                    var options = await _unitOfWork.Options
+                        .GetWhereAsync(opt => opt.VotingId == id);
+                    foreach (var opt in options)
+                    {
+                        await _unitOfWork.Options.DeleteAsync(opt);
+                    }
+                    await _unitOfWork.Votings.DeleteAsync(vote);
+                }
+                return ResponseHandler.Deleted<VotingDTO>();
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occured, {Ex}");
+            }
+        }
+        #endregion
+
+        #region Update
+        public async Task<Response<VotingDTO>> UpdateAsync(int Id, VotingDTO Model)
+        {
+            try
+            {
+                var oldvote = await _unitOfWork.Votings.GetByIdAsync(Id);
+                var newVote = _mapper.Map<Voting>(Model);
+                await _unitOfWork.Votings.UpdateAsync(newVote);
+                //Edit Options
+                //Edit Groups
+                return ResponseHandler.Updated(Model);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region RecieveStudentResponse
+        public async Task<Response<UserVotingDTO>> RecieveStudentResponse(int VotingId, int OptionId)
+        {
+            try
+            {
+                var vote = await _unitOfWork.Votings.GetByIdAsync(VotingId);
+                var option = await _unitOfWork.Options.GetByIdAsync(OptionId);
+                if (vote is null)
+                    return ResponseHandler.NotFound<UserVotingDTO>("There is no such Voting");
+                if (option is null)
+                    return ResponseHandler.NotFound<UserVotingDTO>("There is no such Option");
+                var user = await _userService.GetCurrentUserAsync();
+                //missing validation
+                var uservotes = await _unitOfWork.UserVotings
+                    .GetWhereAsync(v => v.VotingId == VotingId && v.userId == user.Id);
+                var uservote = uservotes.SingleOrDefault();
+                if(uservote is not null)
+                {
+                    uservote.OptionsId = OptionId;
+                    await _unitOfWork.UserVotings.UpdateAsync(uservote);
+                    var userVotingDto = new UserVotingDTO()
+                    {
+                        UserName = user.UserName,
+                        Voting = vote.Text,
+                        Option = option.Text
+                    };
+                    return ResponseHandler.Updated(userVotingDto);
+                }
+                var response = new UserVoting()
+                {
+                    userId = user.Id,
+                    VotingId = VotingId,
+                    OptionsId = OptionId
+                };
+                await _unitOfWork.UserVotings.AddAsync(response);
+                var dto = new UserVotingDTO()
+                {
+                    UserName = user.UserName,
+                    Voting = (await _unitOfWork.Votings.GetByIdAsync(VotingId)).Text,
+                    Option = (await _unitOfWork.Options.GetByIdAsync(OptionId)).Text
+                };
+                return ResponseHandler.Created(dto);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserVotingDTO>($"An Error Occurred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region GetVotingResponses
+        public async Task<Response<ICollection<UserVotingDTO>>> GetVotingResponses(int VotingId)
+        {
+            try
+            {
+                var votes = await _unitOfWork.UserVotings.GetWhereAsync(v => v.VotingId == VotingId);
+                if (votes.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<UserVotingDTO>>("There are no Responses yet");
+                ICollection<UserVotingDTO> votesDto = new List<UserVotingDTO>();
+                foreach(var vote in votes)
+                {
+                    var user = await _userService.GetCurrentUserAsync();
+                    var option = await _unitOfWork.Options.GetByIdAsync(vote.OptionsId);
+                    var voteDto = new UserVotingDTO()
+                    {
+                        UserName = user.UserName,
+                        Voting = (await _unitOfWork.Votings.GetByIdAsync(VotingId)).Text,
+                        Option = option.Text
+                    };
+                    votesDto.Add(voteDto);
+                }
+                return ResponseHandler.Success(votesDto);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<UserVotingDTO>>($"An Error Occurred, {Ex}");
+            }
+        }
+        #endregion
 
         #region Private Methods
         private async Task SendToGroupsAsync(ICollection<int> Groups, int VoteId)
