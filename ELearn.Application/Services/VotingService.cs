@@ -4,6 +4,7 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,7 +12,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ELearn.Application.Services
 {
@@ -73,6 +76,62 @@ namespace ELearn.Application.Services
                 return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
             }
         }
+        #endregion
+
+        #region GetByDate
+        public async Task<Response<ICollection<VotingDTO>>> GetVotesByDate(DateTime date)
+        {
+            if (date == null)
+            {
+                return ResponseHandler.BadRequest<ICollection<VotingDTO>>("Invalid date");
+            }
+            try
+            {
+                var votes = await _unitOfWork.Votings.GetWhereSelectAsync(v => v.Start <= date && v.End >= date,v=>v.Id);
+                if (votes.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are no Votings ");
+                ICollection<VotingDTO>  votesDto = new List<VotingDTO>();
+                foreach (var vote in votes)
+                {
+                    var votedto = await GetByIdAsync(vote);
+                    votesDto.Add(votedto.Data);
+                }
+                return ResponseHandler.Success(votesDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
+            }
+        }
+
+        #endregion
+
+        #region GetByCreator
+        public async Task<Response<ICollection<VotingDTO>>> GetVotesByCreator()
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var votes = await _unitOfWork.Votings.GetWhereSelectAsync(v => v.CreatorId==user.Id, v => v.Id);
+
+                if (votes is null)
+                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are No Votings yet");
+                ICollection<VotingDTO> votesDto = new List<VotingDTO>();
+                foreach (var vote in votes)
+                {
+                    var votedto = await GetByIdAsync(vote);
+                    votesDto.Add(votedto.Data);
+                }
+                return ResponseHandler.Success(votesDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
+            }
+            
+            
+        }
+
         #endregion
 
         #region GetFromGroups
@@ -297,6 +356,7 @@ namespace ELearn.Application.Services
         {
             return await _unitOfWork.GroupVotings.GetWhereSelectAsync(g => g.VotingId == VotingId, g => g.GroupId);
         }
+
         #endregion
     }
 }

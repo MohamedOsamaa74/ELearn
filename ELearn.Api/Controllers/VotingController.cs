@@ -1,6 +1,8 @@
-﻿using ELearn.Application.DTOs;
+﻿using Azure;
+using ELearn.Application.DTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
+using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -114,6 +116,34 @@ namespace ELearn.Api.Controllers
             var response = await _votingService.DeleteManyAsync(Id);
             return this.CreateResponse(response);
         }
+        #endregion
+
+        #region GetByDate
+        [HttpGet("GetVotesByDate/{date}")]
+        public async Task<IActionResult> GetVotesByDate(DateTime date)
+        {
+            var response = await _votingService.GetVotesByDate(date);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetActive
+        [HttpGet("GetVotesByDate")]
+        public async Task<IActionResult> GetActiveVotes()
+        {
+            var response = await _votingService.GetVotesByDate(DateTime.UtcNow);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetVotesofCurrentUser
+        [HttpGet("GetVotesByCreator")]
+        public async Task<IActionResult> GetVotesByCreator()
+        {
+            var response = await _votingService.GetVotesByCreator();
+            return this.CreateResponse(response);
+        }
+
         #endregion
     }
 }
