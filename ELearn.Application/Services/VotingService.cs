@@ -107,15 +107,20 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetByCreator
-        public async Task<Response<ICollection<VotingDTO>>> GetVotesByCreator()
+        public async Task<Response<ICollection<VotingDTO>>> GetVotesByCreator(string UserId)
         {
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
-                var votes = await _unitOfWork.Votings.GetWhereSelectAsync(v => v.CreatorId==user.Id, v => v.Id);
+                if(UserId is null) UserId = user.Id;
+
+                var votes = await _unitOfWork.Votings
+                    .GetWhereSelectAsync(v => v.CreatorId == UserId, v => v.Id);
 
                 if (votes is null)
-                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are No Votings yet");
+                    return ResponseHandler.NotFound<ICollection<VotingDTO>>
+                        ("There are No Votings yet");
+
                 ICollection<VotingDTO> votesDto = new List<VotingDTO>();
                 foreach (var vote in votes)
                 {

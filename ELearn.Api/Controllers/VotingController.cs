@@ -64,6 +64,16 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
+        #region GetAll
+        [HttpGet("GetAllVotings")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult>GetAll()
+        {
+            var response = await _votingService.GetAllAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
         #region GetFromGroups
         [HttpGet("GetVotingsFromGroup/{GroupId:int}")]
         [Authorize(Roles = "Admin, Staff")]
@@ -74,12 +84,40 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        #region GetAll
-        [HttpGet("GetAllVotings")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult>GetAll()
+        #region GetActive
+        [HttpGet("GetVotesByDate")]
+        public async Task<IActionResult> GetActiveVotes()
         {
-            var response = await _votingService.GetAllAsync();
+            var response = await _votingService.GetVotesByDate(DateTime.UtcNow);
+            return this.CreateResponse(response);
+        }
+        #endregion
+        
+        #region GetVotesofCurrentUser
+        [HttpGet("GetCurrentUserVotes")]
+        [Authorize]
+        public async Task<IActionResult> GetVotesByCreator()
+        {
+            var response = await _votingService.GetVotesByCreator(null);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetVotesOfUser
+        [HttpGet("GetVotesOfUser/{UserId}")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> GetVotesByCreator(string UserId)
+        {
+            var response = await _votingService.GetVotesByCreator(UserId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetByDate
+        [HttpGet("GetVotesByDate/{date}")]
+        public async Task<IActionResult> GetVotesByDate(DateTime date)
+        {
+            var response = await _votingService.GetVotesByDate(date);
             return this.CreateResponse(response);
         }
         #endregion
@@ -118,32 +156,5 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        #region GetByDate
-        [HttpGet("GetVotesByDate/{date}")]
-        public async Task<IActionResult> GetVotesByDate(DateTime date)
-        {
-            var response = await _votingService.GetVotesByDate(date);
-            return this.CreateResponse(response);
-        }
-        #endregion
-
-        #region GetActive
-        [HttpGet("GetVotesByDate")]
-        public async Task<IActionResult> GetActiveVotes()
-        {
-            var response = await _votingService.GetVotesByDate(DateTime.UtcNow);
-            return this.CreateResponse(response);
-        }
-        #endregion
-
-        #region GetVotesofCurrentUser
-        [HttpGet("GetVotesByCreator")]
-        public async Task<IActionResult> GetVotesByCreator()
-        {
-            var response = await _votingService.GetVotesByCreator();
-            return this.CreateResponse(response);
-        }
-
-        #endregion
     }
 }
