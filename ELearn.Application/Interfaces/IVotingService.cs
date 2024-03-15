@@ -16,8 +16,10 @@ namespace ELearn.Application.Interfaces
         public Task<Response<VotingDTO>> GetByIdAsync(int Id);
         public Task<Response<ICollection<VotingDTO>>> GetAllAsync();
         public Task<Response<VotingDTO>> DeleteAsync(int Id);
+        public Task<Response<OptionDTO>> DeleteOptionAsync(int Id);
         public Task<Response<VotingDTO>> DeleteManyAsync(ICollection<int> Id);
         public Task<Response<VotingDTO>> UpdateAsync(int Id, VotingDTO Model);
+        public Task<Response<OptionDTO>> EditOption(int Id, OptionDTO Model);
         public Task<Response<ICollection<VotingDTO>>> GetFromGroups(int GroupId);
         public Task<Response<UserVotingDTO>>RecieveStudentResponse(int VotingId, int OptionId);
         public Task<Response<ICollection<UserVotingDTO>>> GetVotingResponses(int VotingId);

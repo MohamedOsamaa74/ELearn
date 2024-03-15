@@ -274,6 +274,45 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region EditOption
+
+        public async Task<Response<OptionDTO>> EditOption(int Id, OptionDTO Model)
+        {
+            try
+            {
+                var oldoption = await _unitOfWork.Options.GetByIdAsync(Id);
+                var newoption = _mapper.Map<Option>(Model);
+                await _unitOfWork.Options.UpdateAsync(newoption);
+                return ResponseHandler.Updated(Model);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<OptionDTO>($"An Error Occurred, {Ex}");
+            }
+        }
+
+        #endregion
+
+        #region DeleteOption
+
+        public async Task<Response<OptionDTO>> DeleteOptionAsync(int Id)
+        {
+            var opt = await _unitOfWork.Options.GetByIdAsync(Id);
+            if (opt is null)
+                return ResponseHandler.NotFound<OptionDTO>("There is no Option ");
+            try
+            {
+                await _unitOfWork.Options.DeleteAsync(opt);
+                return ResponseHandler.Deleted<OptionDTO>();
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<OptionDTO>($"An Error Occurred, {Ex}");
+            }
+        }
+
+        #endregion
+
         #region Private Methods
         private async Task SendToGroupsAsync(ICollection<int> Groups, int VoteId)
         {
