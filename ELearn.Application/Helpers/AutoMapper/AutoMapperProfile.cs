@@ -45,6 +45,7 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
 
+
             CreateMap<Material, UpdateMaterialDTO>()
             .ForMember(dest => dest.File, opt => opt.Ignore())
             .ForMember(dest => dest.Link, opt => opt.Ignore());
