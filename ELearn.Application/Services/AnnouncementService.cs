@@ -138,8 +138,8 @@ namespace ELearn.Application.Services
             
             var announcements = await _context.Announcements
                 .Include(a => a.GroupAnnouncements)
-                .Where(a => a.GroupAnnouncements.Any(ga =>
-                        ga.GroupId == ga.Group.Id &&
+                .Where(a => a.GroupAnnouncements.Any(ga => 
+                        ga.GroupId == ga.Group.Id && 
                         ga.Group.UsersInGroup.Any(ug => ug.Id == user.Id)))
                 .Select(a => a.Text)
                 .ToListAsync();
