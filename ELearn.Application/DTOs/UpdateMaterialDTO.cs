@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ELearn.Application.DTOs
 {
-    public class UpdatMaterialeDto
+    public class UpdateMaterialDTO
     {
        
         public string Title { get; set; }

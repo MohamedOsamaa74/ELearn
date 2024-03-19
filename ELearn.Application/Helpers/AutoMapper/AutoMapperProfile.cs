@@ -38,6 +38,17 @@ namespace ELearn.Application.Helpers.AutoMapper
             CreateMap<GroupDTO, Group>()
                 .ForMember(dest => dest.GroupName, opt => opt.MapFrom(src => src.Name));
             #endregion
+
+            #region Material Mapper
+            CreateMap<UpdateMaterialDTO, Material>()
+                .ForMember(dest => dest.GroupId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+
+
+            CreateMap<Material, UpdateMaterialDTO>()
+            .ForMember(dest => dest.File, opt => opt.Ignore())
+            .ForMember(dest => dest.Link, opt => opt.Ignore());
+            #endregion
         }
     }
 }
