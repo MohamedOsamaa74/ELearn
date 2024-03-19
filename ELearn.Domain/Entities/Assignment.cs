@@ -6,12 +6,15 @@ namespace ELearn.Domain.Entities
 {
     public class Assignment
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public  string Title { get; set; }
-        public  DateTime Date { get; set; }
-        public  Duration Duration { get; set; }
+        public  DateTime CreationDate { get; set; }
+        public required DateTime Start { get; set; }
+        public required DateTime End { get; set; }
         public string FilePath { get; set; }
-        public  required string UserId { get; set; }//CreatorId
+        public  required string UserId { get; set; }
 
         public virtual ApplicationUser User { get; set; }
 

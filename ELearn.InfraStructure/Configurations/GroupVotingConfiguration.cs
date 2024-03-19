@@ -13,10 +13,10 @@ namespace ELearn.InfraStructure.Configurations
     {
         public void Configure(EntityTypeBuilder<GroupVoting> builder)
         {
-            
-                builder.HasKey(us => new { us.GroupId, us.VotingId });
+            builder.ToTable("GroupVotings");
+            builder.HasKey(us => us.Id);
 
-                builder
+            builder
                     .HasOne(us => us.Group)
                     .WithMany(u => u.GroupVoting)
                     .HasForeignKey(us => us.GroupId);

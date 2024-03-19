@@ -18,12 +18,14 @@ namespace ELearn.InfraStructure.Configurations
             //one question to many options
             builder.HasOne(q=>q.Question)
                 .WithMany(o=>o.Options)
-                .HasForeignKey(q=>q.QuestionId);
+                .HasForeignKey(q=>q.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             //one voting to many options
             builder.HasOne(v=>v.Voting)
                 .WithMany(o => o.Options)
-                .HasForeignKey(v=>v.Id);
+                .HasForeignKey(v=>v.Id)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //one survey to many options
             builder.HasOne(q => q.Survey)

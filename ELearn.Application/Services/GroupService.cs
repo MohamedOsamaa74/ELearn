@@ -40,7 +40,7 @@ namespace ELearn.Application.Services
             {
                 Group group = new Group()
                 {
-                    GroupName = Model.Name,
+                    Name = Model.Name,
                     Description = Model.Description,
                     CreatorId = user.Id,
                     DepartmentId = Model.DepartmentId
@@ -135,7 +135,7 @@ namespace ELearn.Application.Services
         {
             try
             {
-                var groups = await _context.Groups.Where(g => g.GroupName == Name).ToListAsync();
+                var groups = await _context.Groups.Where(g => g.Name == Name).ToListAsync();
                 if (groups.IsNullOrEmpty())
                     return ResponseHandler.NotFound<ICollection<GroupDTO>>("There Is No Groups With The Given Name");
                 var groupsDto = new List<GroupDTO>();

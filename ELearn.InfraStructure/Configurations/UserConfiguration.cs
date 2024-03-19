@@ -37,7 +37,7 @@ namespace ELearn.InfraStructure.Configurations
 
          builder.HasMany(p => p.Votings)
                 .WithOne(r => r.ApplicationUser)
-                .HasForeignKey(v => v.ApplicationUserId)
+                .HasForeignKey(v => v.CreatorId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
 

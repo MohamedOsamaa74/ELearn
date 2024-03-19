@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public GroupValidation() 
         {
-            RuleFor(x => x.GroupName)
+            RuleFor(x => x.Name)
                 .NotEmpty().Length(5, 30);
             RuleFor(x => x.Description)
                 .NotEmpty().Length(5, 30);
