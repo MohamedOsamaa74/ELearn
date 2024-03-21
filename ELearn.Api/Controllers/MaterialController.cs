@@ -1,4 +1,7 @@
 ﻿using ELearn.Application.DTOs;
+using ELearn.Application.Helpers.Response;
+using ELearn.Application.Interfaces;
+using ELearn.Application.Services;
 using ELearn.Data;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
@@ -10,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 
 namespace ELearn.Api.Controllers
@@ -18,91 +22,91 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class MaterialController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AppDbContext _context;
-
-        public MaterialController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
+        private readonly IMaterialService _materialService;
+       
+        public MaterialController(IMaterialService MaterialService)
         {
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _context = appDbContext;
-
-
+            _materialService = MaterialService;
+           
         }
-        //done
+       
         #region GetAll
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _unitOfWork.Materials.GetAllAsync(m => new { m.Title, m.Week, m.FilePath }));
-        }
+            var response = await _materialService.GetAllMaterialsAsync();
 
+            return this.CreateResponse(response);
+        }
         #endregion
 
+        #region GetAllFromGroup
+        
         [HttpGet("GetAllFromGroup")]
         public async Task<IActionResult> GetAllFromGroup(int id)
         {
-            return Ok(await _context.Materials.Where(x => x.GroupId == id).ToListAsync());
-        }
-
-        #region Upload
-
-        [HttpPost("UploadMaterial")]
-        [Authorize(Roles = "Admin , Staff")]
-        public async Task<IActionResult> UploaldMaterial(AddMaterialDTO materialDTO)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-            else
-            {
-
-                var material = new Material
-                {
-                    Title = materialDTO.Title,
-                    Week = materialDTO.Week,
-                    File = materialDTO.File,
-                    FilePath = await WriteFile(materialDTO.File),
-                    GroupId = 2, // Replace with current group ID
-                    UserId = _userManager.GetUserId(User),
-
-                };
-                await _unitOfWork.Materials.AddAsync(material);
-                return Ok(material.FilePath);
-
-            }
-        }
-
-        private async Task<string> WriteFile(IFormFile file)
-        {
-            string filename = "";
-            try
-            {
-                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-                filename = DateTime.Now.Ticks.ToString() + extension;
-
-                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload");
-
-                if (!Directory.Exists(filepath))
-                {
-                    Directory.CreateDirectory(filepath);
-                }
-
-                var exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", filename);
-                using (var stream = new FileStream(exactpath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-            return filename;
+            var response = await _materialService.GetAllMaterialsFromGroupAsync(id);
+            return this.CreateResponse(response);
         }
         #endregion
+
+        //#region Upload
+
+        //[HttpPost("UploadMaterial")]
+        //[Authorize(Roles = "Admin , Staff")]
+        //public async Task<IActionResult> UploaldMaterial(AddMaterialDTO materialDTO)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    else
+        //    {
+
+        //        var material = new Material
+        //        {
+        //            Title = materialDTO.Title,
+        //            Week = materialDTO.Week,
+        //            File = materialDTO.File,
+        //            FilePath = await WriteFile(materialDTO.File),
+        //            GroupId =1,
+        //            UserId =
+
+        //        };
+        //        await _unitOfWork.Materials.AddAsync(material);
+        //        return Ok(material.FilePath);
+
+        //    }
+        //}
+
+        //private async Task<string> WriteFile(IFormFile file)
+        //{
+        //    string filename = "";
+        //    try
+        //    {
+        //        var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+        //        filename = DateTime.Now.Ticks.ToString() + extension;
+
+        //        var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload");
+
+        //        if (!Directory.Exists(filepath))
+        //        {
+        //            Directory.CreateDirectory(filepath);
+        //        }
+
+        //        var exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", filename);
+        //        using (var stream = new FileStream(exactpath, FileMode.Create))
+        //        {
+        //            await file.CopyToAsync(stream);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //    }
+        //    return filename;
+        //}
+        //#endregion
 
         #region DownloadFile
         [HttpGet]
@@ -131,41 +135,27 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMaterial(int MaterialId)
         {
-            var Material = await _unitOfWork.Materials.GetByIdAsync(MaterialId);
-            if (Material == null)
-            {
-                return BadRequest("Material not found.");
-            }
-            else
-            {
-                await _unitOfWork.Materials.DeleteAsync(Material);
-                return Ok("Material Deleted Successfully");
-            }
+            
+           
+                var response = await _materialService.DeleteMaterialAsync(MaterialId);
+                return this.CreateResponse(response);
+            
         }
         #endregion
+
 
 
         #region Get Mateial By ID
         [HttpGet("GetMaterialById/{MaterialId:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetMaterialById(int MaterialId)
+
+        public async Task<IActionResult> GetMaterialById(int materialId)
         {
-            try
-            {
-                var Material = await _unitOfWork.Materials.GetByIdAsync(MaterialId);
-                if (Material == null)
-                {
-                    return NotFound($"Material with ID {MaterialId} not found");
-                }
-                return Ok(Material);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
+            var response = await _materialService.GetMaterialByIdAsync(materialId);
+            return this.CreateResponse(response);
         }
+
+        
 
         #endregion
 
@@ -173,38 +163,18 @@ namespace ELearn.Api.Controllers
         #region update Material
         [HttpPut("UpdateMaterial/{MaterialId:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateMaterial(int MaterialId, [FromBody] UpdatMaterialeDto updateDto)
+
+        public async Task<IActionResult> UpdateMaterial(int MaterialId,[FromBody] UpdateMaterialDTO Model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var materialToUpdate = await _unitOfWork.Materials.GetByIdAsync(MaterialId);
-                if (materialToUpdate == null)
-                {
-                    return NotFound($"Material with ID {MaterialId} not found");
-                }
-
-                // Update properties from the DTO
-                materialToUpdate.Title = updateDto.Title;
-                materialToUpdate.Link = updateDto.Link;
-                materialToUpdate.Week = updateDto.Week;
-
-
-
-                _unitOfWork.Materials.UpdateAsync(materialToUpdate);
-
-
-                return Ok(materialToUpdate);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
-
-
-
+            var response = await _materialService.UpdateMaterialAsync(MaterialId, Model);
+            return this.CreateResponse(response);
         }
+
+      
         #endregion        
 
         // view material in browser لسة مش معمول هنشوف تيم الفرونت 
