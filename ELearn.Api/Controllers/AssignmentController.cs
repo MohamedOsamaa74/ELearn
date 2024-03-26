@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Internal;
+using ELearn.Application.Helpers.Response;
+using ELearn.Application.Interfaces;
+using ELearn.Application.Services;
 
 namespace ELearn.Api.Controllers
 {
@@ -18,366 +21,119 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class AssignmentController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AppDbContext _context;
+        private readonly IAssignmentService _assignmentService;
+        private readonly IUserService _userService;
 
-        public AssignmentController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
+        public AssignmentController(IAssignmentService AssignmentService, IUserService userService)
         {
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _context = appDbContext;
+            _assignmentService = AssignmentService;
+            _userService = userService;
         }
-        /*
+
         #region Delete Assignment
         [HttpDelete("Delete/{AssignmentId:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAssignment(int AssignmentId)
         {
-            var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
-            if (assignment == null)
-            {
-                return BadRequest("Assignment not found.");
-            }
-            else
-            {
-                await _unitOfWork.Assignments.DeleteAsync(assignment);
-                return Ok("Assignment Deleted Successfully");
-            }
+
+
+            var response = await _assignmentService.DeleteAssignmentAsync(AssignmentId);
+            return this.CreateResponse(response);
+
         }
         #endregion
 
         #region update Assignment
         [HttpPut("UpdateAssignment/{AssignmentId:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] AssignmentDTO updateDto)
+
+        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] AssignmentDTO Model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var AssignmentToUpdate = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
-                if (AssignmentToUpdate == null)
-                {
-                    return NotFound($"Assignment with ID {AssignmentId} not found");
-                }
-
-                // Update properties from the DTO
-                AssignmentToUpdate.Title = updateDto.Title;
-                AssignmentToUpdate.Date = updateDto.Date;
-                AssignmentToUpdate.Duration = updateDto.Duration;
-
-
-
-                _unitOfWork.Assignments.UpdateAsync(AssignmentToUpdate);
-
-
-                return Ok(AssignmentToUpdate);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
-
-
-
+            var response = await _assignmentService.UpdateAssignmentAsync(AssignmentId, Model);
+            return this.CreateResponse(response);
         }
-        #endregion
-
-        #region DownloadAssignment
-        [HttpGet]
-        [Route("DownloadFile")]
-        public async Task<IActionResult> DownloadFile(string filename)
-        {
-            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "UploadAssignment", filename);
-            if (!System.IO.File.Exists(filepath))
-            {
-                return NotFound();
-            }
-            var provider = new FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(filepath, out var contenttype))
-            {
-                contenttype = "application/octet-stream";
-            }
-
-            var bytes = await System.IO.File.ReadAllBytesAsync(filepath);
-            return File(bytes, contenttype, Path.GetFileName(filepath));
-        }
-        #endregion
-
-
-        #region UploadAssignment
-        [HttpPost("UploadAssignment")]
-        [Authorize(Roles = "Admin , Staff, Student")]
-
-        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
-        {
-            try
-            {
-                if (assignmentDTO == null || assignmentDTO.File == null)
-                    return BadRequest("Assignment data or file not provided.");
-
-                var uploadFolder = "UploadAssignment"; // Folder where assignments will be uploaded
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
-
-                // Ensure the upload folder exists
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                // Generate a unique file name to prevent overwriting existing files
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
-                var filePath = Path.Combine(folderPath, uniqueFileName);
-
-                // Save the uploaded assignment file to the upload folder
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await assignmentDTO.File.CopyToAsync(stream);
-                }
-
-                // Save the file path to the database
-                var assignment = new Assignment()
-                {
-                    Title = assignmentDTO.Title,
-                    Date = assignmentDTO.Date,
-                    Duration = assignmentDTO.Duration,
-
-                    FilePath = filePath // Save the file path in the database
-                };
-
-                // Add assignment to database
-                await _unitOfWork.Assignments.AddAsync(assignment);
-                await _context.SaveChangesAsync();
-
-                return Ok("Assignment uploaded successfully!");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
 
 
         #endregion
 
-
-        #region GetAll Assiguments
+        #region GetAll Assignments
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title, m.Date }));
-        }
+            var response = await _assignmentService.GetAllAssignmentsAsync();
 
+            return this.CreateResponse(response);
+        }
         #endregion
 
-        #region Get assignment By ID
+        #region Get Assignment By ID
         [HttpGet("GetAssignmentById/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin , Staff")]
-        public async Task<IActionResult> GetAssignmentById(int AssignmentId)
-        {
-            try
-            {
-                var Assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
-                if (Assignment == null)
-                {
-                    return NotFound($"Assignment with ID {AssignmentId} not found");
-                }
-                return Ok(Assignment);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
-        }
-
-        #endregion
-
-        //#region Upload Assignment marwan
-
-        //[HttpPost("UploadAssignment{groupId:int}")]
-        //[Authorize(Roles = "Admin , Staff")]
-        //public async Task<IActionResult> UploadAssignment(AssignmentDTO assignmentDTO,int groupId)
-        //{
-        //    try
-        //    { 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest();
-
-        //        }
-        //        else
-        //        {
-
-        //            var assignment = new Assignment
-        //            {
-        //                Date = assignmentDTO.Date,
-        //                Duration = assignmentDTO.Duration,
-        //                UserId = _userManager.GetUserId(User),
-        //                Title = assignmentDTO.Title,
-        //                GroupId=groupId
-
-        //            };
-        //            await _unitOfWork.Assignments.AddAsync(assignment);
-        //            return Ok();
-
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $" an Error occurred while processing the request {ex.Message}");
-        //    }
-        //}
-        //#endregion
-
-        #region UploadAssignment
-        [HttpPost("UploadAssignment")]
-        [Authorize(Roles = "Admin , Staff, Student")]
-
-        public async Task<IActionResult> UploadAssignment([FromForm] AssignmentDTO assignmentDTO)
-        {
-            try
-            {
-                if (assignmentDTO == null || assignmentDTO.File == null)
-                    return BadRequest("Assignment data or file not provided.");
-
-                var uploadFolder = "UploadAssignment";
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
-
-
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + assignmentDTO.File.FileName;
-                var filePath = Path.Combine(folderPath, uniqueFileName);
-
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await assignmentDTO.File.CopyToAsync(stream);
-                }
-
-
-                Assignment assignment = new Assignment
-                {
-                    Title = assignmentDTO.Title,
-                    Date = assignmentDTO.Date,
-                    Duration = assignmentDTO.Duration,
-
-                    // FilePath = assignmentDTO.filePath
-                };
-
-                // Add assignment to database
-                await _unitOfWork.Assignments.AddAsync(assignment);
-                await _context.SaveChangesAsync();
-
-                return Ok("Assignment uploaded successfully!");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-
-
-        #endregion
-
-        #region Get assignment By StaffID (for admin)
-        [HttpGet("Staff")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAssignmentByStaffId(string StaffID)
+
+        public async Task<IActionResult> GetAssignmentById(int assignmentId)
         {
-            try
-            {
-                var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.UserId==StaffID);
-                if (Assignment == null)
-                {
-                    return NotFound($"The Staff with ID {StaffID} has no assignments");
-                }
-                return Ok(Assignment);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
+            var response = await _assignmentService.GetAssignmentByIdAsync(assignmentId);
+            return this.CreateResponse(response);
         }
 
-        #endregion
 
-        #region Get all assignment By my StaffID (for staff)
-        [HttpGet("current-Staff")]
-        [Authorize(Roles = "Admin,Staff")]
-        public async Task<IActionResult> GetAssignmentByCurrentStaffId()
-        {
-            try
-            {
-                var CurrentUserId = _userManager.GetUserId(User);
-                var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a => a.UserId == CurrentUserId);
-                if (Assignment == null)
-                {
-                    return NotFound($"This Staff has no assignments");
-                }
-               
-                return Ok(Assignment);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-
-        }
 
         #endregion
 
         #region Get assignment By GroupID
-        [HttpGet("GetAssignmentByGroupId/{groupID:int}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAssignmentByGroupId(int groupID)
-        {
-            try
-            {
-                var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.GroupId == groupID);
-                if (Assignment == null)
-                {
-                    return NotFound($"This group has no assignments");
-                }
-                return Ok(Assignment);
-            }
-            catch (Exception ex)
-            {
+        //[HttpGet("GetAssignmentByGroupId/{groupID:int}")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> GetAssignmentByGroupId(int groupID)
+        //{
+        //    try
+        //    {
+        //        var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.GroupId == groupID);
+        //        if (Assignment == null)
+        //        {
+        //            return NotFound($"This group has no assignments");
+        //        }
+        //        return Ok(Assignment);
+        //    }
+        //    catch (Exception ex)
+        //    {
 
-                return StatusCode(500, "An error occurred while processing your request");
-            }
+        //        return StatusCode(500, "An error occurred while processing your request");
+        //    }
 
-        }
+        //}
 
         #endregion
 
         #region Delete All Assignments
-        [HttpDelete("Delete All")]
+     
+        [HttpDelete("DeleteMany")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteAllAssignments()
+        public async Task<IActionResult> DeleteMany([FromBody] List<int> Ids)
         {
-            var assignments = await _unitOfWork.Assignments.GetAllAsync(m => new { m.Title, m.Date });
-            if (assignments == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Assignment not found.");
+                return BadRequest(ModelState);
             }
-            else
-            {
-                await _unitOfWork.Assignments.DeleteRangeAsync(assignments as ICollection<Assignment>);
-                return Ok("Assignment Deleted Successfully");
-            }
+            var response = await _assignmentService.DeleteManyAsync(Ids);
+            return this.CreateResponse(response);
         }
         #endregion
-        */
+
+        #region GetAssignmentsOfCurrentUser
+        [HttpGet("GetAssignmentsByCreator")]
+        public async Task<IActionResult> GetAssignmentsByCreator()
+        {
+            var response = await _assignmentService.GetAssignmentsByCreator();
+            return this.CreateResponse(response);
+        }
+
+        #endregion
+
+
     }
 }

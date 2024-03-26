@@ -61,6 +61,18 @@ namespace ELearn.Application.Helpers.AutoMapper
             .ForMember(dest => dest.File, opt => opt.Ignore())
             .ForMember(dest => dest.Link, opt => opt.Ignore());
             #endregion
+
+            #region Assignment Mapper 
+            CreateMap<AssignmentDTO, Assignment>()
+                .ForMember(dest => dest.GroupId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+
+
+
+            CreateMap<Assignment, AssignmentDTO>()
+            .ForMember(dest => dest.File, opt => opt.Ignore());
+            
+            #endregion
         }
     }
 }
