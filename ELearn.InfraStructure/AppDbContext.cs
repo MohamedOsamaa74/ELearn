@@ -24,6 +24,7 @@ namespace ELearn.Data
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<FileEntity> Files { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupAnnouncment> GroupAnnouncments { get; set; }
         public DbSet<GroupSurvey> GroupSurveys { get; set; }

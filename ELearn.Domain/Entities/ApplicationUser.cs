@@ -48,6 +48,7 @@ namespace ELearn.Domain.Entities
 
         //many to many task
         public ICollection<UserAssignment>? UserAssignment { get; set; }
+        public List<RefreshToken>? RefreshTokens { get; set; }
         #endregion
 
     }

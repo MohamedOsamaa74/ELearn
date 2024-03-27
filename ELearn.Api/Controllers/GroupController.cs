@@ -18,15 +18,9 @@ namespace ELearn.Api.Controllers
     [Authorize]
     public class GroupController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IGroupService _groupService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly AppDbContext _context;
-        public GroupController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, AppDbContext context, IGroupService groupService)
+        public GroupController(IGroupService groupService)
         {
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _context = context;
             _groupService = groupService;
         }
 

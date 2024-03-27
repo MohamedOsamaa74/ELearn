@@ -1,10 +1,10 @@
+using ELearn.Application.Helpers.Account;
 using ELearn.Application.Helpers.AutoMapper;
 using ELearn.Application.Interfaces;
 using ELearn.Application.Services;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure;
-using ELearn.InfraStructure.Repositories;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -26,19 +26,29 @@ builder.Services.AddSwaggerGen();
 #region Register Services
 var db = builder.Configuration.GetConnectionString("Default Connection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
+builder.Services.Configure<MailSettings>
+    (builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IMaterialService, MaterialService>();
 builder.Services.AddTransient<IVotingService, VotingService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
+builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IUserTwoFactorTokenProvider<ApplicationUser>, EmailTokenProvider<ApplicationUser>>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddTransient<JWT>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 //builder.Services.AddCors();
 #endregion
 
 #region authentication&autherization
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+    options.Tokens.ProviderMap["Default"] = new TokenProviderDescriptor(typeof(IUserTwoFactorTokenProvider<ApplicationUser>));
+    options.Tokens.EmailConfirmationTokenProvider = "Default";
+    }).AddEntityFrameworkStores<AppDbContext>();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
@@ -64,7 +74,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+        ClockSkew = TimeSpan.Zero
     };
 });
 #endregion

@@ -30,6 +30,16 @@ namespace ELearn.Api.Controllers
            
         }
        
+        #region Get Mateial By ID
+        [HttpGet("GetMaterialById/{MaterialId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetMaterialById(int materialId)
+        {
+            var response = await _materialService.GetMaterialByIdAsync(materialId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
         #region GetAll
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -129,36 +139,15 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-
         #region Delete Mateial
         [HttpDelete("Delete/{MaterialId:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMaterial(int MaterialId)
         {
-            
-           
-                var response = await _materialService.DeleteMaterialAsync(MaterialId);
-                return this.CreateResponse(response);
-            
-        }
-        #endregion
-
-
-
-        #region Get Mateial By ID
-        [HttpGet("GetMaterialById/{MaterialId:int}")]
-        [Authorize(Roles = "Admin")]
-
-        public async Task<IActionResult> GetMaterialById(int materialId)
-        {
-            var response = await _materialService.GetMaterialByIdAsync(materialId);
+            var response = await _materialService.DeleteMaterialAsync(MaterialId);
             return this.CreateResponse(response);
         }
-
-        
-
         #endregion
-
 
         #region update Material
         [HttpPut("UpdateMaterial/{MaterialId:int}")]

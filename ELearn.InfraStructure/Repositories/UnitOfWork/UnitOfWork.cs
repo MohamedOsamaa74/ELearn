@@ -20,6 +20,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         public IBaseRepository<Assignment> Assignments { get; private set; }
         public IBaseRepository<Comment> Comments { get; private set; }
         public IBaseRepository<Department> Departments { get; private set; }
+        public IBaseRepository<FileEntity> Files { get; private set; }
         public IBaseRepository<Group> Groups { get; private set; }
         public IBaseRepository<GroupAnnouncment> GroupAnnouncments { get; private set; }
         public IBaseRepository<GroupSurvey> GroupSurveys { get; private set; }

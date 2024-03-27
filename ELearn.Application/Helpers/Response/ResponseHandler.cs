@@ -14,7 +14,7 @@ namespace ELearn.Application.Helpers.Response
         {
             return new Response<T>()
             {
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = HttpStatusCode.OK,
                 Succeeded = true,
                 Message = "Updated Successfully",
                 Data = entity
@@ -24,22 +24,34 @@ namespace ELearn.Application.Helpers.Response
         {
             return new Response<T>()
             {
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = HttpStatusCode.OK,
                 Succeeded = true,
                 Message = "Deleted Successfully"
             };
         }
-        public static Response<T> Success<T>(T entity, object Meta = null)
+        public static Response<T> Success<T>(T entity, string message = "succeeded process", object Meta = null)
         {
             return new Response<T>()
             {
                 Data = entity,
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = HttpStatusCode.OK,
                 Succeeded = true,
-                Message = "succeeded process",
+                Message = message,
                 Meta = Meta
             };
         }
+        
+        /*public static Response<T> Success<T>(string message = "succeeded process", object Meta = null)
+        {
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Succeeded = true,
+                Message = message,
+                Meta = Meta
+            };
+        }*/
+
         public static Response<ICollection<T>> ManySuccess<T>(ICollection<T> entities, object meta = null)
         {
             return new Response<ICollection<T>>
@@ -51,12 +63,11 @@ namespace ELearn.Application.Helpers.Response
                 Meta = meta
             };
         }
-
         public static Response<T> Unauthorized<T>()
         {
             return new Response<T>()
             {
-                StatusCode = System.Net.HttpStatusCode.Unauthorized,
+                StatusCode = HttpStatusCode.Unauthorized,
                 Succeeded = true,
                 Message = "UnAuthorized"
             };
@@ -66,7 +77,7 @@ namespace ELearn.Application.Helpers.Response
         {
             return new Response<T>()
             {
-                StatusCode = System.Net.HttpStatusCode.BadRequest,
+                StatusCode = HttpStatusCode.BadRequest,
                 Succeeded = false,
                 Message = Message == null ? "Bad Request" : Message
             };
@@ -76,7 +87,7 @@ namespace ELearn.Application.Helpers.Response
         {
             return new Response<T>()
             {
-                StatusCode = System.Net.HttpStatusCode.NotFound,
+                StatusCode = HttpStatusCode.NotFound,
                 Succeeded = false,
                 Message = message == null ? "Not Found" : message
             };
@@ -87,7 +98,7 @@ namespace ELearn.Application.Helpers.Response
             return new Response<T>()
             {
                 Data = entity,
-                StatusCode = System.Net.HttpStatusCode.Created,
+                StatusCode = HttpStatusCode.Created,
                 Succeeded = true,
                 Message = "Entity created",
                 Meta = Meta

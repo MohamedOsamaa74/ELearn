@@ -1,16 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
 using ELearn.Data;
-using System.Text.RegularExpressions;
 using Group = ELearn.Domain.Entities.Group;
 
 namespace ELearn.InfraStructure

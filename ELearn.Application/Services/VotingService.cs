@@ -4,22 +4,13 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ELearn.Application.Services
 {
     public class VotingService : IVotingService
     {
+        #region Constructor
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
@@ -29,6 +20,7 @@ namespace ELearn.Application.Services
             _userService = userService;
             _mapper = mapper;
         }
+        #endregion
 
         #region Create
         public async Task<Response<VotingDTO>> CreateNewAsync(VotingDTO Model)

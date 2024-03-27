@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ELearn.Application.DTOs
 {
-    public class ChangePasswordDTO
+    public class ResetPasswordDTO
     {
-        [Required]
-        public required string CurrentPassword { get; set; }
-        [Required]
+        public required string Email { get; set; }
+        public required string OTP { get; set; }
         public required string NewPassword { get; set; }
-        [Required]
         public required string ConfirmPassword { get; set; }
     }
 }

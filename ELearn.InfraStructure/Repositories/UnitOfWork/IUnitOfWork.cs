@@ -16,6 +16,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         IBaseRepository<Assignment> Assignments { get; }
         IBaseRepository<Comment> Comments { get; }
         IBaseRepository<Department> Departments { get; }
+        IBaseRepository<FileEntity> Files { get; }
         IBaseRepository<Group> Groups { get; }
         IBaseRepository<GroupAnnouncment> GroupAnnouncments { get; }
         IBaseRepository<GroupSurvey> GroupSurveys { get; }

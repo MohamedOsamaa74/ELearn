@@ -1,5 +1,8 @@
 ﻿using ELearn.Application.DTOs;
+using ELearn.Application.Helpers.Response;
+using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,67 +17,55 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _config;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IConfiguration config, SignInManager<ApplicationUser> signInManager)
+        #region Fields & Constructor
+        private readonly IAccountService _accountService;
+
+        public AccountController(IAccountService accountService)
         {
-            _userManager = userManager;
-            _config = config;
-            _signInManager = signInManager;
+            _accountService = accountService;
         }
+        #endregion
 
-        private async Task<JwtSecurityToken> CreateToken(ApplicationUser user)
-        {
-            #region claims
-            var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            #endregion
-
-            #region get roles
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            #endregion
-
-            #region sign-in credintials
-            SecurityKey securityKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
-            SigningCredentials signingCred = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            #endregion
-
-            #region create token
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer: _config["JWT:Issuer"],
-                audience: _config["JWT:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(12),
-                signingCredentials: signingCred
-            );
-            #endregion
-
-            return token;
-        }
-
+        #region LogIn
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn([FromBody] LogInUserDTO Model)
         {
-            var result = await _userManager.FindByNameAsync(Model.UserName);
-            if (result == null || !await _userManager.CheckPasswordAsync(result, Model.Password))
-                return StatusCode(StatusCodes.Status400BadRequest, new { status = "Error", Message = "Invalid Credintials" });
-
-            var token = await CreateToken(result);
-            return StatusCode(StatusCodes.Status200OK,
-                new {
-                status = "Success",
-                Message = $"Welcome Back, {result.FirstName}",
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = DateTime.UtcNow.AddHours(2) });
+            var response = await _accountService.LoginAsync(Model);
+            return this.CreateResponse(response);
         }
+        #endregion
 
+        #region LogOut
+        [HttpPost("LogOut")]
+        [Authorize]
+        public async Task<IActionResult> LogOut()
+        {
+            var response = await _accountService.LogoutAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Refresh Token
+        [HttpPost("Refresh-Token")]
+
+        public async Task<IActionResult> RefreshToken([FromBody] string Token)
+        {
+            var response = await _accountService.RefreshTokenAsync(Token);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Revoke Token
+        [HttpPost("Revoke-Token")]
+        public async Task<IActionResult> RevokeToken([FromBody] string Token)
+        {
+            var response = await _accountService.RevokeTokenAsync(Token);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Change Password
         [HttpPut("Change-Password")]
         public async Task<IActionResult>ChangePassword([FromBody] ChangePasswordDTO Model)
         {
@@ -82,14 +73,60 @@ namespace ELearn.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var CurrentUser = await _userManager.FindByNameAsync(User.Identity.Name);
-            var result = await _userManager.ChangePasswordAsync(CurrentUser, Model.OldPassword, Model.NewPassword);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-            await _signInManager.RefreshSignInAsync(CurrentUser);
-            return Ok("Password Changed Succesfully");
+            var response = await _accountService.ChangePasswordAsync(Model);
+            return this.CreateResponse(response);
         }
+        #endregion
+
+        #region Send Email
+        [HttpPost("Send-Email")]
+        public async Task<IActionResult> SendEmail([FromForm] EmailDTO Model)
+        {
+            var response = await _accountService.SendEmailAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Add Email
+        [HttpPost("Add-Email")]
+        [Authorize]
+        public async Task<IActionResult> AddEmail([FromBody] string Email)
+        {
+            var response = await _accountService.AddEmailAsync(Email);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Confirm Email
+        [HttpPost("Confirm-Email/{Token}")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmEmail(string Token)
+        {
+            var response = await _accountService.ConfirmEmailAsync(Token);
+            return this.CreateResponse(response);
+        }
+        #endregion
+        
+        #region Forgot Password
+        [HttpPost("Forgot-Password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string Email)
+        {
+            var response = await _accountService.ForgotPasswordAsync(Email);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Reset Password
+        [HttpPost("Reset-Password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO Model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _accountService.ResetPasswordAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
     }
 }

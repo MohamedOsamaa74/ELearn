@@ -25,24 +25,17 @@ namespace ELearn.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
-        public UserService(AppDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper, IUnitOfWork unitOfWork)
+        public UserService(UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IMapper mapper, IUnitOfWork unitOfWork)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
-
-        /*public IHttpContextAccessor Get_httpContextAccessor()
-        {
-            return _httpContextAccessor;
-        }*/
 
         public async Task<ApplicationUser> GetCurrentUserAsync()
         {
