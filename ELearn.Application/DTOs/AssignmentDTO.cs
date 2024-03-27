@@ -15,7 +15,7 @@ namespace ELearn.Application.DTOs
         public required DateTime Date { get; set; }
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
-        public required string FilePath { get; set; }
+
         public required IFormFile File { get; set; }
     }
 }

@@ -1,4 +1,12 @@
-﻿using ELearn.Application.Interfaces;
+﻿using AutoMapper;
+using ELearn.Application.DTOs;
+using ELearn.Application.Helpers.Response;
+using ELearn.Application.Interfaces;
+using ELearn.Data;
+using ELearn.Domain.Entities;
+using ELearn.InfraStructure.Repositories.UnitOfWork;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +17,167 @@ namespace ELearn.Application.Services
 {
     public class AssignmentService : IAssignmentService
     {
+        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
+        public AssignmentService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+
+
+        }
+
+        #region Delete Assignment 
+        public async Task<Response<AssignmentDTO>> DeleteAssignmentAsync(int Id)
+        {
+            var assignment = await _unitOfWork.Assignments.GetByIdAsync(Id);
+            if (assignment is null)
+                return ResponseHandler.NotFound<AssignmentDTO>();
+            try
+            {
+                await _unitOfWork.Assignments.DeleteAsync(assignment);
+                return ResponseHandler.Deleted<AssignmentDTO>();
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<AssignmentDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+            }
+        }
+
+
+        #endregion
+
+        #region Update Material
+        public async Task<Response<AssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, AssignmentDTO Model)
+
+        {
+            var AssignmentToUpdate = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+            if (AssignmentToUpdate == null)
+                return ResponseHandler.NotFound<AssignmentDTO>();
+
+            try
+            {
+
+                _mapper.Map(Model, AssignmentToUpdate);
+
+
+                await _unitOfWork.Assignments.UpdateAsync(AssignmentToUpdate);
+                await _context.SaveChangesAsync();
+
+                var updatedDto = _mapper.Map<AssignmentDTO>(AssignmentToUpdate);
+
+
+                return ResponseHandler.Updated(updatedDto);
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while updating material: {ex.Message}");
+            }
+        }
+
+        #endregion
+
+        #region GetAll
+        public async Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync()
+        {
+            try
+            {
+                var assignments = await _unitOfWork.Assignments.GetAllAsync();
+                var assignmentDtos = _mapper.Map<ICollection<AssignmentDTO>>(assignments);
+                return ResponseHandler.Success(assignmentDtos);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<AssignmentDTO>>($"An error occurred while retrieving materials: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Get Assignment By ID
+        public async Task<Response<AssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId)
+        {
+            try
+            {
+                var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+                if (assignment == null)
+                {
+                    return ResponseHandler.NotFound<AssignmentDTO>();
+                }
+
+                var assignmentDto = _mapper.Map<AssignmentDTO>(assignment);
+                return ResponseHandler.Success(assignmentDto);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while retrieving material: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region GetAssignmentsByCreator
+        public async Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator()
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var Assignments = await _unitOfWork.Assignments.GetWhereSelectAsync(v => v.UserId == user.Id, v => v.Id);
+
+                if (Assignments is null)
+                    return ResponseHandler.NotFound<ICollection<AssignmentDTO>>("There are No Assignments yet");
+                ICollection<AssignmentDTO> AssignmentsDto = new List<AssignmentDTO>();
+                foreach (var Assignment in Assignments)
+                {
+                    var Assignmentto = await GetAssignmentByIdAsync(Assignment);
+                    AssignmentsDto.Add(Assignmentto.Data);
+                }
+                return ResponseHandler.Success(AssignmentsDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<AssignmentDTO>>($"An Error Occurred, {Ex}");
+            }
+
+
+        }
+
+        #endregion
+
+        #region Delete Delete All Assignments
+        public async Task<Response<ICollection<AssignmentDTO>>> DeleteManyAsync(List<int> Ids)
+        {
+            try
+            {
+                var assignments = await GetAssignmentByIdAsync(Ids); 
+                if (assignments is null || !assignments.Any())
+                    return ResponseHandler.NotFound<ICollection<AssignmentDTO>>();
+
+                await _unitOfWork.Assignments.DeleteRangeAsync(assignments);
+                return ResponseHandler.Deleted<ICollection<AssignmentDTO>>();
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<AssignmentDTO>>($"An Error Occured, {Ex}");
+            }
+        }
+        #endregion
+
+        #region Methods
+        private async Task<ICollection<Assignment>> GetAssignmentByIdAsync(IEnumerable<int> Ids)
+        {
+            List<Assignment> assignments = new List<Assignment>();
+            foreach (var Id in Ids)
+            {
+                var entity = await _unitOfWork.Assignments.GetByIdAsync(Id);
+                if (entity != null)
+                    assignments.Add(entity);
+            }
+            return assignments;
+        } 
+        #endregion
     }
 }
