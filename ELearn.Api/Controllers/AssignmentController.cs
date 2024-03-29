@@ -22,12 +22,10 @@ namespace ELearn.Api.Controllers
     public class AssignmentController : ControllerBase
     {
         private readonly IAssignmentService _assignmentService;
-        private readonly IUserService _userService;
 
-        public AssignmentController(IAssignmentService AssignmentService, IUserService userService)
+        public AssignmentController(IAssignmentService AssignmentService)
         {
             _assignmentService = AssignmentService;
-            _userService = userService;
         }
 
         #region Delete Assignment
@@ -35,11 +33,8 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAssignment(int AssignmentId)
         {
-
-
             var response = await _assignmentService.DeleteAssignmentAsync(AssignmentId);
             return this.CreateResponse(response);
-
         }
         #endregion
 
@@ -74,15 +69,11 @@ namespace ELearn.Api.Controllers
         #region Get Assignment By ID
         [HttpGet("GetAssignmentById/{AssignmentId:int}")]
         [Authorize(Roles = "Admin")]
-
         public async Task<IActionResult> GetAssignmentById(int assignmentId)
         {
             var response = await _assignmentService.GetAssignmentByIdAsync(assignmentId);
             return this.CreateResponse(response);
         }
-
-
-
         #endregion
 
         #region Get assignment By GroupID
@@ -106,11 +97,9 @@ namespace ELearn.Api.Controllers
         //    }
 
         //}
-
         #endregion
 
         #region Delete All Assignments
-     
         [HttpDelete("DeleteMany")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMany([FromBody] List<int> Ids)
@@ -131,9 +120,6 @@ namespace ELearn.Api.Controllers
             var response = await _assignmentService.GetAssignmentsByCreator();
             return this.CreateResponse(response);
         }
-
         #endregion
-
-
     }
 }

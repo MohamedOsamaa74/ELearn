@@ -97,9 +97,12 @@ namespace ELearn.Application.Services
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
+
                 if (user == null)
                     return ResponseHandler.BadRequest<string>("User not found");
+
                 await _signInManager.SignOutAsync();
+
                 return ResponseHandler.Success("Logged Out Successfully");
             }
             catch (Exception ex)

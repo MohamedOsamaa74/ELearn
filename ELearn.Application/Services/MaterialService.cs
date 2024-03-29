@@ -140,6 +140,9 @@ namespace ELearn.Application.Services
                 return ResponseHandler.BadRequest<ICollection<UpdateMaterialDTO>>($"An error occurred while retrieving materials: {ex.Message}");
             }
         }
+
         #endregion
+
+        
     }
 }
