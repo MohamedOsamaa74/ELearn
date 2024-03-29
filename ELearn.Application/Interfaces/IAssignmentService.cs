@@ -15,11 +15,7 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync();
         public Task<Response<AssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId);
         //public Task<IEnumerable<AssignmentDTO>> GetAssignmentsByStaffId(string staffId);
-
         public Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator();
-
         public Task<Response<ICollection<AssignmentDTO>>> DeleteManyAsync(List<int> Ids);
-
-
     }
 }
