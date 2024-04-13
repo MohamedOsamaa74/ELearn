@@ -31,6 +31,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IMaterialService, MaterialService>();
 builder.Services.AddTransient<IVotingService, VotingService>();
+builder.Services.AddTransient<ISurveyService, SurveyService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
