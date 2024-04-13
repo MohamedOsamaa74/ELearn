@@ -61,17 +61,6 @@ namespace ELearn.Application.Helpers.AutoMapper
             .ForMember(dest => dest.File, opt => opt.Ignore())
             .ForMember(dest => dest.Link, opt => opt.Ignore());
             #endregion
-
-            #region Voting Mapper
-            CreateMap<Survey, SurveyDTO>()
-                .ForMember(dest => dest.groups, opt => opt.Ignore())
-                .ForMember(dest => dest.Options, opt => opt.Ignore());
-
-            CreateMap<SurveyDTO, Survey>()
-                .ForMember(dest => dest.ApplicationUserId, opt => opt.Ignore())
-                .ForMember(dest => dest.Options, opt => opt.Ignore())
-                .ForMember(dest => dest.Group, opt => opt.Ignore());
-            #endregion
         }
     }
 }
