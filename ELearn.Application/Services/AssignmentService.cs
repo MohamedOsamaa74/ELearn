@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
@@ -88,6 +88,10 @@ namespace ELearn.Application.Services
             try
             {
                 var assignments = await _unitOfWork.Assignments.GetAllAsync();
+                if (assignments == null)
+                {
+                    return ResponseHandler.NotFound<ICollection<AssignmentDTO>>("There are no assignments yet");
+                }
                 var assignmentDtos = _mapper.Map<ICollection<AssignmentDTO>>(assignments);
                 return ResponseHandler.Success(assignmentDtos);
             }

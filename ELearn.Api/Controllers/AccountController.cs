@@ -1,4 +1,4 @@
-﻿using ELearn.Application.DTOs;
+﻿using ELearn.Application.DTOs.AuthDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;

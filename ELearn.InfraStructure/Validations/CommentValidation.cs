@@ -18,9 +18,8 @@ namespace ELearn.InfraStructure.Validations
                 .NotEmpty();
             RuleFor(x => x.PostId)
                 .NotNull();
-            RuleFor(x => x.Date)
+            RuleFor(x => x.CreationDate)
                 .NotNull();
-
         }
     }
 }

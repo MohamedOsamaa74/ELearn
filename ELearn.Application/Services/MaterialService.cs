@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.MaterialDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
@@ -18,6 +18,7 @@ namespace ELearn.Application.Services
 {
     public class MaterialService : IMaterialService
     {
+        #region Fields
         private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
@@ -29,6 +30,7 @@ namespace ELearn.Application.Services
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+        #endregion
            
         #region Delete Material
         public async Task<Response<AddMaterialDTO>> DeleteMaterialAsync(int Id)
@@ -142,7 +144,5 @@ namespace ELearn.Application.Services
         }
 
         #endregion
-
-        
     }
 }

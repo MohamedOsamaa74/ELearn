@@ -9,15 +9,20 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
-        public char? CorrectOption { get; set; }
-        public required ICollection<Option> Options { get; set; } = new HashSet<Option>();
-        //one to many (questions)
+        public string? CorrectOption { get; set; }
+
+        #region ForeignKeys
         public int? QuizId { get; set; }
         public int? SurveyId { get; set; }
+        #endregion
+
+        #region NavigationProberty
+        public ICollection<Option> Options { get; set; } = new HashSet<Option>();
         public virtual Quiz? Quiz { get; set; }
         public virtual Survey? Survey { get; set; }
-        public ICollection<UserQuestion>? UserQuestion { get; set; } = new HashSet<UserQuestion>();
+        public FileEntity? File { get; set; }
+        public ICollection<UserAnswerQuestion>? UserQuestion { get; set; } = new HashSet<UserAnswerQuestion>();
         public ICollection<ApplicationUser> ApplicationUser { get; set; } = new HashSet<ApplicationUser>();
-
+        #endregion
     }
 }

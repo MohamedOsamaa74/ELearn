@@ -156,15 +156,8 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
@@ -195,9 +188,6 @@ namespace ELearn.InfraStructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
@@ -243,12 +233,45 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Createion")
+                    b.Property<int?>("AnnouncementId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Creation")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DownloadUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FolderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MessageId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuestionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -258,11 +281,42 @@ namespace ELearn.InfraStructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url")
+                    b.Property<int?>("UserAssignementId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ViewUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AnnouncementId");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("CommentId")
+                        .IsUnique()
+                        .HasFilter("[CommentId] IS NOT NULL");
+
+                    b.HasIndex("MaterialId");
+
+                    b.HasIndex("MessageId")
+                        .IsUnique()
+                        .HasFilter("[MessageId] IS NOT NULL");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("QuestionId")
+                        .IsUnique()
+                        .HasFilter("[QuestionId] IS NOT NULL");
+
+                    b.HasIndex("UserAssignementId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Files", (string)null);
                 });
@@ -384,19 +438,14 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Link")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -421,9 +470,6 @@ namespace ELearn.InfraStructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("ReceiverId")
                         .IsRequired()
@@ -508,7 +554,7 @@ namespace ELearn.InfraStructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CorrectOption")
-                        .HasColumnType("nvarchar(1)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("QuizId")
                         .HasColumnType("int");
@@ -536,9 +582,6 @@ namespace ELearn.InfraStructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
@@ -628,6 +671,38 @@ namespace ELearn.InfraStructure.Migrations
                     b.ToTable("Surveys");
                 });
 
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("OptionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("OptionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("UserAnswerQuestions");
+                });
+
             modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
                 {
                     b.Property<int>("Id")
@@ -638,9 +713,6 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.Property<int>("AssignmentId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("DateAnswered")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -680,41 +752,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserGroups", (string)null);
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.UserQuestion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateAnswered")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("OptionId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("UserQuestions");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
@@ -1058,6 +1095,73 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ELearn.Domain.Entities.FileEntity", b =>
+                {
+                    b.HasOne("ELearn.Domain.Entities.Announcement", "Announcement")
+                        .WithMany("Files")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.Assignment", "Assignment")
+                        .WithMany("Files")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.Comment", "Comment")
+                        .WithOne("File")
+                        .HasForeignKey("ELearn.Domain.Entities.FileEntity", "CommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.Material", "Material")
+                        .WithMany("Files")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.Message", "Message")
+                        .WithOne("File")
+                        .HasForeignKey("ELearn.Domain.Entities.FileEntity", "MessageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.Post", "Post")
+                        .WithMany("Files")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
+                        .WithOne("File")
+                        .HasForeignKey("ELearn.Domain.Entities.FileEntity", "QuestionId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.UserAssignment", "UserAssignment")
+                        .WithMany("Files")
+                        .HasForeignKey("UserAssignementId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("Files")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Announcement");
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("Material");
+
+                    b.Navigation("Message");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserAssignment");
+                });
+
             modelBuilder.Entity("ELearn.Domain.Entities.Group", b =>
                 {
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
@@ -1273,6 +1377,31 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerQuestion", b =>
+                {
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany("UserQuestion")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("ELearn.Domain.Entities.Option", "Option")
+                        .WithMany()
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
+                        .WithMany("UserQuestion")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Option");
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
                 {
                     b.HasOne("ELearn.Domain.Entities.Assignment", "Assignment")
@@ -1309,31 +1438,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.UserQuestion", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany("UserQuestion")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("ELearn.Domain.Entities.Option", "Option")
-                        .WithMany()
-                        .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
-                        .WithMany("UserQuestion")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Option");
-
-                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
@@ -1432,6 +1536,8 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.Announcement", b =>
                 {
+                    b.Navigation("Files");
+
                     b.Navigation("GroupAnnouncements");
                 });
 
@@ -1444,6 +1550,8 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("CreatedGroups");
+
+                    b.Navigation("Files");
 
                     b.Navigation("Materials");
 
@@ -1474,9 +1582,16 @@ namespace ELearn.InfraStructure.Migrations
 
             modelBuilder.Entity("ELearn.Domain.Entities.Assignment", b =>
                 {
+                    b.Navigation("Files");
+
                     b.Navigation("UserAssignment");
 
                     b.Navigation("users");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.Comment", b =>
+                {
+                    b.Navigation("File");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Department", b =>
@@ -1505,15 +1620,29 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("UserGroups");
                 });
 
+            modelBuilder.Entity("ELearn.Domain.Entities.Material", b =>
+                {
+                    b.Navigation("Files");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.Message", b =>
+                {
+                    b.Navigation("File");
+                });
+
             modelBuilder.Entity("ELearn.Domain.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Files");
 
                     b.Navigation("Reacts");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Question", b =>
                 {
+                    b.Navigation("File");
+
                     b.Navigation("Options");
 
                     b.Navigation("UserQuestion");
@@ -1535,6 +1664,11 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("UserSurvey");
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
+                {
+                    b.Navigation("Files");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Voting", b =>

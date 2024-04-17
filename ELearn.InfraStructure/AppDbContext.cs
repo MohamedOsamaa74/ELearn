@@ -24,7 +24,6 @@ namespace ELearn.Data
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Department> Departments { get; set; }
-        public DbSet<FileEntity> Files { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupAnnouncment> GroupAnnouncments { get; set; }
         public DbSet<GroupSurvey> GroupSurveys { get; set; }
@@ -39,11 +38,11 @@ namespace ELearn.Data
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
-        public DbSet<UserQuestion> UserQuestions { get; set; }
+        public DbSet<UserAnswerQuestion> UserAnswerQuestions { get; set; }
         public DbSet<UserSurvey> UserSurveys { get; set; }
         public DbSet<UserVoting> UserVotings { get; set; }
         public DbSet<Voting> Votings { get; set; }
         public DbSet<UserAssignment> UserAssignments { get; set; }
-
+        public DbSet<FileEntity> Attachements { get; set; }
     }
 }

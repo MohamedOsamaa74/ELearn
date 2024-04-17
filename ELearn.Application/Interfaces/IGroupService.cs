@@ -1,4 +1,4 @@
-﻿using ELearn.Application.DTOs;
+﻿using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.Helpers.Response;
 using System;
 using System.Collections.Generic;

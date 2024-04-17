@@ -1,11 +1,6 @@
 ﻿using ELearn.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Configurations
 {
@@ -16,11 +11,52 @@ namespace ELearn.InfraStructure.Configurations
             builder.ToTable("Files");
             builder.HasKey(x => x.Id);
 
-            /*builder.Property(p => p.Title).IsRequired();
-            builder.Property(p => p.FilePath).IsRequired();
-            builder.Property(p => p.Url).IsRequired();
-            builder.Property(p => p.Type).IsRequired();
-            builder.Property(p => p.Createion).IsRequired();*/
+            #region Relations
+            builder.HasOne(c => c.Comment)
+                .WithOne(f => f.File)
+                .HasForeignKey<FileEntity>(i => i.CommentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(q => q.Question)
+                .WithOne(f => f.File)
+                .HasForeignKey<FileEntity>(f => f.QuestionId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(m => m.Message)
+                .WithOne(f => f.File)
+                .HasForeignKey<FileEntity>(f => f.MessageId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(u => u.User)
+                .WithMany(f => f.Files)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(M => M.Material)
+                .WithMany(m => m.Files)
+                .HasForeignKey(f => f.MaterialId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(a => a.Announcement)
+                .WithMany(f => f.Files)
+                .HasForeignKey(f => f.AnnouncementId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(a => a.Assignment)
+                .WithMany(f => f.Files)
+                .HasForeignKey(f => f.AssignmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(a => a.UserAssignment)
+                .WithMany(f => f.Files)
+                .HasForeignKey(f => f.UserAssignementId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(p => p.Post)
+                .WithMany(f => f.Files)
+                .HasForeignKey(f => f.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+            #endregion
         }
     }
 }

@@ -10,7 +10,7 @@ namespace ELearn.Domain.Entities
         public int Id { get; set; }
         public required int GroupId { get; set; }
         public required string UserId { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime CreationDate => DateTime.UtcNow.ToLocalTime();
         public required string title { get; set; }
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }

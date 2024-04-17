@@ -27,7 +27,7 @@ namespace ELearn.InfraStructure
             services.AddTransient<IValidator<Survey>, SurveyValidation>();
             services.AddTransient<IValidator<UserAssignment>, UserAssignmentValidation>();
             services.AddTransient<IValidator<UserGroup>, UserGroupValidation>();
-            services.AddTransient<IValidator<UserQuestion>, UserQuestionValidation>();
+            services.AddTransient<IValidator<UserAnswerQuestion>, UserQuestionValidation>();
             services.AddTransient<IValidator<UserSurvey>, UserSurveyValidation>();
             services.AddTransient<IValidator<UserVoting>, UserVotingValidation>();
             services.AddTransient<IValidator<Voting>, VotingValidation>();

@@ -1,5 +1,4 @@
-﻿using ELearn.Application.DTOs;
-using ELearn.Application.Helpers.Account;
+﻿using ELearn.Application.Helpers.Account;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -17,6 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
+using ELearn.Application.DTOs.AuthDTOs;
 
 
 namespace ELearn.Application.Services

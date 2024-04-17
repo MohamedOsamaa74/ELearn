@@ -36,6 +36,7 @@ builder.Services.AddTransient<IMaterialService, MaterialService>();
 builder.Services.AddTransient<IVotingService, VotingService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IFileService, FilesService>();
 builder.Services.AddTransient<IUserTwoFactorTokenProvider<ApplicationUser>, EmailTokenProvider<ApplicationUser>>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<JWT>();
@@ -115,7 +116,7 @@ var app = builder.Build();
 AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

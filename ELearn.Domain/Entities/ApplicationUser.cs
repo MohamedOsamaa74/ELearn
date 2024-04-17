@@ -26,7 +26,7 @@ namespace ELearn.Domain.Entities
         public ICollection<Post>? Posts { get; set; }
         public ICollection<Material>? Materials { get; set; }
         public ICollection<Quiz>? Quizzes { get; set; }
-
+        public ICollection<FileEntity> Files { get;} = new List<FileEntity>();
         public ICollection<Message>? SentMessages { get; set; }
         public ICollection<Message>? ReceivedMessages { get; set; }
         public ICollection<Voting>? Votings { get; set; }
@@ -36,7 +36,7 @@ namespace ELearn.Domain.Entities
         public ICollection<Comment>? Comments { get; set; }
         public ICollection<Announcement>? Announcements { get; set; }
         public ICollection<Assignment>? Assignments { get; set; }
-        public ICollection<UserQuestion>? UserQuestion { get; set; }
+        public ICollection<UserAnswerQuestion>? UserQuestion { get; set; }
         public ICollection<Question>? Question { get; set; }
 
         //user create many groups

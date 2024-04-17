@@ -18,19 +18,14 @@ namespace ELearn.InfraStructure.Repositories.Base
         Task<IEnumerable<object>> GetAllAsync(Expression<Func<T, object>> Selected);
         Task<bool> FindIfExistAsync(Expression<Func<T, bool>> Condition);
         Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> expression);
-        public Task<List<TResult>> GetWhereSelectAsync<TResult>(Expression<Func<T, bool>> Condition, Expression<Func<T, TResult>> expression);
-        // Get By Department Id   
-        // Get X from Multiple Groups 1
-        // Get x From Group Y
-        Task<ApplicationUser> GetCurrentUserAsync(ClaimsPrincipal User);
+        Task<T> GetWhereSingleAsync(Expression<Func<T, bool>> expression);
+        Task<List<TResult>> GetWhereSelectAsync<TResult>(Expression<Func<T, bool>> Condition, Expression<Func<T, TResult>> expression);
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
         Task DeleteRangeAsync(ICollection<T> entities);
-        Task<string> UploadFileAsync(IFormFile file, string folderPath);
         Task SaveChangesAsync();
-        //Task<string> UploadFile(IFormFile formFile, string x);
         void Commit();
         void RollBack();
     }

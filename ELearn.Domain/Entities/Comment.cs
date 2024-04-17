@@ -9,16 +9,17 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
-        public DateTime Date { get; set; }
-        //UserId
+        public DateTime CreationDate => DateTime.UtcNow.ToLocalTime();
 
-        //PostId
+        #region ForeignKeys
         public required int PostId { get; set; }
-        public virtual required Post Post { get; set; }
-        public string UserId { get; set; }//CreatorId
+        public required string UserId { get; set; }//CreatorId
+        #endregion
 
-        public virtual required ApplicationUser User { get; set; }
-
+        #region NavigationProperties
+        public virtual Post Post { get; set; }
+        public virtual ApplicationUser User { get; set; }
+        public FileEntity? File { get; set; }
+        #endregion
     }
-
 }

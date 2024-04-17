@@ -31,7 +31,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         IBaseRepository<Survey> Surveys { get; }
         IBaseRepository<UserAssignment> UserAssignments { get; }
         IBaseRepository<UserGroup> UserGroups { get; }
-        IBaseRepository<UserQuestion> UserQuestions { get; }
+        IBaseRepository<UserAnswerQuestion> UserQuestions { get; }
         IBaseRepository<UserSurvey> UserSurveys { get; }
         IBaseRepository<UserVoting> UserVotings { get; }
         IBaseRepository<Voting> Votings { get; }

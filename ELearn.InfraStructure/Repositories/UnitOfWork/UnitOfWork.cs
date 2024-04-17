@@ -35,7 +35,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         public IBaseRepository<Survey> Surveys { get; private set; }
         public IBaseRepository<UserAssignment> UserAssignments { get; private set; }
         public IBaseRepository<UserGroup> UserGroups { get; private set; }
-        public IBaseRepository<UserQuestion> UserQuestions { get; private set; }
+        public IBaseRepository<UserAnswerQuestion> UserQuestions { get; private set; }
         public IBaseRepository<UserSurvey> UserSurveys { get; private set; }
         public IBaseRepository<UserVoting> UserVotings { get; private set; }
         public IBaseRepository<Voting> Votings { get; private set; }
@@ -51,6 +51,7 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
             Assignments = new BaseRepository<Assignment>(context, userManager);
             Comments = new BaseRepository<Comment>(context, userManager);
             Departments = new BaseRepository<Department>(context, userManager);
+            Files = new BaseRepository<FileEntity>(context, userManager);
             Groups = new BaseRepository<Group>(context, userManager);
             GroupAnnouncments = new BaseRepository<GroupAnnouncment>(context, userManager);
             GroupSurveys = new BaseRepository<GroupSurvey>(context, userManager);

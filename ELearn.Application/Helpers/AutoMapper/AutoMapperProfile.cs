@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
-using ELearn.Application.DTOs;
-using ELearn.Application.Interfaces;
-using ELearn.Data;
+using ELearn.Application.DTOs.AnnouncementDTOs;
+using ELearn.Application.DTOs.AssignmentDTOs;
+using ELearn.Application.DTOs.FileDTOs;
+using ELearn.Application.DTOs.GroupDTOs;
+using ELearn.Application.DTOs.MaterialDTOs;
+using ELearn.Application.DTOs.QuizDTOs;
+using ELearn.Application.DTOs.UserDTOs;
+using ELearn.Application.DTOs.VotingDTOs;
 using ELearn.Domain.Entities;
-using ELearn.InfraStructure.Repositories.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ELearn.Application.Helpers.AutoMapper
 {
@@ -17,16 +16,27 @@ namespace ELearn.Application.Helpers.AutoMapper
         public AutoMapperProfile()
         {
             #region Announcement Mapper
-            CreateMap<Announcement, AnnouncementDTO>()
+            CreateMap<Announcement, UploadAnnouncementDTO>()
                 .ForMember(dest => dest.Groups, opt => opt.Ignore());
 
-            CreateMap<AnnouncementDTO, Announcement>();
+            CreateMap<UploadAnnouncementDTO, Announcement>()
+                .ForMember(dest => dest.Files, opt => opt.Ignore());
+
+            CreateMap<UploadAnnouncementDTO, ViewAnnouncementDTO>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
+                .ForMember(dest => dest.FilesUrls, opt => opt.Ignore());
+
+            CreateMap<Announcement, ViewAnnouncementDTO>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.FilesUrls, opt => opt.Ignore())
+                .ForMember(dest => dest.Groups, opt => opt.Ignore());
             #endregion
 
             #region User Mapper
-            CreateMap<ApplicationUser, UserDTO>();
+            CreateMap<ApplicationUser, AddUserDTO>();
 
-            CreateMap<UserDTO, ApplicationUser>();
+            CreateMap<AddUserDTO, ApplicationUser>();
 
             CreateMap<EditUserDTO, ApplicationUser>();
             #endregion
@@ -40,11 +50,11 @@ namespace ELearn.Application.Helpers.AutoMapper
             #endregion
 
             #region Voting Mapper
-            CreateMap<Voting, VotingDTO>()
+            CreateMap<Voting, AddVotingDTO>()
                 .ForMember(dest => dest.groups, opt => opt.Ignore())
                 .ForMember(dest => dest.Options, opt => opt.Ignore());
 
-            CreateMap<VotingDTO, Voting>()
+            CreateMap<AddVotingDTO, Voting>()
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Options, opt => opt.Ignore())
                 .ForMember(dest => dest.Group, opt => opt.Ignore());
@@ -71,7 +81,20 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             CreateMap<Assignment, AssignmentDTO>()
             .ForMember(dest => dest.File, opt => opt.Ignore());
-            
+
+            #endregion
+
+            #region Quiz Mapper
+            CreateMap<CreateQuizDTO,Quiz> ()
+                .ForMember(dest => dest.GroupId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Questions, opt => opt.Ignore());
+
+            CreateMap<Quiz, CreateQuizDTO>();
+            #endregion
+
+            #region File Mapper
+            CreateMap<FileEntity, FileDTO>();
             #endregion
         }
     }

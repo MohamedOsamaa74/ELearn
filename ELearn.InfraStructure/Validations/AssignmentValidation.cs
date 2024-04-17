@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public AssignmentValidation() 
         {
-            RuleFor(x=>x.CreationDate)
+            RuleFor(x=>x.Start)
                 .NotNull();
             RuleFor(x => x.Title)
                 .NotEmpty()

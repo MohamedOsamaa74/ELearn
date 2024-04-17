@@ -1,4 +1,4 @@
-﻿using ELearn.Application.DTOs;
+﻿using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
@@ -26,7 +26,7 @@ namespace ELearn.Api.Controllers
         #region Add Single User
         [HttpPost("AddSignleUser")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddSingleUser([FromBody] UserDTO Model)
+        public async Task<IActionResult> AddSingleUser([FromBody] AddUserDTO Model)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);

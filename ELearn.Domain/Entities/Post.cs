@@ -10,13 +10,10 @@ namespace ELearn.Domain.Entities
         public int Id { get; set; }
         public required string Text { get; set; }
         public DateTime Date { get; set; }
-
-        public string UserId { get; set; }//CreatorId
-
-        public virtual required ApplicationUser User { get; set; }
-
+        public required string UserId { get; set; } //CreatorId
+        public virtual ApplicationUser User { get; set; }
+        public ICollection<FileEntity> Files { get; } = new List<FileEntity>();
         public ICollection<React>? Reacts { get; set; }
         public ICollection<Comment>? Comments { get; set; }
-
     }
 }

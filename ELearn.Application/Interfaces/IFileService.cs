@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ELearn.Application.DTOs.FileDTOs;
+using ELearn.Application.Helpers.Response;
+using ELearn.Domain.Entities;
 
 namespace ELearn.Application.Interfaces
 {
     public interface IFileService
     {
-        Task<string> UploadFileAsync(byte[] file, string folderName, string fileName);
-        Task<byte[]> DownloadFileAsync(string folderName, string fileName);
-        Task<bool> DeleteFileAsync(string folderName, string fileName);
+        Task<Response<FileDTO>> GetByIdAsync(int Id);
+        Task<Response<FileDTO>> GetByFileNameAsync(string fileName);
+        Task<Response<ICollection<FileDTO>>> GetAllFilesAsync();
+        Task<Response<FileDTO>> UploadFileAsync(UploadFileDTO fileDTO);
+        Task<byte[]> DownloadFileAsync(DownloadFileDTO downloadFileDTO);
+        Task<Response<FileDTO>> DeleteAsync(int Id);
+        Task<string>GetFileType(string fileName);
+        //Task<string> GetFileNameAsync();
+
     }
 }

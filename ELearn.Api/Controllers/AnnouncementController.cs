@@ -1,4 +1,4 @@
-using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.AnnouncementDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
@@ -23,6 +23,7 @@ namespace ELearn.Api.Controllers
         {
             _announcementService = AnnouncementService;
         }
+
 
         #region Get By Id
         [HttpGet("{Id:int}")]
@@ -73,7 +74,7 @@ namespace ELearn.Api.Controllers
         #region Create New
         [HttpPost("CreateNew")]
         [Authorize(Roles = "Admin ,Staff")]
-        public async Task<IActionResult> Create([FromBody] AnnouncementDTO Model)
+        public async Task<IActionResult> Create([FromForm] UploadAnnouncementDTO Model)
         {
             var response = await _announcementService.CreateNewAsync(Model);
             return this.CreateResponse(response);
@@ -83,7 +84,7 @@ namespace ELearn.Api.Controllers
         #region Edit
         [HttpPut("EditAnnouncement/{AnnouncementId:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateAnnouncement([FromBody] AnnouncementDTO Model, int AnnouncementId)
+        public async Task<IActionResult> UpdateAnnouncement([FromBody] UploadAnnouncementDTO Model, int AnnouncementId)
         {
             if (!ModelState.IsValid)
             {

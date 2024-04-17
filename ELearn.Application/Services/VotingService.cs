@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.OptionDTOs;
+using ELearn.Application.DTOs.VotingDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -23,16 +24,16 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Create
-        public async Task<Response<VotingDTO>> CreateNewAsync(VotingDTO Model)
+        public async Task<Response<AddVotingDTO>> CreateNewAsync(AddVotingDTO Model)
         {
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
                 var vote = _mapper.Map<Voting>(Model);
                 vote.CreatorId = user.Id;
-                await _unitOfWork.Votings.AddAsync(vote);
                 if (Model.Options.IsNullOrEmpty() || Model.Options.Count()<2)
-                    return ResponseHandler.BadRequest<VotingDTO>("You have to insert at least two options");
+                    return ResponseHandler.BadRequest<AddVotingDTO>("You have to insert at least two options");
+                await _unitOfWork.Votings.AddAsync(vote);
                 foreach(var text in Model.Options)
                 {
                     Option option = new Option() { Text = text, VotingId = vote.Id};
@@ -43,21 +44,21 @@ namespace ELearn.Application.Services
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<AddVotingDTO>($"An Error Occurred, {Ex}");
             }
         }
 
         #endregion
 
         #region GetById
-        public async Task<Response<VotingDTO>> GetByIdAsync(int Id)
+        public async Task<Response<AddVotingDTO>> GetByIdAsync(int Id)
         {
             try
             {
                 var vote = await _unitOfWork.Votings.GetByIdAsync(Id);
                 if(vote is null)
-                    return ResponseHandler.NotFound<VotingDTO>("There is no such Voting");
-                var voteDto = _mapper.Map<VotingDTO>(vote);
+                    return ResponseHandler.NotFound<AddVotingDTO>("There is no such Voting");
+                var voteDto = _mapper.Map<AddVotingDTO>(vote);
                 voteDto.groups = await _unitOfWork.GroupVotings
                     .GetWhereSelectAsync(v => v.Id == Id, v => v.GroupId);
                 voteDto.Options = await _unitOfWork.Options.GetWhereSelectAsync(opt => opt.VotingId == Id, opt => opt.Text);
@@ -65,24 +66,24 @@ namespace ELearn.Application.Services
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<AddVotingDTO>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
         #region GetByDate
-        public async Task<Response<ICollection<VotingDTO>>> GetVotesByDate(DateTime date)
+        public async Task<Response<ICollection<AddVotingDTO>>> GetVotesByDate(DateTime date)
         {
             if (date == null)
             {
-                return ResponseHandler.BadRequest<ICollection<VotingDTO>>("Invalid date");
+                return ResponseHandler.BadRequest<ICollection<AddVotingDTO>>("Invalid date");
             }
             try
             {
                 var votes = await _unitOfWork.Votings.GetWhereSelectAsync(v => v.Start <= date && v.End >= date,v=>v.Id);
                 if (votes.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are no Votings ");
-                ICollection<VotingDTO>  votesDto = new List<VotingDTO>();
+                    return ResponseHandler.NotFound<ICollection<AddVotingDTO>>("There are no Votings ");
+                ICollection<AddVotingDTO>  votesDto = new List<AddVotingDTO>();
                 foreach (var vote in votes)
                 {
                     var votedto = await GetByIdAsync(vote);
@@ -92,14 +93,14 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddVotingDTO>>($"An Error Occurred, {Ex}");
             }
         }
 
         #endregion
 
         #region GetByCreator
-        public async Task<Response<ICollection<VotingDTO>>> GetVotesByCreator(string UserId)
+        public async Task<Response<ICollection<AddVotingDTO>>> GetVotesByCreator(string UserId)
         {
             try
             {
@@ -110,10 +111,10 @@ namespace ELearn.Application.Services
                     .GetWhereSelectAsync(v => v.CreatorId == UserId, v => v.Id);
 
                 if (votes is null)
-                    return ResponseHandler.NotFound<ICollection<VotingDTO>>
+                    return ResponseHandler.NotFound<ICollection<AddVotingDTO>>
                         ("There are No Votings yet");
 
-                ICollection<VotingDTO> votesDto = new List<VotingDTO>();
+                ICollection<AddVotingDTO> votesDto = new List<AddVotingDTO>();
                 foreach (var vote in votes)
                 {
                     var votedto = await GetByIdAsync(vote);
@@ -123,7 +124,7 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddVotingDTO>>($"An Error Occurred, {Ex}");
             }
             
             
@@ -132,15 +133,15 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetFromGroups
-        public async Task<Response<ICollection<VotingDTO>>> GetFromGroups(int GroupId)
+        public async Task<Response<ICollection<AddVotingDTO>>> GetFromGroups(int GroupId)
         {
             try
             {
                 var votes = await _unitOfWork.GroupVotings.
                     GetWhereSelectAsync(v => v.GroupId == GroupId, v => v.VotingId);
                 if (votes.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are no Votings yet");
-                ICollection<VotingDTO> votesDto = new List<VotingDTO>();
+                    return ResponseHandler.NotFound<ICollection<AddVotingDTO>>("There are no Votings yet");
+                ICollection<AddVotingDTO> votesDto = new List<AddVotingDTO>();
                 foreach(var vote in votes)
                 {
                     var votedto = await GetByIdAsync(vote);
@@ -150,24 +151,24 @@ namespace ELearn.Application.Services
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddVotingDTO>>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
         #region GetAll
-        public async Task<Response<ICollection<VotingDTO>>> GetAllAsync()
+        public async Task<Response<ICollection<AddVotingDTO>>> GetAllAsync()
         {
             try
             {
                 var votes = await _unitOfWork.Votings.GetAllAsync();
                 if (votes.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<VotingDTO>>("There are no Votings yet");
+                    return ResponseHandler.NotFound<ICollection<AddVotingDTO>>("There are no Votings yet");
                 
-                ICollection<VotingDTO> votesDto = new List<VotingDTO>();
+                ICollection<AddVotingDTO> votesDto = new List<AddVotingDTO>();
                 foreach(var vote in votes)
                 {
-                    var votedto = _mapper.Map<VotingDTO>(vote);
+                    var votedto = _mapper.Map<AddVotingDTO>(vote);
                     votedto.Options = await GetVotingOptios(vote.Id);
                     votedto.groups = await GetVotingGroups(vote.Id);
                     votesDto.Add(votedto);
@@ -176,17 +177,17 @@ namespace ELearn.Application.Services
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<VotingDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddVotingDTO>>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
         #region Delete One
-        public async Task<Response<VotingDTO>> DeleteAsync(int Id)
+        public async Task<Response<AddVotingDTO>> DeleteAsync(int Id)
         {
             var vote = await _unitOfWork.Votings.GetByIdAsync(Id);
             if (vote is null)
-                return ResponseHandler.NotFound<VotingDTO>("There is no such Voting");
+                return ResponseHandler.NotFound<AddVotingDTO>("There is no such Voting");
             try
             {
                 var options = await _unitOfWork.Options.GetWhereAsync(opt => opt.VotingId == Id);
@@ -195,17 +196,17 @@ namespace ELearn.Application.Services
                     await _unitOfWork.Options.DeleteAsync(opt);
                 }
                 await _unitOfWork.Votings.DeleteAsync(vote);
-                return ResponseHandler.Deleted<VotingDTO>();
+                return ResponseHandler.Deleted<AddVotingDTO>();
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<AddVotingDTO>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
         #region Delete Many
-        public async Task<Response<VotingDTO>>DeleteManyAsync(ICollection<int>Id)
+        public async Task<Response<AddVotingDTO>>DeleteManyAsync(ICollection<int>Id)
         {
             try
             {
@@ -213,7 +214,7 @@ namespace ELearn.Application.Services
                 {
                     var vote = await _unitOfWork.Votings.GetByIdAsync(id);
                     if (vote is null)
-                        return ResponseHandler.NotFound<VotingDTO>("There is no Votings");
+                        return ResponseHandler.NotFound<AddVotingDTO>("There is no Votings");
                     var options = await _unitOfWork.Options
                         .GetWhereAsync(opt => opt.VotingId == id);
                     foreach (var opt in options)
@@ -222,17 +223,17 @@ namespace ELearn.Application.Services
                     }
                     await _unitOfWork.Votings.DeleteAsync(vote);
                 }
-                return ResponseHandler.Deleted<VotingDTO>();
+                return ResponseHandler.Deleted<AddVotingDTO>();
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occured, {Ex}");
+                return ResponseHandler.BadRequest<AddVotingDTO>($"An Error Occured, {Ex}");
             }
         }
         #endregion
 
         #region Update
-        public async Task<Response<VotingDTO>> UpdateAsync(int Id, VotingDTO Model)
+        public async Task<Response<AddVotingDTO>> UpdateAsync(int Id, AddVotingDTO Model)
         {
             try
             {
@@ -245,7 +246,7 @@ namespace ELearn.Application.Services
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<VotingDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<AddVotingDTO>($"An Error Occurred, {Ex}");
             }
         }
         #endregion

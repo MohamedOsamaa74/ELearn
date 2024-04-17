@@ -13,13 +13,13 @@ using System.Text;
 using System.Threading.Tasks;
 using ELearn.Application.Interfaces;
 using ELearn.Application.Helpers.Response;
-using ELearn.Application.DTOs;
 using ELearn.Domain.Const;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Collections.ObjectModel;
 using AutoMapper;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.Application.DTOs.UserDTOs;
 
 namespace ELearn.Application.Services
 {
@@ -43,14 +43,20 @@ namespace ELearn.Application.Services
             return await _userManager.GetUserAsync(currentUser);
         }
 
+        public async Task<string> GetCurrentUserIDAsync()
+        {
+            ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
+            return _userManager.GetUserId(currentUser);
+        }
+
         public async Task<ApplicationUser> GetByUserName(string UserName)
         {
             return await _userManager.FindByNameAsync(UserName);
         }
-        public async Task<Response<UserDTO>> CreateNewUserAsync(UserDTO Model)
+        public async Task<Response<AddUserDTO>> CreateNewUserAsync(AddUserDTO Model)
         {
             if (Model == null)
-                return ResponseHandler.BadRequest<UserDTO>("Invalid User");
+                return ResponseHandler.BadRequest<AddUserDTO>("Invalid User");
             try
             {
                 var NewUser = _mapper.Map<ApplicationUser>(Model);
@@ -61,33 +67,33 @@ namespace ELearn.Application.Services
                     var errors = string.Empty;
                     foreach (var error in result.Errors)
                         errors += error.Description;
-                    return ResponseHandler.BadRequest<UserDTO>(errors);
+                    return ResponseHandler.BadRequest<AddUserDTO>(errors);
                 }
                 await _userManager.AddToRoleAsync(NewUser, UserRoles.Student);
                 return ResponseHandler.Created(Model);
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<UserDTO>(Ex.ToString());
+                return ResponseHandler.BadRequest<AddUserDTO>(Ex.ToString());
             }
 
         }
 
-        public async Task<Response<ICollection<UserDTO>>> AddMultipleUsersAsync(IFormFile file)
+        public async Task<Response<ICollection<AddUserDTO>>> AddMultipleUsersAsync(IFormFile file)
         {
             if (file == null)
             {
-                return ResponseHandler.BadRequest<ICollection<UserDTO>>("Invalid, Please Upload the File");
+                return ResponseHandler.BadRequest<ICollection<AddUserDTO>>("Invalid, Please Upload the File");
             }
             try
             {
                 var NewUsers = await UploadCSV(file);
                 if (NewUsers.IsNullOrEmpty())
-                    return ResponseHandler.BadRequest<ICollection<UserDTO>>("The Uploaded File Doesn't Contain Any Data");
-                var users = new List<UserDTO>();
+                    return ResponseHandler.BadRequest<ICollection<AddUserDTO>>("The Uploaded File Doesn't Contain Any Data");
+                var users = new List<AddUserDTO>();
                 foreach (var user in NewUsers)
                 {
-                    var NewUser = _mapper.Map<UserDTO>(user);
+                    var NewUser = _mapper.Map<AddUserDTO>(user);
                     if (IsValidUser(user))
                     {
                         await CreateNewUserAsync(NewUser);
@@ -99,54 +105,54 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<UserDTO>>($"An Error Occured While Proccessing The Request, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddUserDTO>>($"An Error Occured While Proccessing The Request, {Ex}");
             }
 
         }
 
-        public async Task<Response<ICollection<UserDTO>>> GetAllAsync()
+        public async Task<Response<ICollection<AddUserDTO>>> GetAllAsync()
         {
             var users = await _unitOfWork.Users.GetAllAsync();
             if (users.IsNullOrEmpty())
-                return ResponseHandler.NotFound<ICollection<UserDTO>>("There Are No Users");
+                return ResponseHandler.NotFound<ICollection<AddUserDTO>>("There Are No Users");
             try
             {
-                var usersDTO = new List<UserDTO>();
+                var usersDTO = new List<AddUserDTO>();
                 foreach (var item in users)
                 {
-                    var dto = _mapper.Map<UserDTO>(item);
+                    var dto = _mapper.Map<AddUserDTO>(item);
                     usersDTO.Add(dto);
                 }
                 return ResponseHandler.ManySuccess(usersDTO);
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<UserDTO>>($"An Error Occurred,{Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddUserDTO>>($"An Error Occurred,{Ex}");
             }
         }
 
-        public async Task<Response<UserDTO>> DeleteUserAsync(string Id)
+        public async Task<Response<AddUserDTO>> DeleteUserAsync(string Id)
         {
             var user = await _unitOfWork.Users.GetByIdAsync(Id);
             if (user == null)
-                return ResponseHandler.NotFound<UserDTO>();
+                return ResponseHandler.NotFound<AddUserDTO>();
             try
             {
                 await _unitOfWork.Users.DeleteAsync(user);
-                return ResponseHandler.Deleted<UserDTO>();
+                return ResponseHandler.Deleted<AddUserDTO>();
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<UserDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<AddUserDTO>($"An Error Occurred, {Ex}");
             }
 
         }
 
-        public async Task<Response<UserDTO>> EditUserAsync(string id, EditUserDTO NewData)
+        public async Task<Response<AddUserDTO>> EditUserAsync(string id, EditUserDTO NewData)
         {
             var user = await _unitOfWork.Users.GetByIdAsync(id);
             if (user is null)
-                return ResponseHandler.NotFound<UserDTO>("There is no such user");
+                return ResponseHandler.NotFound<AddUserDTO>("There is no such user");
             try
             {
                 if (NewData.FirstName != null) user.FirstName = NewData.FirstName;
@@ -158,27 +164,27 @@ namespace ELearn.Application.Services
                 if (NewData.DepartmentId != 0) user.DepartmentId = NewData.DepartmentId;
 
                 await _unitOfWork.Users.UpdateAsync(user);
-                return ResponseHandler.Updated(_mapper.Map<UserDTO>(user));
+                return ResponseHandler.Updated(_mapper.Map<AddUserDTO>(user));
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<UserDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<AddUserDTO>($"An Error Occurred, {Ex}");
             }
         }
 
-        public async Task<Response<ICollection<UserDTO>>> DeleteManyAsync(List<string> Ids)
+        public async Task<Response<ICollection<AddUserDTO>>> DeleteManyAsync(List<string> Ids)
         {
             var users = await GetSelectedUsersAsync(Ids);
             if(users.IsNullOrEmpty())
-                return ResponseHandler.NotFound<ICollection<UserDTO>>();
+                return ResponseHandler.NotFound<ICollection<AddUserDTO>>();
             try
             {
                 await _unitOfWork.Users.DeleteRangeAsync(users);
-                return ResponseHandler.Deleted<ICollection<UserDTO>>();
+                return ResponseHandler.Deleted<ICollection<AddUserDTO>>();
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<UserDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<AddUserDTO>>($"An Error Occurred, {Ex}");
             }
         }
 

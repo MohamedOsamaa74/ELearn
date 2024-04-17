@@ -1,19 +1,13 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.AnnouncementDTOs;
+using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ELearn.Application.Services
 {
@@ -23,33 +17,39 @@ namespace ELearn.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public AnnouncementService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
+        private readonly IFileService _fileService;
+        public AnnouncementService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IFileService fileService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _fileService = fileService;
         }
-        
-        public async Task<Response<AnnouncementDTO>> GetByIdAsync(int id)
+
+        #region GetByID
+        public async Task<Response<ViewAnnouncementDTO>> GetByIdAsync(int id)
         {
             var announcement = await _unitOfWork.Announcments.GetByIdAsync(id);
             if (announcement == null)
-                return ResponseHandler.NotFound<AnnouncementDTO>("Announcement Not Found");
+                return ResponseHandler.NotFound<ViewAnnouncementDTO>("Announcement Not Found");
             try
             {
                 var groups = await GetAnnouncementGroupsAsync(id);
-                var announcementDTO = _mapper.Map<AnnouncementDTO>(announcement);
-                announcementDTO.Groups = groups;
-                return ResponseHandler.Success(announcementDTO);
+                var viewAnnouncementDTO = _mapper.Map<ViewAnnouncementDTO>(announcement);
+                viewAnnouncementDTO.Groups = (ICollection<int>)groups;
+                viewAnnouncementDTO.FilesUrls = await GetAnnouncementFiles(id);
+                return ResponseHandler.Success(viewAnnouncementDTO);
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {ex}");
+                return ResponseHandler.BadRequest<ViewAnnouncementDTO>($"An Error Occurred While Proccessing The Request, {ex}");
             }
         }
-       
-        public async Task<Response<ICollection<AnnouncementDTO>>> GetAllAnnouncementsAsync()
+        #endregion
+
+        #region GetAll
+        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetAllAnnouncementsAsync()
         {
             try
             {
@@ -57,64 +57,88 @@ namespace ELearn.Application.Services
 
                 if (announcements == null || !announcements.Any())
                 {
-                    return ResponseHandler.NotFound<ICollection<AnnouncementDTO>>("No announcements found");
+                    return ResponseHandler.NotFound<ICollection<ViewAnnouncementDTO>>("No announcements found");
                 }
-                var announcementDTOs = new List<AnnouncementDTO>();
+                var viewAnnouncementDTOs = new List<ViewAnnouncementDTO>();
                 foreach (var item in announcements)
                 {
-                    var dto = _mapper.Map<AnnouncementDTO>(item);
-                    dto.Groups = await GetAnnouncementGroupsAsync(item.Id);
-                    announcementDTOs.Add(dto);
+                    var dto = _mapper.Map<ViewAnnouncementDTO>(item);
+                    dto.Groups = (ICollection<int>)await GetAnnouncementGroupsAsync(item.Id);
+                    dto.FilesUrls = await GetAnnouncementFiles(item.Id);
+                    viewAnnouncementDTOs.Add(dto);
                 }
-                return ResponseHandler.ManySuccess(announcementDTOs);
+                return ResponseHandler.ManySuccess(viewAnnouncementDTOs);
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<ICollection<AnnouncementDTO>>($"An error occurred: {ex.Message}");
+                return ResponseHandler.BadRequest<ICollection<ViewAnnouncementDTO>>($"An error occurred: {ex.Message}");
             }
         }
+        #endregion
 
-        public async Task<Response<AnnouncementDTO>> CreateNewAsync(AnnouncementDTO Model)
+        #region CreateNew
+        public async Task<Response<ViewAnnouncementDTO>> CreateNewAsync(UploadAnnouncementDTO Model)
         {
             try
             {
-                var user = await _userService.GetCurrentUserAsync();
+                var userId = await _userService.GetCurrentUserIDAsync();
                 var announcement = _mapper.Map<Announcement>(Model);
-                announcement.UserId = user.Id;
+                announcement.UserId = userId;
                 await _unitOfWork.Announcments.AddAsync(announcement);
+
+                var ViewAnnouncement = _mapper.Map<ViewAnnouncementDTO>(announcement);
+                ViewAnnouncement.UserId = userId;
+                ViewAnnouncement.Groups = (ICollection<int>)Model.Groups;
+
+                List<string> ViewUrls = [];
+                if (Model.Files != null && Model.Files.Any())
+                {
+                    foreach (var file in Model.Files)
+                    {
+                        var uploadFileDto = new UploadFileDTO()
+                        { File = file, FolderName = "Announcements", ParentId = announcement.Id};
+                        var newFile = await _fileService.UploadFileAsync(uploadFileDto);
+                        ViewUrls.Add(newFile.Data.ViewUrl);
+                    }
+                    ViewAnnouncement.FilesUrls = ViewUrls;
+                }
                 await SendToGroupsAsync((ICollection<int>)Model.Groups, announcement.Id);
-                return ResponseHandler.Created(Model);
+                return ResponseHandler.Created(ViewAnnouncement);
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+                return ResponseHandler.BadRequest<ViewAnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
             }
         }
+        #endregion
 
-        public async Task<Response<AnnouncementDTO>> DeleteAsync(int Id)
+        #region Delete
+        public async Task<Response<UploadAnnouncementDTO>> DeleteAsync(int Id)
         {
             var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
             if (announcement is null)
-                return ResponseHandler.NotFound<AnnouncementDTO>();
+                return ResponseHandler.NotFound<UploadAnnouncementDTO>();
             try
             {
                 await _unitOfWork.Announcments.DeleteAsync(announcement);
-                return ResponseHandler.Deleted<AnnouncementDTO>();
+                return ResponseHandler.Deleted<UploadAnnouncementDTO>();
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+                return ResponseHandler.BadRequest<UploadAnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
             }
         }
+        #endregion
 
-        public async Task<Response<AnnouncementDTO>> UpdateAsync(AnnouncementDTO Model, int Id)
+        #region Update
+        public async Task<Response<UploadAnnouncementDTO>> UpdateAsync(UploadAnnouncementDTO Model, int Id)
         {
             var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
             if (announcement is null)
-                return ResponseHandler.NotFound<AnnouncementDTO>();
+                return ResponseHandler.NotFound<UploadAnnouncementDTO>();
             try
             {
-                announcement.Text = Model.text;
+                announcement.Text = Model.Text;
                 foreach (var groupId in Model.Groups)
                 {
                     var group = await _unitOfWork.Groups.GetByIdAsync(groupId);
@@ -128,71 +152,93 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<AnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+                return ResponseHandler.BadRequest<UploadAnnouncementDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
             }
         }
+        #endregion
 
-        public async Task<Response<ICollection<Announcement>>> GetFromGroupsAsync()
+        #region GetFromGroups
+        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetFromUserGroupsAsync()
         {
-            var user = await _userService.GetCurrentUserAsync();
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
             
-            var announcements = await _context.Announcements
-                .Include(a => a.GroupAnnouncements)
-                .Where(a => a.GroupAnnouncements.Any(ga => 
-                        ga.GroupId == ga.Group.Id && 
-                        ga.Group.UsersInGroup.Any(ug => ug.Id == user.Id)))
-                .Select(a => a.Text)
-                .ToListAsync();
-            if (announcements is null || !announcements.Any())
-                return ResponseHandler.NotFound<ICollection<Announcement>>();
+                var announcements = await _context.Announcements
+                    .Include(a => a.GroupAnnouncements)
+                    .Where(a => a.GroupAnnouncements.Any(ga => 
+                            ga.GroupId == ga.Group.Id && 
+                            ga.Group.UsersInGroup.Any(ug => ug.Id == user.Id)))
+                    .ToListAsync();
+                if (announcements is null || !announcements.Any())
+                    return ResponseHandler.NotFound<ICollection<ViewAnnouncementDTO>>();
 
-            return ResponseHandler.ManySuccess((ICollection<Announcement>)announcements);
+                var viewAnnouncementDTOs = new List<ViewAnnouncementDTO>();
+                foreach (var item in announcements)
+                {
+                    var dto = _mapper.Map<ViewAnnouncementDTO>(item);
+                    dto.Groups = (ICollection<int>)await GetAnnouncementGroupsAsync(item.Id);
+                    dto.FilesUrls = await GetAnnouncementFiles(item.Id);
+                    viewAnnouncementDTOs.Add(dto);
+                }
+                return ResponseHandler.ManySuccess(viewAnnouncementDTOs);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<ViewAnnouncementDTO>>($"An Error Occurred, {Ex}");
+            }
         }
+        #endregion
 
-        public async Task<Response<ICollection<AnnouncementDTO>>> GetByCreatorAsync()
+        #region GetByCreator
+        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetByCreatorAsync()
         {
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
 
-                var announcements = await _context.Announcements.
-                    Where(a => a.UserId == user.Id)
-                    .ToListAsync();
+                var announcements = await _unitOfWork.Announcments
+                                   .GetWhereAsync(a => a.UserId == user.Id);
 
                 if (announcements is null || !announcements.Any())
-                    return ResponseHandler.NotFound<ICollection<AnnouncementDTO>>("You Haven't sent Any Announcements");
-                var announcementDTOs = new List<AnnouncementDTO>();
+                    return ResponseHandler.NotFound<ICollection<ViewAnnouncementDTO>>("You Haven't sent Any Announcements");
+                var viewAnnouncementDTOs = new List<ViewAnnouncementDTO>();
                 foreach (var item in announcements)
                 {
-                    var dto = _mapper.Map<AnnouncementDTO>(item);
-                    dto.Groups = await GetAnnouncementGroupsAsync(item.Id);
-                    announcementDTOs.Add(dto);
+                    var dto = _mapper.Map<ViewAnnouncementDTO>(item);
+                    dto.Groups = (ICollection<int>)await GetAnnouncementGroupsAsync(item.Id);
+                    dto.FilesUrls = await GetAnnouncementFiles(item.Id);
+                    viewAnnouncementDTOs.Add(dto);
                 }
-                return ResponseHandler.ManySuccess(announcementDTOs);
+                return ResponseHandler.ManySuccess(viewAnnouncementDTOs);
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<AnnouncementDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<ViewAnnouncementDTO>>($"An Error Occurred, {Ex}");
             }
         }
+        #endregion
 
-        public async Task<Response<ICollection<AnnouncementDTO>>> DeleteManyAsync(List<int>Ids)
+        #region DeleteMany
+        public async Task<Response<ICollection<UploadAnnouncementDTO>>> DeleteManyAsync(List<int>Ids)
         {
             try
             {
                 var announcements = await GetAnnouncementsAsync(Ids);
                 if (announcements is null || !announcements.Any())
-                    return ResponseHandler.NotFound<ICollection<AnnouncementDTO>>();
+                    return ResponseHandler.NotFound<ICollection<UploadAnnouncementDTO>>();
 
                 await _unitOfWork.Announcments.DeleteRangeAsync(announcements);
-                return ResponseHandler.Deleted<ICollection<AnnouncementDTO>>();
+                return ResponseHandler.Deleted<ICollection<UploadAnnouncementDTO>>();
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<AnnouncementDTO>>($"An Error Occured, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<UploadAnnouncementDTO>>($"An Error Occured, {Ex}");
             }
         }
-        
+        #endregion
+
+        #region PrivateMethods
         private async Task<IEnumerable<int>> GetAnnouncementGroupsAsync(int announcementId)
         => await _unitOfWork.GroupAnnouncments
             .GetWhereSelectAsync(g => g.AnnouncementId == announcementId, g => g.GroupId);
@@ -221,6 +267,18 @@ namespace ELearn.Application.Services
             }
             return announcements;
         }
+
+        private async Task<ICollection<string>> GetAnnouncementFiles(int announcementId)
+        {
+            var files = await _unitOfWork.Files
+                .GetWhereAsync(f => f.AnnouncementId == announcementId);
+
+            if (files is null || !files.Any())
+                return null;
+            
+            return files.Select(f => f.ViewUrl).ToList();
+        }
+        #endregion
 
     }
 }

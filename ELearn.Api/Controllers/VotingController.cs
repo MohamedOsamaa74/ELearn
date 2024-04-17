@@ -1,5 +1,5 @@
 ﻿using Azure;
-using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.VotingDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -23,7 +23,7 @@ namespace ELearn.Api.Controllers
         #region Create New
         [HttpPost("CreateVoting")]
         [Authorize(Roles = "Admin, Staff")]
-        public async Task<IActionResult>Create([FromBody] VotingDTO Model)
+        public async Task<IActionResult>Create([FromBody] AddVotingDTO Model)
         {
             if(!ModelState.IsValid)
             {
@@ -125,7 +125,7 @@ namespace ELearn.Api.Controllers
         #region Update
         [HttpPut("UpdateVoting/{Id:int}")]
         [Authorize(Roles = "Admin, Staff")]
-        public async Task<IActionResult>Update(int Id, [FromBody] VotingDTO Model)
+        public async Task<IActionResult>Update(int Id, [FromBody] AddVotingDTO Model)
         {
             if(!ModelState.IsValid)
             {
