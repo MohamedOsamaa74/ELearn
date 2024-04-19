@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Validations
 {
-    public class UserVotingValidation : AbstractValidator<UserVoting>
+    public class UserVotingValidation : AbstractValidator<UserAnswerVoting>
     {
         public UserVotingValidation()
         {
-            RuleFor(uv => uv.userId).NotEmpty();
+            RuleFor(uv => uv.UserId).NotEmpty();
             RuleFor(uv => uv.VotingId).NotEmpty();
         }
     }

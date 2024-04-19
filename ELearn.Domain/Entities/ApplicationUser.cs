@@ -30,9 +30,9 @@ namespace ELearn.Domain.Entities
         public ICollection<Message>? SentMessages { get; set; }
         public ICollection<Message>? ReceivedMessages { get; set; }
         public ICollection<Voting>? Votings { get; set; }
-        public ICollection<UserVoting>? UserVoting { get; set; }
+        public ICollection<UserAnswerVoting>? UserVoting { get; set; }
         public ICollection<Survey>? Surveys { get; set; }
-        public ICollection<UserSurvey>? UserSurvey { get; set; }
+        public ICollection<UserAnswerSurvey>? UserSurvey { get; set; }
         public ICollection<Comment>? Comments { get; set; }
         public ICollection<Announcement>? Announcements { get; set; }
         public ICollection<Assignment>? Assignments { get; set; }
@@ -47,7 +47,7 @@ namespace ELearn.Domain.Entities
         public virtual ICollection<UserGroup>? UserGroups { get; set; } = new HashSet<UserGroup>();
 
         //many to many task
-        public ICollection<UserAssignment>? UserAssignment { get; set; }
+        public ICollection<UserAnswerAssignment>? UserAssignment { get; set; }
         public List<RefreshToken>? RefreshTokens { get; set; }
         #endregion
 

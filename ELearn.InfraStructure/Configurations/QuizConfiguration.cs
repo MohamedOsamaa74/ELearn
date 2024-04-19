@@ -22,7 +22,8 @@ namespace ELearn.InfraStructure.Configurations
             
             builder.HasOne(u => u.User)
                 .WithMany(u => u.Quizzes)
-                .HasForeignKey(m => m.UserId);
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //one(quiz) to many (questions) in QuestionConfiguration
 

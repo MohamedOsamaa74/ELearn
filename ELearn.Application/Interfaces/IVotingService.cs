@@ -14,8 +14,9 @@ namespace ELearn.Application.Interfaces
     public interface IVotingService
     {
         public Task<Response<AddVotingDTO>> CreateNewAsync(AddVotingDTO Model);
+        public Task<Response<ICollection<string>>> AddOptionsAsync(int VotingId, ICollection<string> Model);
         public Task<Response<ICollection<AddVotingDTO>>> GetVotesByDate(DateTime date);
-        public Task<Response<ICollection<AddVotingDTO>>> GetVotesByCreator(string UserId);
+        public Task<Response<ICollection<AddVotingDTO>>> GetVotesByCreator(string UserId); 
         public Task<Response<AddVotingDTO>> GetByIdAsync(int Id);
         public Task<Response<ICollection<AddVotingDTO>>> GetAllAsync();
         public Task<Response<AddVotingDTO>> DeleteAsync(int Id);

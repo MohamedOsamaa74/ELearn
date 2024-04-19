@@ -8,10 +8,15 @@ namespace ELearn.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
+        #region ForeignKeys
         public required int GroupId { get; set; }
         public required int VotingId { get; set; }
+        #endregion
+
+        #region Relations
         public virtual Group Group { get; set; }
-       
         public virtual Voting Voting { get; set; }
+        #endregion
     }
 }

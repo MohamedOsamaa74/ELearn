@@ -14,7 +14,7 @@ namespace ELearn.InfraStructure.Validations
         {
             RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
             RuleFor(x => x.Text).NotEmpty().MaximumLength(100);
-            RuleFor(x => x.Options).NotEmpty();
+            //RuleFor(x => x.Options).NotEmpty();
 
         }
     }

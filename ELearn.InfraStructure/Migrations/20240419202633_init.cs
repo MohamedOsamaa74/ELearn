@@ -275,17 +275,16 @@ namespace ELearn.InfraStructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Start = table.Column<DateTime>(type: "datetime2", nullable: false),
                     End = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CreatorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Surveys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Surveys_ApplicationUser_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
+                        name: "FK_Surveys_ApplicationUser_CreatorId",
+                        column: x => x.CreatorId,
                         principalTable: "ApplicationUser",
                         principalColumn: "Id");
                 });
@@ -300,6 +299,11 @@ namespace ELearn.InfraStructure.Migrations
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Start = table.Column<DateTime>(type: "datetime2", nullable: false),
                     End = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Option1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Option2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Option3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Option4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Option5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -399,12 +403,12 @@ namespace ELearn.InfraStructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Grade = table.Column<int>(type: "int", nullable: false),
                     Start = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    End = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    End = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -413,8 +417,7 @@ namespace ELearn.InfraStructure.Migrations
                         name: "FK_Quizzes_ApplicationUser_UserId",
                         column: x => x.UserId,
                         principalTable: "ApplicationUser",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Quizzes_Groups_GroupId",
                         column: x => x.GroupId,
@@ -500,30 +503,6 @@ namespace ELearn.InfraStructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupSurvey",
-                columns: table => new
-                {
-                    GroupId = table.Column<int>(type: "int", nullable: false),
-                    SurveysId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GroupSurvey", x => new { x.GroupId, x.SurveysId });
-                    table.ForeignKey(
-                        name: "FK_GroupSurvey_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupSurvey_Surveys_SurveysId",
-                        column: x => x.SurveysId,
-                        principalTable: "Surveys",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "GroupSurveys",
                 columns: table => new
                 {
@@ -550,25 +529,27 @@ namespace ELearn.InfraStructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupVoting",
+                name: "UserAnswerSurveys",
                 columns: table => new
                 {
-                    GroupId = table.Column<int>(type: "int", nullable: false),
-                    votingsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SurveyId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupVoting", x => new { x.GroupId, x.votingsId });
+                    table.PrimaryKey("PK_UserAnswerSurveys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GroupVoting_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
+                        name: "FK_UserAnswerSurveys_ApplicationUser_UserId",
+                        column: x => x.UserId,
+                        principalTable: "ApplicationUser",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GroupVoting_Votings_votingsId",
-                        column: x => x.votingsId,
-                        principalTable: "Votings",
+                        name: "FK_UserAnswerSurveys_Surveys_SurveyId",
+                        column: x => x.SurveyId,
+                        principalTable: "Surveys",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -600,7 +581,33 @@ namespace ELearn.InfraStructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserAssignments",
+                name: "UserAnswerVotings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Option = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VotingId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAnswerVotings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserAnswerVotings_ApplicationUser_UserId",
+                        column: x => x.UserId,
+                        principalTable: "ApplicationUser",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserAnswerVotings_Votings_VotingId",
+                        column: x => x.VotingId,
+                        principalTable: "Votings",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserAnswerAssignments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -610,15 +617,15 @@ namespace ELearn.InfraStructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserAssignments", x => x.Id);
+                    table.PrimaryKey("PK_UserAnswerAssignments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserAssignments_ApplicationUser_UserId",
+                        name: "FK_UserAnswerAssignments_ApplicationUser_UserId",
                         column: x => x.UserId,
                         principalTable: "ApplicationUser",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserAssignments_Assignments_AssignmentId",
+                        name: "FK_UserAnswerAssignments_Assignments_AssignmentId",
                         column: x => x.AssignmentId,
                         principalTable: "Assignments",
                         principalColumn: "Id",
@@ -632,7 +639,13 @@ namespace ELearn.InfraStructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CorrectOption = table.Column<string>(type: "nvarchar(1)", nullable: true),
+                    Grade = table.Column<int>(type: "int", nullable: false),
+                    Option1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Option2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Option3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Option4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Option5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrectOption = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     QuizId = table.Column<int>(type: "int", nullable: true),
                     SurveyId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -652,14 +665,44 @@ namespace ELearn.InfraStructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserAnswerQuizziz",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Grade = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    QuizId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAnswerQuizziz", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserAnswerQuizziz_ApplicationUser_UserId",
+                        column: x => x.UserId,
+                        principalTable: "ApplicationUser",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserAnswerQuizziz_Quizzes_QuizId",
+                        column: x => x.QuizId,
+                        principalTable: "Quizzes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Files",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FolderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ViewUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DownloadUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Creation = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -716,139 +759,35 @@ namespace ELearn.InfraStructure.Migrations
                         principalTable: "Questions",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Files_UserAssignments_UserAssignementId",
+                        name: "FK_Files_UserAnswerAssignments_UserAssignementId",
                         column: x => x.UserAssignementId,
-                        principalTable: "UserAssignments",
+                        principalTable: "UserAnswerAssignments",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Options",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    QuestionId = table.Column<int>(type: "int", nullable: true),
-                    SurveyId = table.Column<int>(type: "int", nullable: true),
-                    VotingId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Options", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Options_Questions_QuestionId",
-                        column: x => x.QuestionId,
-                        principalTable: "Questions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Options_Surveys_SurveyId",
-                        column: x => x.SurveyId,
-                        principalTable: "Surveys",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Options_Votings_Id",
-                        column: x => x.Id,
-                        principalTable: "Votings",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserQuestions",
+                name: "UserAnswerQuestions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Option = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false),
-                    OptionId = table.Column<int>(type: "int", nullable: false),
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserQuestions", x => x.Id);
+                    table.PrimaryKey("PK_UserAnswerQuestions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserQuestions_ApplicationUser_ApplicationUserId",
+                        name: "FK_UserAnswerQuestions_ApplicationUser_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "ApplicationUser",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_UserQuestions_Options_OptionId",
-                        column: x => x.OptionId,
-                        principalTable: "Options",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserQuestions_Questions_QuestionId",
+                        name: "FK_UserAnswerQuestions_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserSurveys",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SurveyId = table.Column<int>(type: "int", nullable: false),
-                    OptionId = table.Column<int>(type: "int", nullable: false),
-                    DateAnswered = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserSurveys", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserSurveys_ApplicationUser_UserId",
-                        column: x => x.UserId,
-                        principalTable: "ApplicationUser",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserSurveys_Options_OptionId",
-                        column: x => x.OptionId,
-                        principalTable: "Options",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserSurveys_Surveys_SurveyId",
-                        column: x => x.SurveyId,
-                        principalTable: "Surveys",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserVotings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    userId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    VotingId = table.Column<int>(type: "int", nullable: false),
-                    OptionsId = table.Column<int>(type: "int", nullable: false),
-                    DateAnswered = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserVotings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserVotings_ApplicationUser_userId",
-                        column: x => x.userId,
-                        principalTable: "ApplicationUser",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserVotings_Options_OptionsId",
-                        column: x => x.OptionsId,
-                        principalTable: "Options",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserVotings_Votings_VotingId",
-                        column: x => x.VotingId,
-                        principalTable: "Votings",
                         principalColumn: "Id");
                 });
 
@@ -974,11 +913,6 @@ namespace ELearn.InfraStructure.Migrations
                 column: "ParentGroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupSurvey_SurveysId",
-                table: "GroupSurvey",
-                column: "SurveysId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_GroupSurveys_GroupId",
                 table: "GroupSurveys",
                 column: "GroupId");
@@ -987,11 +921,6 @@ namespace ELearn.InfraStructure.Migrations
                 name: "IX_GroupSurveys_SurveyId",
                 table: "GroupSurveys",
                 column: "SurveyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupVoting_votingsId",
-                table: "GroupVoting",
-                column: "votingsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GroupVotings_GroupId",
@@ -1022,16 +951,6 @@ namespace ELearn.InfraStructure.Migrations
                 name: "IX_Messages_SenderId",
                 table: "Messages",
                 column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Options_QuestionId",
-                table: "Options",
-                column: "QuestionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Options_SurveyId",
-                table: "Options",
-                column: "SurveyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_UserId",
@@ -1071,19 +990,59 @@ namespace ELearn.InfraStructure.Migrations
                 filter: "[UserID] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Surveys_ApplicationUserId",
+                name: "IX_Surveys_CreatorId",
                 table: "Surveys",
-                column: "ApplicationUserId");
+                column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAssignments_AssignmentId",
-                table: "UserAssignments",
+                name: "IX_UserAnswerAssignments_AssignmentId",
+                table: "UserAnswerAssignments",
                 column: "AssignmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAssignments_UserId",
-                table: "UserAssignments",
+                name: "IX_UserAnswerAssignments_UserId",
+                table: "UserAnswerAssignments",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerQuestions_ApplicationUserId",
+                table: "UserAnswerQuestions",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerQuestions_QuestionId",
+                table: "UserAnswerQuestions",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerQuizziz_QuizId",
+                table: "UserAnswerQuizziz",
+                column: "QuizId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerQuizziz_UserId",
+                table: "UserAnswerQuizziz",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerSurveys_SurveyId",
+                table: "UserAnswerSurveys",
+                column: "SurveyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerSurveys_UserId",
+                table: "UserAnswerSurveys",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerVotings_UserId",
+                table: "UserAnswerVotings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswerVotings_VotingId",
+                table: "UserAnswerVotings",
+                column: "VotingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserGroups_GroupId",
@@ -1094,51 +1053,6 @@ namespace ELearn.InfraStructure.Migrations
                 name: "IX_UserGroups_UserId",
                 table: "UserGroups",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserQuestions_ApplicationUserId",
-                table: "UserQuestions",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserQuestions_OptionId",
-                table: "UserQuestions",
-                column: "OptionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserQuestions_QuestionId",
-                table: "UserQuestions",
-                column: "QuestionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserSurveys_OptionId",
-                table: "UserSurveys",
-                column: "OptionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserSurveys_SurveyId",
-                table: "UserSurveys",
-                column: "SurveyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserSurveys_UserId",
-                table: "UserSurveys",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserVotings_OptionsId",
-                table: "UserVotings",
-                column: "OptionsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserVotings_userId",
-                table: "UserVotings",
-                column: "userId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserVotings_VotingId",
-                table: "UserVotings",
-                column: "VotingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Votings_CreatorId",
@@ -1186,7 +1100,7 @@ namespace ELearn.InfraStructure.Migrations
                 table: "Groups");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Surveys_ApplicationUser_ApplicationUserId",
+                name: "FK_Surveys_ApplicationUser_CreatorId",
                 table: "Surveys");
 
             migrationBuilder.DropForeignKey(
@@ -1200,13 +1114,7 @@ namespace ELearn.InfraStructure.Migrations
                 name: "GroupAnnouncments");
 
             migrationBuilder.DropTable(
-                name: "GroupSurvey");
-
-            migrationBuilder.DropTable(
                 name: "GroupSurveys");
-
-            migrationBuilder.DropTable(
-                name: "GroupVoting");
 
             migrationBuilder.DropTable(
                 name: "GroupVotings");
@@ -1224,6 +1132,18 @@ namespace ELearn.InfraStructure.Migrations
                 name: "Roles");
 
             migrationBuilder.DropTable(
+                name: "UserAnswerQuestions");
+
+            migrationBuilder.DropTable(
+                name: "UserAnswerQuizziz");
+
+            migrationBuilder.DropTable(
+                name: "UserAnswerSurveys");
+
+            migrationBuilder.DropTable(
+                name: "UserAnswerVotings");
+
+            migrationBuilder.DropTable(
                 name: "UserClaims");
 
             migrationBuilder.DropTable(
@@ -1233,19 +1153,10 @@ namespace ELearn.InfraStructure.Migrations
                 name: "UserLogins");
 
             migrationBuilder.DropTable(
-                name: "UserQuestions");
-
-            migrationBuilder.DropTable(
                 name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "UserSurveys");
-
-            migrationBuilder.DropTable(
                 name: "UserTokens");
-
-            migrationBuilder.DropTable(
-                name: "UserVotings");
 
             migrationBuilder.DropTable(
                 name: "Comments");
@@ -1257,19 +1168,16 @@ namespace ELearn.InfraStructure.Migrations
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "UserAssignments");
+                name: "UserAnswerAssignments");
 
             migrationBuilder.DropTable(
                 name: "Announcements");
 
             migrationBuilder.DropTable(
-                name: "Options");
+                name: "Questions");
 
             migrationBuilder.DropTable(
                 name: "Posts");
-
-            migrationBuilder.DropTable(
-                name: "Questions");
 
             migrationBuilder.DropTable(
                 name: "Quizzes");

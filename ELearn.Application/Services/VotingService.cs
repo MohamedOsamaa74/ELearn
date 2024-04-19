@@ -23,7 +23,77 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region Create
+        public Task<Response<ICollection<string>>> AddOptionsAsync(int VotingId, ICollection<string> Model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<AddVotingDTO>> CreateNewAsync(AddVotingDTO Model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<AddVotingDTO>> DeleteAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<AddVotingDTO>> DeleteManyAsync(ICollection<int> Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<OptionDTO>> DeleteOptionAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<OptionDTO>> EditOption(int Id, OptionDTO Model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<AddVotingDTO>>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<AddVotingDTO>> GetByIdAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<AddVotingDTO>>> GetFromGroups(int GroupId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<AddVotingDTO>>> GetVotesByCreator(string UserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<AddVotingDTO>>> GetVotesByDate(DateTime date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<UserVotingDTO>>> GetVotingResponses(int VotingId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<UserVotingDTO>> RecieveStudentResponse(int VotingId, int OptionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<AddVotingDTO>> UpdateAsync(int Id, AddVotingDTO Model)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*#region Create
         public async Task<Response<AddVotingDTO>> CreateNewAsync(AddVotingDTO Model)
         {
             try
@@ -34,11 +104,11 @@ namespace ELearn.Application.Services
                 if (Model.Options.IsNullOrEmpty() || Model.Options.Count()<2)
                     return ResponseHandler.BadRequest<AddVotingDTO>("You have to insert at least two options");
                 await _unitOfWork.Votings.AddAsync(vote);
-                foreach(var text in Model.Options)
-                {
-                    Option option = new Option() { Text = text, VotingId = vote.Id};
-                    await _unitOfWork.Options.AddAsync(option);
-                }
+                
+                var options = await AddOptionsAsync(vote.Id, Model.Options);
+                if (options.Succeeded == false)
+                    return ResponseHandler.BadRequest<AddVotingDTO>($"An Error Occurred, {options.Message}");
+
                 await SendToGroupsAsync(Model.groups, vote.Id);
                 return ResponseHandler.Success(Model);
             }
@@ -48,6 +118,28 @@ namespace ELearn.Application.Services
             }
         }
 
+        #endregion
+
+        /*#region AddOption
+        public async Task<Response<ICollection<string>>> AddOptionsAsync(int VotingId, ICollection<string> Options)
+        {
+            try
+            {
+                var vote = await _unitOfWork.Votings.GetByIdAsync(VotingId);
+                if (vote is null)
+                    return ResponseHandler.NotFound<ICollection<string>>("There is no such Voting");
+                foreach(var opt in Options)
+                {
+                    var option = new Option() { Text = opt, VotingId = VotingId };
+                    await _unitOfWork.Options.AddAsync(option);
+                }
+                return ResponseHandler.Created(Options);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<string>>($"An Error Occurred, {Ex}");
+            }
+        }
         #endregion
 
         #region GetById
@@ -394,6 +486,6 @@ namespace ELearn.Application.Services
             return await _unitOfWork.GroupVotings.GetWhereSelectAsync(g => g.VotingId == VotingId, g => g.GroupId);
         }
 
-        #endregion
+        #endregion*/
     }
 }

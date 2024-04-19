@@ -9,6 +9,12 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
+        public required int Grade { get; set; }
+        public required string Option1 { get; set; }
+        public required string Option2 { get; set; }
+        public string? Option3 { get; set; }
+        public string? Option4 { get; set; }
+        public string? Option5 { get; set; }
         public string? CorrectOption { get; set; }
 
         #region ForeignKeys
@@ -17,7 +23,7 @@ namespace ELearn.Domain.Entities
         #endregion
 
         #region NavigationProberty
-        public ICollection<Option> Options { get; set; } = new HashSet<Option>();
+        //public ICollection<Option> Options { get; set; } = new HashSet<Option>();
         public virtual Quiz? Quiz { get; set; }
         public virtual Survey? Survey { get; set; }
         public FileEntity? File { get; set; }

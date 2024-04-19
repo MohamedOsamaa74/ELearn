@@ -2,8 +2,6 @@
 using ELearn.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using System.Reflection.Emit;
-using ELearn.InfraStructure.Configurations;
 
 namespace ELearn.Data
 {
@@ -30,7 +28,7 @@ namespace ELearn.Data
         public DbSet<GroupVoting> GroupVotings { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<Option> Options { get; set; }
+        //public DbSet<Option> Options { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Quiz> Quizzes { get; set; }
@@ -38,11 +36,12 @@ namespace ELearn.Data
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<UserAnswerQuiz> UserAnswerQuizziz { get; set; }
         public DbSet<UserAnswerQuestion> UserAnswerQuestions { get; set; }
-        public DbSet<UserSurvey> UserSurveys { get; set; }
-        public DbSet<UserVoting> UserVotings { get; set; }
+        public DbSet<UserAnswerSurvey> UserAnswerSurveys { get; set; }
+        public DbSet<UserAnswerVoting> UserAnswerVotings { get; set; }
         public DbSet<Voting> Votings { get; set; }
-        public DbSet<UserAssignment> UserAssignments { get; set; }
-        public DbSet<FileEntity> Attachements { get; set; }
+        public DbSet<UserAnswerAssignment> UserAnswerAssignments { get; set; }
+        public DbSet<FileEntity> Files { get; set; }
     }
 }

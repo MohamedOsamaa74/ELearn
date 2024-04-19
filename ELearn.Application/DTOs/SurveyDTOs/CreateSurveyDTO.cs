@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ELearn.Application.DTOs
+﻿namespace ELearn.Application.DTOs
 {
-    public class SurveyDTO
+    public class CreateSurveyDTO
     {
         public required string Text { get; set; }
         public DateTime CreateDate => DateTime.UtcNow.ToLocalTime();

@@ -21,7 +21,42 @@ namespace ELearn.Application.Services
             _mapper = mapper;
         }
 
-        #region Create
+        public Task<Response<CreateSurveyDTO>> CreateNewAsync(CreateSurveyDTO Model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<CreateSurveyDTO>> DeleteAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<CreateSurveyDTO>> GetByIdAsync(int Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetFromGroups(int GroupId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetFromUserGroups()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetSurveysByCreator()
+        {
+            throw new NotImplementedException();
+        }
+
+        /*#region Create
         public async Task<Response<SurveyDTO>> CreateNewAsync(SurveyDTO Model)
         {
             try
@@ -223,6 +258,6 @@ namespace ELearn.Application.Services
         private async Task<ICollection<int>> GetSurveyGroups(int SurveyId)
         {
             return await _unitOfWork.GroupSurveys.GetWhereSelectAsync(g => g.SurveyId == SurveyId, g => g.GroupId);
-        }
+        }*/
     }
 }

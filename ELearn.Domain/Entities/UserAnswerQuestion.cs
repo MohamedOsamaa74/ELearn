@@ -10,14 +10,15 @@ namespace ELearn.Domain.Entities
         public int Id { get; set; }
         public DateTime DateAnswered => DateTime.UtcNow.ToLocalTime();
 
+        public required string Option { get; set; }
+
         #region ForeignKeys
         public required string UserId { get; set; }
         public int QuestionId { get; set; }
-        public int OptionId { get; set; }
         #endregion
 
         #region NavigationProperties
-        public virtual Option Option { get; set; }
+        //public virtual Option Option { get; set; }
         public virtual Question Question { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
         #endregion

@@ -33,7 +33,7 @@
         public Comment? Comment { get; set; }
         public Question? Question { get; set; }
         public Message? Message { get; set; }
-        public UserAssignment? UserAssignment { get; set; }
+        public UserAnswerAssignment? UserAssignment { get; set; }
         #endregion
     }
 }

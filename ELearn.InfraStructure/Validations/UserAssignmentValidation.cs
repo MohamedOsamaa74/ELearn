@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Validations
 {
-  public class UserAssignmentValidation : AbstractValidator<UserAssignment>
+  public class UserAssignmentValidation : AbstractValidator<UserAnswerAssignment>
     {
         public UserAssignmentValidation() {
             RuleFor(ua => ua.AssignmentId).NotEmpty();

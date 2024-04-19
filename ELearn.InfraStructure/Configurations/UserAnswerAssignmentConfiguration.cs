@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Configurations
 {
-    public class UserAssignmentConfiguration : IEntityTypeConfiguration<UserAssignment>
+    public class UserAnswerAssignmentConfiguration : IEntityTypeConfiguration<UserAnswerAssignment>
     {
-        public void Configure(EntityTypeBuilder<UserAssignment> builder)
+        public void Configure(EntityTypeBuilder<UserAnswerAssignment> builder)
         {
-            builder.ToTable("UserAssignments");
+            builder.ToTable("UserAnswerAssignments");
             builder.HasKey(ua => ua.Id);
 
             builder
