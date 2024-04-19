@@ -6,6 +6,8 @@ using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +45,32 @@ builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<JWT>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 //builder.Services.AddCors();
+#endregion
+
+#region Validation Services
+builder.Services.AddTransient<IValidator<Announcement>, AnnouncementValidation>();
+builder.Services.AddTransient<IValidator<ApplicationUser>, ApplicationUserValidation>();
+builder.Services.AddTransient<IValidator<Assignment>, AssignmentValidation>();
+builder.Services.AddTransient<IValidator<Comment>, CommentValidation>();
+builder.Services.AddTransient<IValidator<Department>, DepartmentValidation>();
+builder.Services.AddTransient<IValidator<GroupAnnouncment>, GroupAnnouncmentValidation>();
+builder.Services.AddTransient<IValidator<Group>, GroupValidation>();
+builder.Services.AddTransient<IValidator<React>, ReactValidation>();
+builder.Services.AddTransient<IValidator<Survey>, SurveyValidation>();
+builder.Services.AddTransient<IValidator<UserAnswerAssignment>, UserAssignmentValidation>();
+builder.Services.AddTransient<IValidator<UserGroup>, UserGroupValidation>();
+builder.Services.AddTransient<IValidator<UserAnswerQuestion>, UserQuestionValidation>();
+builder.Services.AddTransient<IValidator<UserAnswerSurvey>, UserSurveyValidation>();
+builder.Services.AddTransient<IValidator<UserAnswerVoting>, UserVotingValidation>();
+builder.Services.AddTransient<IValidator<Voting>, VotingValidation>();
+builder.Services.AddTransient<IValidator<GroupSurvey>, GroupSurveyValidation>();
+builder.Services.AddTransient<IValidator<GroupVoting>, GroupVotingValidation>();
+builder.Services.AddTransient<IValidator<Question>, QuestionValidation>();
+builder.Services.AddTransient<IValidator<Material>, MaterialValidation>();
+builder.Services.AddTransient<IValidator<Message>, MessageValidation>();
+//builder.Services.AddTransient<IValidator<Option>, OptionValidation>();
+builder.Services.AddTransient<IValidator<Post>, PostValidation>();
+builder.Services.AddTransient<IValidator<Quiz>, QuizValidation>();
 #endregion
 
 #region authentication&autherization

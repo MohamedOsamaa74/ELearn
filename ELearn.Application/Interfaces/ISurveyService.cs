@@ -5,12 +5,12 @@ namespace ELearn.Application.Interfaces
 {
     public interface ISurveyService
     {
-        public Task<Response<SurveyDTO>> CreateNewAsync(SurveyDTO Model);
-        public Task<Response<SurveyDTO>> GetByIdAsync(int Id);
-        public Task<Response<ICollection<SurveyDTO>>> GetSurveysByCreator();
-        public Task<Response<ICollection<SurveyDTO>>> GetFromUserGroups();
-        public Task<Response<ICollection<SurveyDTO>>> GetAllAsync();
-        public Task<Response<ICollection<SurveyDTO>>> GetFromGroups(int GroupId);
-        public Task<Response<SurveyDTO>> DeleteAsync(int Id);
+        public Task<Response<CreateSurveyDTO>> CreateNewAsync(CreateSurveyDTO Model);
+        public Task<Response<CreateSurveyDTO>> GetByIdAsync(int Id);
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetSurveysByCreator();
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetFromUserGroups();
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetAllAsync();
+        public Task<Response<ICollection<CreateSurveyDTO>>> GetFromGroups(int GroupId);
+        public Task<Response<CreateSurveyDTO>> DeleteAsync(int Id);
     }
 }

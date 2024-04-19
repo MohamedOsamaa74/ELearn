@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ELearn.Domain.Entities
 {
-    public class UserAssignment
+    public class UserAnswerAssignment
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -4,27 +4,30 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Configurations
 {
-    public class GroupSurveyConfiguration : IEntityTypeConfiguration<GroupSurvey>
+    public class UserAnswerSurveyConfiguration : IEntityTypeConfiguration<UserAnswerSurvey>
     {
-        public void Configure(EntityTypeBuilder<GroupSurvey> builder)
+        public void Configure(EntityTypeBuilder<UserAnswerSurvey> builder)
         {
-            builder.ToTable("GroupSurveys");
+            builder.ToTable("UserAnswerSurveys");
             builder.HasKey(us => us.Id);
 
             builder
-                .HasOne(us => us.Group)
-                .WithMany(u => u.GroupSurvey)
-                .HasForeignKey(us => us.GroupId);
+                .HasOne(us => us.User)
+                .WithMany(u => u.UserSurvey)
+                .HasForeignKey(us => us.UserId);
 
             builder
                 .HasOne(us => us.Survey)
-                .WithMany(s => s.GroupSurvey)
+                .WithMany(s => s.UserSurvey)
                 .HasForeignKey(us => us.SurveyId);
+
+
         }
     }
 }

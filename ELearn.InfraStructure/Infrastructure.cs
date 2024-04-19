@@ -10,12 +10,11 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure
 {
-    public class Infrastructure
+    public static class Infrastructure
     {
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services)
         {
             #region Validation Services
-
             services.AddTransient<IValidator<Announcement>, AnnouncementValidation>();
             services.AddTransient<IValidator<ApplicationUser>, ApplicationUserValidation>();
             services.AddTransient<IValidator<Assignment>, AssignmentValidation>();
@@ -25,22 +24,20 @@ namespace ELearn.InfraStructure
             services.AddTransient<IValidator<Group>, GroupValidation>();
             services.AddTransient<IValidator<React>, ReactValidation>();
             services.AddTransient<IValidator<Survey>, SurveyValidation>();
-            services.AddTransient<IValidator<UserAssignment>, UserAssignmentValidation>();
+            services.AddTransient<IValidator<UserAnswerAssignment>, UserAssignmentValidation>();
             services.AddTransient<IValidator<UserGroup>, UserGroupValidation>();
             services.AddTransient<IValidator<UserAnswerQuestion>, UserQuestionValidation>();
-            services.AddTransient<IValidator<UserSurvey>, UserSurveyValidation>();
-            services.AddTransient<IValidator<UserVoting>, UserVotingValidation>();
+            services.AddTransient<IValidator<UserAnswerSurvey>, UserSurveyValidation>();
+            services.AddTransient<IValidator<UserAnswerVoting>, UserVotingValidation>();
             services.AddTransient<IValidator<Voting>, VotingValidation>();
             services.AddTransient<IValidator<GroupSurvey>, GroupSurveyValidation>();
             services.AddTransient<IValidator<GroupVoting>, GroupVotingValidation>();
             services.AddTransient<IValidator<Question>, QuestionValidation>();
             services.AddTransient<IValidator<Material>, MaterialValidation>();
             services.AddTransient<IValidator<Message>, MessageValidation>();
-            services.AddTransient<IValidator<Option>, OptionValidation>();
+            //services.AddTransient<IValidator<Option>, OptionValidation>();
             services.AddTransient<IValidator<Post>, PostValidation>();
             services.AddTransient<IValidator<Quiz>, QuizValidation>();
-
-
             #endregion
         }
     }

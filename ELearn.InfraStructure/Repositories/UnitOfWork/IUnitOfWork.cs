@@ -23,17 +23,18 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         IBaseRepository<GroupVoting> GroupVotings { get; }
         IBaseRepository<Material> Materials { get; }
         IBaseRepository<Message> Messages { get; }
-        IBaseRepository<Option> Options { get; }
+        //IBaseRepository<Option> Options { get; }
         IBaseRepository<Post> Posts { get; }
         IBaseRepository<Question> Questions { get; }
         IBaseRepository<Quiz> Quizziz { get; }
         IBaseRepository<React> Reacts { get; }
         IBaseRepository<Survey> Surveys { get; }
-        IBaseRepository<UserAssignment> UserAssignments { get; }
+        IBaseRepository<UserAnswerAssignment> UserAnswerAssignments { get; }
         IBaseRepository<UserGroup> UserGroups { get; }
-        IBaseRepository<UserAnswerQuestion> UserQuestions { get; }
-        IBaseRepository<UserSurvey> UserSurveys { get; }
-        IBaseRepository<UserVoting> UserVotings { get; }
+        IBaseRepository<UserAnswerQuiz> UserAnswerQuizziz { get; }
+        IBaseRepository<UserAnswerQuestion> UserAnswerQuestions { get; }
+        IBaseRepository<UserAnswerSurvey> UserAnswerSurveys { get; }
+        IBaseRepository<UserAnswerVoting> UserAnswerVotings { get; }
         IBaseRepository<Voting> Votings { get; }
         #endregion
         int complete();

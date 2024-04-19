@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Configurations
 {
-    public class UserVotingConfiguration : IEntityTypeConfiguration<UserVoting>
+    public class UserAnswerVotingConfiguration : IEntityTypeConfiguration<UserAnswerVoting>
     {
-        public void Configure(EntityTypeBuilder<UserVoting> builder)
+        public void Configure(EntityTypeBuilder<UserAnswerVoting> builder)
         {
-            builder.ToTable("UserVotings");
+            builder.ToTable("UserAnswerVotings");
             builder.HasKey(uv => uv.Id);
             builder
                 .HasOne(us => us.User)
                 .WithMany(u => u.UserVoting)
-                .HasForeignKey(us => us.userId);
+                .HasForeignKey(us => us.UserId);
 
             builder
                 .HasOne(us => us.Voting)

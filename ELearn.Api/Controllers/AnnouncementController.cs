@@ -55,7 +55,7 @@ namespace ELearn.Api.Controllers
                 return RedirectToAction("GetAll");
             }
 
-            var responses = await _announcementService.GetFromGroupsAsync();
+            var responses = await _announcementService.GetFromUserGroupsAsync();
 
             return this.CreateResponse(responses);
         }

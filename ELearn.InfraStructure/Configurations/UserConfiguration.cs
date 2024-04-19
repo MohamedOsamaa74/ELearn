@@ -44,7 +44,7 @@ namespace ELearn.InfraStructure.Configurations
             //one user to many survey (staff)
         builder.HasMany(p => p.Surveys)
                .WithOne(r => r.ApplicationUser)
-               .HasForeignKey(v => v.ApplicationUserId)
+               .HasForeignKey(v => v.CreatorId)
                .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
 

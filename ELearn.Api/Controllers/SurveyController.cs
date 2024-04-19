@@ -1,9 +1,7 @@
-﻿using ELearn.Application.DTOs.SurveyDTOs;
+﻿using ELearn.Application.DTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
-using ELearn.Application.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELearn.Api.Controllers
@@ -21,7 +19,7 @@ namespace ELearn.Api.Controllers
         #region Create New
         [HttpPost("CreateSurvey")]
         [Authorize(Roles = "Admin, Staff")]
-        public async Task<IActionResult> Create([FromBody] SurveyDTO Model)
+        public async Task<IActionResult> Create([FromBody] CreateSurveyDTO Model)
         {
             if (!ModelState.IsValid)
             {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELearn.InfraStructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240407192017_init")]
+    [Migration("20240419202633_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -248,7 +248,19 @@ namespace ELearn.InfraStructure.Migrations
                     b.Property<DateTime>("Creation")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DownloadUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FolderName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -272,16 +284,16 @@ namespace ELearn.InfraStructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("UserAssignementId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ViewUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -395,7 +407,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("SurveyId");
 
-                    b.ToTable("GroupSurveys", (string)null);
+                    b.ToTable("GroupSurveys");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.GroupVoting", b =>
@@ -418,7 +430,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("VotingId");
 
-                    b.ToTable("GroupVotings", (string)null);
+                    b.ToTable("GroupVotings");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Material", b =>
@@ -483,34 +495,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.ToTable("Messages", (string)null);
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.Option", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SurveyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("VotingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("SurveyId");
-
-                    b.ToTable("Options", (string)null);
-                });
-
             modelBuilder.Entity("ELearn.Domain.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -545,7 +529,27 @@ namespace ELearn.InfraStructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CorrectOption")
-                        .HasColumnType("nvarchar(1)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Option1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option5")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("QuizId")
                         .HasColumnType("int");
@@ -574,11 +578,11 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
@@ -642,11 +646,8 @@ namespace ELearn.InfraStructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
+                    b.Property<string>("CreatorId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
@@ -660,12 +661,12 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("CreatorId");
 
-                    b.ToTable("Surveys");
+                    b.ToTable("Surveys", (string)null);
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerAssignment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -686,7 +687,117 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAssignments", (string)null);
+                    b.ToTable("UserAnswerAssignments", (string)null);
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Option")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("UserAnswerQuestions");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerQuiz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserAnswerQuizziz");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerSurvey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("SurveyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserAnswerSurveys", (string)null);
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerVoting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Option")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("VotingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VotingId");
+
+                    b.ToTable("UserAnswerVotings", (string)null);
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserGroup", b =>
@@ -716,102 +827,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.ToTable("UserGroups", (string)null);
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.UserQuestion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("OptionId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("UserQuestions");
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateAnswered")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SurveyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OptionId");
-
-                    b.HasIndex("SurveyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserSurveys", (string)null);
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.UserVoting", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateAnswered")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OptionsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VotingId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OptionsId");
-
-                    b.HasIndex("VotingId");
-
-                    b.HasIndex("userId");
-
-                    b.ToTable("UserVotings", (string)null);
-                });
-
             modelBuilder.Entity("ELearn.Domain.Entities.Voting", b =>
                 {
                     b.Property<int>("Id")
@@ -829,6 +844,23 @@ namespace ELearn.InfraStructure.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Option1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Option5")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
@@ -840,37 +872,7 @@ namespace ELearn.InfraStructure.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Votings");
-                });
-
-            modelBuilder.Entity("GroupSurvey", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SurveysId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GroupId", "SurveysId");
-
-                    b.HasIndex("SurveysId");
-
-                    b.ToTable("GroupSurvey");
-                });
-
-            modelBuilder.Entity("GroupVoting", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("votingsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GroupId", "votingsId");
-
-                    b.HasIndex("votingsId");
-
-                    b.ToTable("GroupVoting");
+                    b.ToTable("Votings", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1010,7 +1012,7 @@ namespace ELearn.InfraStructure.Migrations
                         .IsRequired();
 
                     b.HasOne("ELearn.Domain.Entities.Survey", null)
-                        .WithMany("user")
+                        .WithMany("User")
                         .HasForeignKey("SurveyId");
 
                     b.HasOne("ELearn.Domain.Entities.Voting", null)
@@ -1126,7 +1128,7 @@ namespace ELearn.InfraStructure.Migrations
                         .HasForeignKey("ELearn.Domain.Entities.FileEntity", "QuestionId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("ELearn.Domain.Entities.UserAssignment", "UserAssignment")
+                    b.HasOne("ELearn.Domain.Entities.UserAnswerAssignment", "UserAssignment")
                         .WithMany("Files")
                         .HasForeignKey("UserAssignementId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -1276,30 +1278,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.Option", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.Voting", "Voting")
-                        .WithMany("Options")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ELearn.Domain.Entities.Survey", "Survey")
-                        .WithMany("Options")
-                        .HasForeignKey("SurveyId");
-
-                    b.Navigation("Question");
-
-                    b.Navigation("Survey");
-
-                    b.Navigation("Voting");
-                });
-
             modelBuilder.Entity("ELearn.Domain.Entities.Post", b =>
                 {
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
@@ -1336,7 +1314,7 @@ namespace ELearn.InfraStructure.Migrations
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
                         .WithMany("Quizzes")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -1365,13 +1343,13 @@ namespace ELearn.InfraStructure.Migrations
                 {
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
                         .WithMany("Surveys")
-                        .HasForeignKey("ApplicationUserId")
+                        .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerAssignment", b =>
                 {
                     b.HasOne("ELearn.Domain.Entities.Assignment", "Assignment")
                         .WithMany("UserAssignment")
@@ -1388,6 +1366,80 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("Assignment");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerQuestion", b =>
+                {
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany("UserQuestion")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
+                        .WithMany("UserQuestion")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerQuiz", b =>
+                {
+                    b.HasOne("ELearn.Domain.Entities.Quiz", "Quiz")
+                        .WithMany("UserQuiz")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quiz");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerSurvey", b =>
+                {
+                    b.HasOne("ELearn.Domain.Entities.Survey", "Survey")
+                        .WithMany("UserSurvey")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("UserSurvey")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerVoting", b =>
+                {
+                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("UserVoting")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELearn.Domain.Entities.Voting", "Voting")
+                        .WithMany("UserVoting")
+                        .HasForeignKey("VotingId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Voting");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.UserGroup", b =>
@@ -1409,85 +1461,6 @@ namespace ELearn.InfraStructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.UserQuestion", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany("UserQuestion")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("ELearn.Domain.Entities.Option", "Option")
-                        .WithMany()
-                        .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Question", "Question")
-                        .WithMany("UserQuestion")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Option");
-
-                    b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.UserSurvey", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.Option", "Option")
-                        .WithMany()
-                        .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Survey", "Survey")
-                        .WithMany("UserSurvey")
-                        .HasForeignKey("SurveyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
-                        .WithMany("UserSurvey")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Option");
-
-                    b.Navigation("Survey");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ELearn.Domain.Entities.UserVoting", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.Option", "Options")
-                        .WithMany()
-                        .HasForeignKey("OptionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Voting", "Voting")
-                        .WithMany("UserVoting")
-                        .HasForeignKey("VotingId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
-                        .WithMany("UserVoting")
-                        .HasForeignKey("userId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Options");
-
-                    b.Navigation("User");
-
-                    b.Navigation("Voting");
-                });
-
             modelBuilder.Entity("ELearn.Domain.Entities.Voting", b =>
                 {
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "ApplicationUser")
@@ -1496,36 +1469,6 @@ namespace ELearn.InfraStructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("GroupSurvey", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Survey", null)
-                        .WithMany()
-                        .HasForeignKey("SurveysId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GroupVoting", b =>
-                {
-                    b.HasOne("ELearn.Domain.Entities.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ELearn.Domain.Entities.Voting", null)
-                        .WithMany()
-                        .HasForeignKey("votingsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Announcement", b =>
@@ -1637,30 +1580,28 @@ namespace ELearn.InfraStructure.Migrations
                 {
                     b.Navigation("File");
 
-                    b.Navigation("Options");
-
                     b.Navigation("UserQuestion");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Quiz", b =>
                 {
                     b.Navigation("Questions");
+
+                    b.Navigation("UserQuiz");
                 });
 
             modelBuilder.Entity("ELearn.Domain.Entities.Survey", b =>
                 {
                     b.Navigation("GroupSurvey");
 
-                    b.Navigation("Options");
-
                     b.Navigation("Question");
 
-                    b.Navigation("UserSurvey");
+                    b.Navigation("User");
 
-                    b.Navigation("user");
+                    b.Navigation("UserSurvey");
                 });
 
-            modelBuilder.Entity("ELearn.Domain.Entities.UserAssignment", b =>
+            modelBuilder.Entity("ELearn.Domain.Entities.UserAnswerAssignment", b =>
                 {
                     b.Navigation("Files");
                 });
@@ -1668,8 +1609,6 @@ namespace ELearn.InfraStructure.Migrations
             modelBuilder.Entity("ELearn.Domain.Entities.Voting", b =>
                 {
                     b.Navigation("GroupVoting");
-
-                    b.Navigation("Options");
 
                     b.Navigation("UserVoting");
 

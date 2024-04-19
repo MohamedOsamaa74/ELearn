@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ELearn.InfraStructure.Validations
 {
-    public class UserSurveyValidation : AbstractValidator<UserSurvey>
+    public class UserSurveyValidation : AbstractValidator<UserAnswerSurvey>
     {
         public UserSurveyValidation() {
             RuleFor(us => us.SurveyId).NotEmpty();

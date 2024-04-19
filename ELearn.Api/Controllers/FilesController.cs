@@ -2,7 +2,6 @@
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELearn.Api.Controllers

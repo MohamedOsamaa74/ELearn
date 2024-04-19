@@ -27,17 +27,18 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
         public IBaseRepository<GroupVoting> GroupVotings { get; private set; }
         public IBaseRepository<Material> Materials { get; private set; }
         public IBaseRepository<Message> Messages { get; private set; }
-        public IBaseRepository<Option> Options { get; private set; }
+        //public IBaseRepository<Option> Options { get; private set; }
         public IBaseRepository<Post> Posts { get; private set; }
         public IBaseRepository<Question> Questions { get; private set; }
         public IBaseRepository<Quiz> Quizziz { get; private set; }
         public IBaseRepository<React> Reacts { get; private set; }
         public IBaseRepository<Survey> Surveys { get; private set; }
-        public IBaseRepository<UserAssignment> UserAssignments { get; private set; }
+        public IBaseRepository<UserAnswerAssignment> UserAnswerAssignments { get; private set; }
         public IBaseRepository<UserGroup> UserGroups { get; private set; }
-        public IBaseRepository<UserAnswerQuestion> UserQuestions { get; private set; }
-        public IBaseRepository<UserSurvey> UserSurveys { get; private set; }
-        public IBaseRepository<UserVoting> UserVotings { get; private set; }
+        public IBaseRepository<UserAnswerQuestion> UserAnswerQuestions { get; private set; }
+        public IBaseRepository<UserAnswerQuiz> UserAnswerQuizziz { get; private set; }
+        public IBaseRepository<UserAnswerSurvey> UserAnswerSurveys { get; private set; }
+        public IBaseRepository<UserAnswerVoting> UserAnswerVotings { get; private set; }
         public IBaseRepository<Voting> Votings { get; private set; }
 
         #endregion
@@ -58,16 +59,18 @@ namespace ELearn.InfraStructure.Repositories.UnitOfWork
             GroupVotings = new BaseRepository<GroupVoting>(context, userManager);
             Materials = new BaseRepository<Material>(context, userManager);
             Messages = new BaseRepository<Message>(context, userManager);
-            Options = new BaseRepository<Option>(context, userManager);
+            //Options = new BaseRepository<Option>(context, userManager);
             Posts = new BaseRepository<Post>(context, userManager);
             Questions = new BaseRepository<Question>(context, userManager);
             Quizziz = new BaseRepository<Quiz>(context, userManager);
             Reacts = new BaseRepository<React>(context, userManager);
             Surveys = new BaseRepository<Survey>(context, userManager);
-            UserAssignments = new BaseRepository<UserAssignment>(context, userManager);
-            UserSurveys = new BaseRepository<UserSurvey>(context, userManager);
-            UserSurveys = new BaseRepository<UserSurvey>(context, userManager);
-            UserVotings = new BaseRepository<UserVoting>(context, userManager);
+            UserGroups = new BaseRepository<UserGroup>(context, userManager);
+            UserAnswerAssignments = new BaseRepository<UserAnswerAssignment>(context, userManager);
+            UserAnswerQuizziz = new BaseRepository<UserAnswerQuiz>(context, userManager);
+            UserAnswerQuestions = new BaseRepository<UserAnswerQuestion>(context, userManager);
+            UserAnswerSurveys = new BaseRepository<UserAnswerSurvey>(context, userManager);
+            UserAnswerVotings = new BaseRepository<UserAnswerVoting>(context, userManager);
             Votings = new BaseRepository<Voting>(context, userManager);
         }
 

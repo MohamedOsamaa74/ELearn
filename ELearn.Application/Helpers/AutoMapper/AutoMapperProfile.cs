@@ -4,6 +4,7 @@ using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
+using ELearn.Application.DTOs.OptionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.DTOs.VotingDTOs;
@@ -56,20 +57,22 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             CreateMap<AddVotingDTO, Voting>()
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
-                .ForMember(dest => dest.Options, opt => opt.Ignore())
+                //.ForMember(dest => dest.Options, opt => opt.Ignore())
                 .ForMember(dest => dest.Group, opt => opt.Ignore());
             #endregion
+
+            /*#region Option Mapper
+            CreateMap<Option, OptionDTO>();
+            #endregion*/
 
             #region Material Mapper
             CreateMap<UpdateMaterialDTO, Material>()
                 .ForMember(dest => dest.GroupId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
-
-
             CreateMap<Material, UpdateMaterialDTO>()
-            .ForMember(dest => dest.File, opt => opt.Ignore())
-            .ForMember(dest => dest.Link, opt => opt.Ignore());
+                .ForMember(dest => dest.File, opt => opt.Ignore())
+                .ForMember(dest => dest.Link, opt => opt.Ignore());
             #endregion
 
             #region Assignment Mapper 
@@ -77,11 +80,8 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.GroupId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
-
-
             CreateMap<Assignment, AssignmentDTO>()
-            .ForMember(dest => dest.File, opt => opt.Ignore());
-
+                .ForMember(dest => dest.File, opt => opt.Ignore());
             #endregion
 
             #region Quiz Mapper
