@@ -11,6 +11,6 @@ namespace ELearn.Application.Interfaces
 {
     public interface IQuizService
     {
-        public Task<Response<CreateQuizDTO>> CreateNewAsync(CreateQuizDTO Model);
+        public Task<Response<CreateQuizDTO>> CreateNewAsync(CreateQuizDTO Model, int groupID);
     }
 }

@@ -16,13 +16,19 @@ namespace ELearn.Api.Controllers
         {
             _quizService = QuizService;
         }
+
+
+        #region CreateNewQuiz 
         [HttpPost("CreateNewQuiz")]
         [Authorize(Roles = "Admin ,Staff")]
-        public async Task<IActionResult> CreateQuiz([FromBody] CreateQuizDTO Model)
+        public async Task<IActionResult> CreateQuiz([FromBody] CreateQuizDTO Model, [FromQuery] int groupID)
         {
-            var response = await _quizService.CreateNewAsync(Model);
+            var response = await _quizService.CreateNewAsync(Model, groupID);
             return this.CreateResponse(response);
 
-        }
+        } 
+        #endregion
+
+
     }
 }
