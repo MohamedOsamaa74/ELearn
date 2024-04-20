@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
@@ -33,6 +34,19 @@ namespace ELearn.Application.Services
             {
                 var quiz = _mapper.Map<CreateQuizDTO, Quiz>(Model);
                 quiz.UserId = _userService.GetCurrentUserAsync().Result.Id;
+                quiz.GroupId = 2;
+
+                if (Model.Questions != null && Model.Questions.Any())
+                {
+                    var questions = new List<Question>();
+                    foreach (var createQuestionDTO in Model.Questions)
+                    {
+                        var question = _mapper.Map<CreateQuestionDTO, Question>(createQuestionDTO);
+                        question.Quiz = quiz; 
+                        questions.Add(question);
+                    }
+                    quiz.Questions = questions; 
+                }
 
                 await _unitOfWork.Quizziz.AddAsync(quiz);
                 return ResponseHandler.Created(Model);

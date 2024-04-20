@@ -5,6 +5,7 @@ using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
 using ELearn.Application.DTOs.OptionDTOs;
+using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.DTOs.VotingDTOs;
@@ -91,6 +92,17 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.Questions, opt => opt.Ignore());
 
             CreateMap<Quiz, CreateQuizDTO>();
+            #endregion
+
+            #region Question Mapper
+            CreateMap<CreateQuestionDTO, Question>()
+                .ForMember(dest => dest.File, opt => opt.Ignore())
+                .ForMember(dest => dest.UserQuestion, opt => opt.Ignore())
+                .ForMember(dest => dest.ApplicationUser, opt => opt.Ignore())
+                .ForMember(dest => dest.Quiz, opt => opt.Ignore())
+                .ForMember(dest => dest.Survey, opt => opt.Ignore());
+
+            CreateMap<Question, CreateQuestionDTO>();
             #endregion
 
             #region File Mapper
