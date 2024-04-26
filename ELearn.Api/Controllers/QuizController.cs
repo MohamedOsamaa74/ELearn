@@ -26,8 +26,19 @@ namespace ELearn.Api.Controllers
             var response = await _quizService.CreateNewAsync(Model, groupID);
             return this.CreateResponse(response);
 
-        } 
+        }
         #endregion
+
+        #region UpdateQuiz
+        [HttpPut("UpdateQuiz")]
+        [Authorize(Roles = "Admin ,Staff")]
+        public async Task<IActionResult> UpdateQuiz([FromBody] EditQuizDTO Model, [FromQuery] int quizID)
+        {
+            var response = await _quizService.UpdateQuiz(Model, quizID);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
 
 
     }

@@ -40,6 +40,7 @@ builder.Services.AddTransient<ISurveyService, SurveyService>();
 builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 builder.Services.AddTransient<IAssignmentService, AssignmentService>();
 builder.Services.AddTransient<IQuizService, QuizService>();
+builder.Services.AddTransient<IQuestionService, QuestionService>();
 builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<IFileService, FilesService>();
 builder.Services.AddTransient<IUserTwoFactorTokenProvider<ApplicationUser>, EmailTokenProvider<ApplicationUser>>();
