@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs.QuestionDTOs;
+using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -16,11 +17,13 @@ namespace ELearn.Application.Services
     {
         #region Fields and Constructor
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public QuestionService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _userService = userService;
             _mapper = mapper;
         }
         #endregion
@@ -91,7 +94,7 @@ namespace ELearn.Application.Services
                 return ResponseHandler.Deleted<QuestionDTO>();
             }
             catch (Exception ex)
-            {
+        {
                 return ResponseHandler.BadRequest<QuestionDTO>(ex.Message);
             }
         }
@@ -108,9 +111,9 @@ namespace ELearn.Application.Services
 
                 var questionDTO = _mapper.Map<QuestionDTO>(question);
                 return ResponseHandler.Success(questionDTO);
-            }
+        }
             catch (Exception ex)
-            {
+        {
                 return ResponseHandler.BadRequest<QuestionDTO>(ex.Message);
             }
         }

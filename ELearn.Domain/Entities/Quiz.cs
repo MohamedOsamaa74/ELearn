@@ -14,6 +14,7 @@ namespace ELearn.Domain.Entities
         public bool IsActive { get => Start <= DateTime.UtcNow.ToLocalTime() && End >= DateTime.UtcNow.ToLocalTime(); }
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
+        public bool IsActive => Start <= DateTime.Now && End >= DateTime.Now;
 
         #region ForeignKeys
         public required int GroupId { get; set; }

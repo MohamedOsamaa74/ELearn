@@ -20,11 +20,13 @@ namespace ELearn.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public QuizService(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
+        private readonly IQuestionService _questionService;
+        public QuizService(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IQuestionService questionService)
         {
             _unitOfWork = unitOfWork;
             _userService = userService;
             _mapper = mapper;
+            _questionService = questionService;
         }
         #endregion
 
@@ -75,6 +77,72 @@ namespace ELearn.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.BadRequest<CreateQuizDTO>(ex.Message);
+            }
+        }
+        #endregion
+
+        #region UpdateQuiz
+        public async Task<Response<EditQuizDTO>> UpdateQuizAsync(EditQuizDTO Model , int QuizId)
+        {
+            try
+            {
+                var oldquiz = await _unitOfWork.Quizziz.GetByIdAsync(QuizId);
+                if (oldquiz is null)
+                {
+                    return ResponseHandler.NotFound<EditQuizDTO>("Quiz not found");
+                }
+                if (oldquiz.UserId != _userService.GetCurrentUserAsync().Result.Id)
+                {
+                    return ResponseHandler.Unauthorized<EditQuizDTO>();
+                }
+                if (Model.Start > Model.End || Model.Start < DateTime.Now)
+                {
+                    return ResponseHandler.BadRequest<EditQuizDTO>("Start date must be less than end date And greater than current date");
+                }
+                var totalQuestionGrade = oldquiz.Questions.Sum(q => q.Grade);
+                if (totalQuestionGrade != Model.Grade)
+                {
+                    return ResponseHandler.BadRequest<EditQuizDTO>("Sum of question grades doesn't match quiz grade");
+                }
+                oldquiz.title = Model.title;
+                oldquiz.Start = Model.Start;
+                oldquiz.End = Model.End;
+                oldquiz.Grade = Model.Grade;
+
+                #region Old
+                //if (Model.Questions != null && Model.Questions.Any())
+                //{
+                //    var totalQuestionGrade = Model.Questions.Sum(q => q.Grade);
+                //    if (totalQuestionGrade != Model.Grade)
+                //    {
+                //        return ResponseHandler.BadRequest<CreateQuizDTO>("Sum of question grades doesn't match quiz grade");
+                //    }
+                //    var questions = new List<Question>();
+                //    foreach (var createQuestionDTO in Model.Questions)
+                //    {
+                //        var question = _mapper.Map<CreateQuestionDTO, Question>(createQuestionDTO);
+                //        if (question.CorrectOption == null || question.CorrectOption == "" || question.CorrectOption == string.Empty)
+                //            return ResponseHandler.BadRequest<CreateQuizDTO>("Correct Option is required");
+                //        if (question.CorrectOption != question.Option1 && question.CorrectOption != question.Option2 && question.CorrectOption != question.Option3 && question.CorrectOption != question.Option4 && question.CorrectOption != question.Option5)
+                //            return ResponseHandler.BadRequest<CreateQuizDTO>("Invalid Correct Option");
+                //        question.Quiz = oldquiz;
+                //        questions.Add(question);
+                //    }
+                //    oldquiz.Questions = questions;
+                //}
+
+                //oldquiz.IsPublished = Model.IsPublished;
+                //oldquiz.IsClosed = Model.IsClosed;
+                //oldquiz.IsDeleted = Model.IsDeleted;
+                //oldquiz.UpdatedAt = DateTime.Now; 
+                #endregion
+
+                await _unitOfWork.Quizziz.UpdateAsync(oldquiz);
+                return ResponseHandler.Updated(Model);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<EditQuizDTO>(ex.Message);
             }
         }
         #endregion
