@@ -1,4 +1,5 @@
 ﻿using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.Helpers.Response;
 
 namespace ELearn.Application.Interfaces

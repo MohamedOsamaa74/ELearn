@@ -11,12 +11,13 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class QuizController : ControllerBase
     {
+        #region Fields & Constructor
         private readonly IQuizService _quizService;
         public QuizController(IQuizService QuizService)
         {
             _quizService = QuizService;
         }
-
+        #endregion
 
         #region CreateNewQuiz 
         [HttpPost("CreateNewQuiz")]
@@ -38,8 +39,5 @@ namespace ELearn.Api.Controllers
             return this.CreateResponse(response);
         }
         #endregion
-
-
-
     }
 }

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.QuestionDTOs;
+using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -10,21 +12,65 @@ namespace ELearn.Application.Services
 {
     public class SurveyService : ISurveyService
     {
+        #region Fields & Constructor
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-
-        public SurveyService(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
+        private readonly IQuestionService _questionService;
+        public SurveyService(IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IQuestionService questionService)
         {
             _unitOfWork = unitOfWork;
             _userService = userService;
             _mapper = mapper;
+            _questionService = questionService;
         }
+        #endregion
 
-        public Task<Response<CreateSurveyDTO>> CreateNewAsync(CreateSurveyDTO Model)
+        #region CreateNew
+        public async Task<Response<CreateSurveyDTO>> CreateNewAsync(CreateSurveyDTO Model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var survey = _mapper.Map<Survey>(Model);
+                survey.CreatorId = user.Id;
+                await _unitOfWork.Surveys.AddAsync(survey);
+                
+                var result = await SendToGroups(survey.Id, Model.GroupIds);
+                foreach (var question in Model.Questions)
+                {
+                    await _questionService.CreateNewAsync(question, "Survey", survey.Id);
+                }
+                return ResponseHandler.Success(Model);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<CreateSurveyDTO>($"An Error Occurred, {Ex}");
+            }
         }
+        #endregion
+
+        #region GetById
+        public async Task<Response<CreateSurveyDTO>> GetByIdAsync(int Id)
+        {
+            try
+            {
+                var survey = await _unitOfWork.Surveys.GetByIdAsync(Id);
+                if (survey is null)
+                    return ResponseHandler.NotFound<CreateSurveyDTO>("There is no such Survey");
+                var surveyDto = _mapper.Map<CreateSurveyDTO>(survey);
+                surveyDto.GroupIds = await _unitOfWork.GroupSurveys
+                    .GetWhereSelectAsync(v => v.SurveyId == Id, v => v.GroupId);
+                var Questions = await _unitOfWork.Questions.GetWhereAsync(q => q.SurveyId == Id);
+                surveyDto.Questions = _mapper.Map<ICollection<QuestionDTO>>(Questions);
+                return ResponseHandler.Success(surveyDto);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<CreateSurveyDTO>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
 
         public Task<Response<CreateSurveyDTO>> DeleteAsync(int Id)
         {
@@ -36,10 +82,6 @@ namespace ELearn.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<Response<CreateSurveyDTO>> GetByIdAsync(int Id)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<Response<ICollection<CreateSurveyDTO>>> GetFromGroups(int GroupId)
         {
@@ -55,6 +97,37 @@ namespace ELearn.Application.Services
         {
             throw new NotImplementedException();
         }
+
+        #region Private Methods
+        private async Task<string> SendToGroups(int surveyId, ICollection<int>Groups)
+        {
+            try
+            {
+                foreach (var groupId in Groups)
+                {
+                    if (await _unitOfWork.Groups.GetByIdAsync(groupId) == null)
+                        return "Invalid Group Id";
+
+                    var groupVoting = await _unitOfWork.GroupSurveys
+                        .GetWhereAsync(g => g.GroupId == groupId && g.SurveyId == surveyId);
+
+                    if (!groupVoting.IsNullOrEmpty())
+                        continue;
+                    GroupSurvey NewGroupSurvey = new GroupSurvey()
+                    {
+                        GroupId = groupId,
+                        SurveyId = surveyId
+                    };
+                    await _unitOfWork.GroupSurveys.AddAsync(NewGroupSurvey);
+                }
+                return "Success";
+            }
+            catch(Exception Ex)
+            {
+                return $"An Error Occurred, {Ex}";
+            }
+        }
+        #endregion
 
         /*#region Create
         public async Task<Response<SurveyDTO>> CreateNewAsync(SurveyDTO Model)

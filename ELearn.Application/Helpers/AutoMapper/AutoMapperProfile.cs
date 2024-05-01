@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ELearn.Application.DTOs;
 using ELearn.Application.DTOs.AnnouncementDTOs;
 using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.DTOs.FileDTOs;
@@ -7,6 +8,7 @@ using ELearn.Application.DTOs.MaterialDTOs;
 using ELearn.Application.DTOs.OptionDTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
+using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.DTOs.VotingDTOs;
 using ELearn.Domain.Entities;
@@ -69,10 +71,6 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             #endregion
 
-            /*#region Option Mapper
-            CreateMap<Option, OptionDTO>();
-            #endregion*/
-
             #region Material Mapper
             CreateMap<UpdateMaterialDTO, Material>()
                 .ForMember(dest => dest.GroupId, opt => opt.Ignore())
@@ -118,6 +116,18 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             #region File Mapper
             CreateMap<FileEntity, FileDTO>();
+            #endregion
+
+            #region Survey Mapper
+            CreateMap<Survey, CreateSurveyDTO>()
+                .ForMember(dest => dest.Questions, opt => opt.Ignore());
+
+            CreateMap<CreateSurveyDTO, Survey>();
+
+            CreateMap<Survey, ViewSurveyDTO>()
+                .ForMember(dest => dest.Questions, opt => opt.Ignore());
+
+            CreateMap<ViewSurveyDTO, Survey>();
             #endregion
         }
     }
