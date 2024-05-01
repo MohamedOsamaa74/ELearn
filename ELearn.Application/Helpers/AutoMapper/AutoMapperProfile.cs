@@ -57,9 +57,16 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.Options, opt => opt.Ignore());
 
             CreateMap<AddVotingDTO, Voting>()
-                .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
-                //.ForMember(dest => dest.Options, opt => opt.Ignore())
-                .ForMember(dest => dest.Group, opt => opt.Ignore());
+                .ForMember(dest => dest.CreatorId, opt => opt.Ignore());
+            //.ForMember(dest => dest.Options, opt => opt.Ignore())
+
+            CreateMap<Voting, ViewVotingDTO>()
+                .ForMember(dest => dest.Groups, opt => opt.Ignore());
+
+            CreateMap<ViewVotingDTO, Voting>();
+
+            CreateMap<AddVotingDTO, ViewVotingDTO>();
+
             #endregion
 
             /*#region Option Mapper
@@ -95,14 +102,11 @@ namespace ELearn.Application.Helpers.AutoMapper
             #endregion
 
             #region Question Mapper
-            CreateMap<CreateQuestionDTO, Question>()
-                .ForMember(dest => dest.File, opt => opt.Ignore())
-                .ForMember(dest => dest.UserQuestion, opt => opt.Ignore())
-                .ForMember(dest => dest.ApplicationUser, opt => opt.Ignore())
-                .ForMember(dest => dest.Quiz, opt => opt.Ignore())
-                .ForMember(dest => dest.Survey, opt => opt.Ignore());
+            CreateMap<QuestionDTO, Question>()
+                .ForMember(dest => dest.QuizId, opt => opt.Ignore())
+                .ForMember(dest => dest.SurveyId, opt => opt.Ignore());
 
-            CreateMap<Question, CreateQuestionDTO>();
+            CreateMap<Question, QuestionDTO>();
             #endregion
 
             #region File Mapper

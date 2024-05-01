@@ -155,7 +155,7 @@ namespace ELearn.Application.Services
                 Type = file.Type,
                 UserId = file.UserId,
                 DownloadUrl = file.DownloadUrl,
-                Creation = file.Creation
+                Creation = file.CreationDate
             });
         }
         #endregion

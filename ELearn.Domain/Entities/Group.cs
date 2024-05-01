@@ -9,7 +9,7 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Name { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
         public required string Description { get; set; }
         public required string CreatorId { get; set; }
         public int DepartmentId { get; set; }

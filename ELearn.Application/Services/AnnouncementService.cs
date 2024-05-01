@@ -13,6 +13,8 @@ namespace ELearn.Application.Services
 {
     public class AnnouncementService : IAnnouncementService
     {
+
+        #region Fields
         private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
@@ -26,6 +28,7 @@ namespace ELearn.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _fileService = fileService;
         }
+        #endregion
 
         #region GetByID
         public async Task<Response<ViewAnnouncementDTO>> GetByIdAsync(int id)

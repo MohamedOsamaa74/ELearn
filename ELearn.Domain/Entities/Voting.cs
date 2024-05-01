@@ -9,15 +9,16 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
-        public bool IsActive => Start <= DateTime.Now && End >= DateTime.Now;
+        public bool IsActive { get => Start <= DateTime.Now && End >= DateTime.Now; }
         public required string Option1 { get; set; }
         public required string Option2 { get; set; }
         public string? Option3 { get; set; }
         public string? Option4 { get; set; }
         public string? Option5 { get; set; }
+
         #region ForeignKeys
         public required string CreatorId { get; set; }
         #endregion

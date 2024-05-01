@@ -12,7 +12,7 @@ namespace ELearn.Domain.Entities
     {
         public string Token { get; set; }
         public DateTime ExpiresOn { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
         public DateTime? RevokedOn { get; set; }
         public bool IsExpired => DateTime.UtcNow >= ExpiresOn;
         public bool IsActive => RevokedOn == null && !IsExpired;

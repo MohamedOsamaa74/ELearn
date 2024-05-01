@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public DepartmentValidation() 
         {
-            RuleFor(x => x.title)
+            RuleFor(x => x.Title)
                 .NotEmpty();
         }
     }

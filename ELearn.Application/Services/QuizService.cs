@@ -59,7 +59,7 @@ namespace ELearn.Application.Services
                     var questions = new List<Question>();
                     foreach (var createQuestionDTO in Model.Questions)
                     {
-                        var question = _mapper.Map<CreateQuestionDTO, Question>(createQuestionDTO);
+                        var question = _mapper.Map<QuestionDTO, Question>(createQuestionDTO);
                         if(question.CorrectOption!=question.Option1 || question.CorrectOption!=question.Option2 || question.CorrectOption != question.Option3 || question.CorrectOption != question.Option4 || question.CorrectOption != question.Option5 || question.CorrectOption == null)
                             return ResponseHandler.BadRequest<CreateQuizDTO>("Invalid CorrectOption");
                         question.Quiz = quiz;

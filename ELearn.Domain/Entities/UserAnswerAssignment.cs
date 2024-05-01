@@ -13,7 +13,7 @@ namespace ELearn.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public DateTime DateAnswered => DateTime.UtcNow.ToLocalTime();
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
 
         #region ForeignKeys
         public required string UserId { get; set; }

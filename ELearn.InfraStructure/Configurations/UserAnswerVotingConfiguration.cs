@@ -24,7 +24,7 @@ namespace ELearn.InfraStructure.Configurations
                 .HasOne(us => us.Voting)
                 .WithMany(s => s.UserVoting)
                 .HasForeignKey(us => us.VotingId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

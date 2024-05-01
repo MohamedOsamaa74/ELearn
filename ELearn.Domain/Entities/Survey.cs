@@ -9,9 +9,10 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
-        public bool IsActive => Start <= DateTime.Now && End >= DateTime.Now;
+        public bool IsActive { get => Start <= DateTime.UtcNow.ToLocalTime() && End >= DateTime.UtcNow.ToLocalTime(); }
 
         #region ForeignKeys
         public required string CreatorId { get; set; }

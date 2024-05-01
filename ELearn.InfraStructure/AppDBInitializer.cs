@@ -36,15 +36,15 @@ namespace ELearn.InfraStructure
                     {
                         new Department()
                         {
-                            title = "Dept1",
+                            Title = "Dept1",
                         },
                         new Department()
                         {
-                            title = "Dept2",
+                            Title = "Dept2",
                         },
                         new Department()
                         {
-                            title = "Dept3",
+                            Title = "Dept3",
                         }
                     });
 

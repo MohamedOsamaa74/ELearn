@@ -10,7 +10,7 @@
         public required string ViewUrl { get; set; }
         public required string DownloadUrl { get; set; }
         public required string Type { get; set; }
-        public DateTime Creation { get; set; } = DateTime.UtcNow.ToLocalTime();
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
 
         #region ForeignKeys
         public required string UserId { get; set; }

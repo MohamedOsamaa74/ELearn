@@ -11,6 +11,7 @@ namespace ELearn.Domain.Entities
         public required string title { get; set; }
         public required int Grade { get; set; }
         public DateTime CreationDate => DateTime.UtcNow.ToLocalTime();
+        public bool IsActive { get => Start <= DateTime.UtcNow.ToLocalTime() && End >= DateTime.UtcNow.ToLocalTime(); }
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
 

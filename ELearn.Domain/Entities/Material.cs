@@ -13,7 +13,7 @@ namespace ELearn.Domain.Entities
         public int Week { get; set; }
         public required MaterialType Type { get; set; }
         public required DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
-        
+
         #region ForeignKeys
         public required int GroupId { get; set; }
         public required string UserId { get; set; }

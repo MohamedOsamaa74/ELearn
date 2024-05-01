@@ -8,7 +8,7 @@ namespace ELearn.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public DateTime DateAnswered => DateTime.UtcNow.ToLocalTime();
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
 
         public required string Option { get; set; }
 

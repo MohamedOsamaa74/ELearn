@@ -8,7 +8,8 @@ namespace ELearn.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public required string title { get; set; }
+        public required string Title { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
         public virtual ICollection<ApplicationUser>? Users { get; set; }=new List<ApplicationUser>();
 
         //dept has many groups

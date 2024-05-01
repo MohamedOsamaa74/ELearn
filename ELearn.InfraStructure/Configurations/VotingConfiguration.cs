@@ -15,11 +15,13 @@ namespace ELearn.InfraStructure.Configurations
         {
             builder.ToTable("Votings");
             builder.HasKey(v => v.Id);
+
             builder.HasMany(g => g.Group)
                 .WithMany(v => v.votings)
                 .UsingEntity<GroupVoting>();
-                           /*(gv => gv.HasOne(gv => gv.Group).WithMany(g => g.GroupVotings).HasForeignKey(gv => gv.GroupId),
-                           gv => gv.HasOne(gv => gv.Voting).WithMany(v => v.GroupVotings).HasForeignKey(gv => gv.VotingId));*/
+            /*(gv => gv.HasOne(gv => gv.Group).WithMany(g => g.GroupVotings).HasForeignKey(gv => gv.GroupId),
+            gv => gv.HasOne(gv => gv.Voting).WithMany(v => v.GroupVotings).HasForeignKey(gv => gv.VotingId));*/
+           
         }
     }
 }

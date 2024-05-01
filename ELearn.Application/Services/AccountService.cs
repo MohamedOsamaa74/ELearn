@@ -415,7 +415,7 @@ namespace ELearn.Application.Services
             {
                 Token = Convert.ToBase64String(randomNumber),
                 ExpiresOn = DateTime.UtcNow.AddDays(7),
-                CreatedOn = DateTime.UtcNow,
+                CreationDate = DateTime.UtcNow,
             };
         }
         #endregion
