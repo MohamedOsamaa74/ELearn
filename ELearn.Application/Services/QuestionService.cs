@@ -20,7 +20,7 @@ namespace ELearn.Application.Services
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public QuestionService(IUnitOfWork unitOfWork, IMapper mapper)
+        public QuestionService(IUnitOfWork unitOfWork, IMapper mapper , IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _userService = userService;

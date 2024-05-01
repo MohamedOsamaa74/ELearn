@@ -39,7 +39,27 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
+        #region Get Quiz By ID
+        [HttpGet("GetQuizById/{QuizId:int}")]
+        [Authorize(Roles = "Admin ,Staff")]
+        public async Task<IActionResult> GeQuizById(int quizId)
+        {
+            var response = await _quizService.GetQuizByIdAsync(quizId);
+            return this.CreateResponse(response);
+        }
 
+        #endregion
+
+        #region Get All Quizes
+        [HttpGet]
+        [Authorize(Roles = "Admin ,Staff")]
+        public async Task<IActionResult> GetAll()
+        {
+            var response = await _quizService.GetAllQuizzesAsync();
+            return this.CreateResponse(response);
+        }
+
+        #endregion
 
     }
 }
