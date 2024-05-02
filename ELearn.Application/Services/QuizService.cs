@@ -150,6 +150,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Get Quiz By ID
+
         public async Task<Response<ViewQuizDTO>> GetQuizByIdAsync(int quizId)
         {
             try
@@ -159,16 +160,16 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.NotFound<ViewQuizDTO>();
                 }
-
-                var viewQuizDTO = _mapper.Map<ViewQuizDTO>(quiz);
-                return ResponseHandler.Success(viewQuizDTO);
+                var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
+                var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
+                quizDto.Questions = questions.Data;
+                return ResponseHandler.Success(quizDto);
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<ViewQuizDTO>($"An error occurred while retrieving quiz: {ex.Message}");
+                return ResponseHandler.BadRequest<ViewQuizDTO>($"An error occurred while retrieving Quiz: {ex.Message}");
             }
         }
-
         #endregion
 
         #region Get All Quizes
