@@ -173,20 +173,53 @@ namespace ELearn.Application.Services
 
         #region Get All Quizes
 
-        public async Task<Response<ViewQuizDTO>> GetAllQuizzesAsync()
+        public async Task<Response<ICollection<ViewQuizDTO>>> GetAllQuizzesAsync()
         {
             try
             {
                 var quizzes = await _unitOfWork.Quizziz.GetAllAsync();
-                var quizDtos = _mapper.Map<ViewQuizDTO>(quizzes);
+                if (quizzes == null)
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewQuizDTO>>();
+                }
+                ICollection<ViewQuizDTO> quizDtos = new List<ViewQuizDTO>();
+                foreach (var quiz in quizzes)
+                {
+                    var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
+                    var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
+                    quizDto.Questions = questions.Data;
+                    quizDtos.Add(quizDto);
+                }
+
                 return ResponseHandler.Success(quizDtos);
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<ViewQuizDTO>($"An error occurred while retrieving materials: {ex.Message}");
+                return ResponseHandler.BadRequest<ICollection<ViewQuizDTO>>($"An error occurred while retrieving Quizzes: {ex.Message}");
             }
         }
         #endregion
+
+        #region Delete
+        public async Task<Response<CreateQuizDTO>> DeleteAsync(int Id)
+        {
+            try
+            {
+                var quiz = await _unitOfWork.Quizziz.GetByIdAsync(Id);
+                if (quiz == null)
+                    return ResponseHandler.NotFound<CreateQuizDTO>("Quiz not found");
+
+                await _unitOfWork.Quizziz.DeleteAsync(quiz);
+                return ResponseHandler.Deleted<CreateQuizDTO>();
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<CreateQuizDTO>(ex.Message);
+            }
+        }
+        #endregion
+
+
 
     }
 }
