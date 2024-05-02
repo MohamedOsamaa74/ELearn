@@ -7,6 +7,7 @@ using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.ObjectModel;
 
 namespace ELearn.Application.Services
 {
@@ -72,31 +73,200 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        public Task<Response<CreateSurveyDTO>> DeleteAsync(int Id)
+        #region Delete
+        public async Task<Response<CreateSurveyDTO>> DeleteAsync(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var survey = await _unitOfWork.Surveys.GetByIdAsync(Id);
+                if (survey is null)
+                    return ResponseHandler.NotFound<CreateSurveyDTO>("There is no such Survey");
+                await _unitOfWork.Surveys.DeleteAsync(survey);
+                return ResponseHandler.Deleted<CreateSurveyDTO>();
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<CreateSurveyDTO>($"An Error Occorred, {Ex}");
+            }
         }
+        #endregion
 
-        public Task<Response<ICollection<CreateSurveyDTO>>> GetAllAsync()
+        #region DeleteMany
+        public async Task<Response<CreateSurveyDTO>> DeleteManyAsync(int[] Ids)
         {
-            throw new NotImplementedException();
+            try
+            {
+                foreach (var Id in Ids)
+                {
+                    var survey = await _unitOfWork.Surveys.GetByIdAsync(Id);
+                    if (survey is null)
+                        return ResponseHandler.NotFound<CreateSurveyDTO>("There is no such Survey");
+                    await _unitOfWork.Surveys.DeleteAsync(survey);
+                }
+                return ResponseHandler.Deleted<CreateSurveyDTO>();
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<CreateSurveyDTO>($"An Error Occorred, {Ex}");
+            }
         }
+        #endregion
 
-
-        public Task<Response<ICollection<CreateSurveyDTO>>> GetFromGroups(int GroupId)
+        #region GetAll
+        public async Task<Response<ICollection<CreateSurveyDTO>>> GetAllAsync()
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var surveys = await _unitOfWork.Surveys.GetAllAsync();
+                if (surveys.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are no Surveys yet");
 
-        public Task<Response<ICollection<CreateSurveyDTO>>> GetFromUserGroups()
-        {
-            throw new NotImplementedException();
+                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                foreach (var survey in surveys)
+                {
+                    var surveydto = _mapper.Map<CreateSurveyDTO>(survey);
+                    surveydto.GroupIds = await _unitOfWork.GroupSurveys.GetWhereSelectAsync(g => g.SurveyId == survey.Id, g => g.GroupId);
+                    surveydto.Questions = _mapper.Map<ICollection<QuestionDTO>>(await _unitOfWork.Questions.GetWhereAsync(q => q.SurveyId == survey.Id));
+                    surveysDto.Add(surveydto);
+                }
+                return ResponseHandler.Success(surveysDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+            }
         }
+        #endregion
 
-        public Task<Response<ICollection<CreateSurveyDTO>>> GetSurveysByCreator()
+        #region GetFromGroup
+        public async Task<Response<ICollection<CreateSurveyDTO>>> GetFromGroup(int GroupId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var surveys = await _unitOfWork.GroupSurveys.GetWhereSelectAsync(g => g.GroupId == GroupId, g => g.SurveyId);
+                if (surveys.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are no Surveys yet");
+                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                foreach (var survey in surveys)
+                {
+                    var surveydto = GetByIdAsync(survey);
+                    surveysDto.Add(surveydto.Result.Data);
+                }
+                return ResponseHandler.Success(surveysDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+            }
         }
+        #endregion
+
+        #region GetFromUserGroups
+        public async Task<Response<ICollection<CreateSurveyDTO>>> GetFromUserGroups()
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var groups = await _unitOfWork.UserGroups.GetWhereSelectAsync(u => u.UserId == user.Id, g => g.GroupId);
+                if(groups.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("You Are Not in Any Groups");
+                var surveys = new List<int>();
+                foreach (var group in groups)
+                {
+                    surveys.AddRange(await _unitOfWork.GroupSurveys.GetWhereSelectAsync(v => v.GroupId == group, v => v.SurveyId));
+                }
+                if (surveys.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are no Surveys yet");
+                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                foreach (var survey in surveys)
+                {
+                    var surveydto = GetByIdAsync(survey);
+                    surveysDto.Add(surveydto.Result.Data);
+                }
+                return ResponseHandler.Success(surveysDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region GetByCreator
+        public async Task<Response<ICollection<CreateSurveyDTO>>> GetSurveysByCreator()
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var surveys = await _unitOfWork.Surveys.GetWhereSelectAsync(v => v.CreatorId == user.Id, v => v.Id);
+                if (surveys.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are No Surveys yet");
+                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                foreach (var survey in surveys)
+                {
+                    var surveydto = await GetByIdAsync(survey);
+                    surveysDto.Add(surveydto.Data);
+                }
+                return ResponseHandler.Success(surveysDto);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region RecieveStudentResponse
+        public async Task<Response<UserAnswerSurveyDTO>> RecieveStudentResponseAsync(UserAnswerSurveyDTO userAnswerDTO)
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var survey = await _unitOfWork.Surveys.GetByIdAsync(userAnswerDTO.SurveyId);
+                if (survey is null)
+                    return ResponseHandler.NotFound<UserAnswerSurveyDTO> ("There is no such Survey");
+                foreach (var answer in userAnswerDTO.Answers)
+                {
+                    var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);
+                    if(!recieveAnswer.Succeeded)
+                        return ResponseHandler.BadRequest<UserAnswerSurveyDTO>($"An Error Occurred, {recieveAnswer.Message}");
+                }
+                UserAnswerSurvey userAnswerSurvey= new() { SurveyId = userAnswerDTO.SurveyId, UserId = user.Id };
+                await _unitOfWork.UserAnswerSurveys.AddAsync(userAnswerSurvey);
+                return ResponseHandler.Success(userAnswerDTO);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserAnswerSurveyDTO>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region GetUserAnswer
+        public async Task<Response<UserAnswerSurveyDTO>> GetUserAnswerAsync(int surveyId, string UserId)
+        {
+            try
+            {
+                var user = await _userService.GetByIdAsync(UserId);
+                if (user is null)
+                    return ResponseHandler.NotFound<UserAnswerSurveyDTO>("There is no such User");
+                var survey = await _unitOfWork.Surveys.GetByIdAsync(surveyId);
+                if (survey is null)
+                    return ResponseHandler.NotFound<UserAnswerSurveyDTO>("There is no such Survey");
+                var studentAnswers = await _questionService.GetStudentAnswersAsync("Survey", surveyId, UserId);
+                var userAnswers = new UserAnswerSurveyDTO()
+                {
+                    SurveyId = surveyId,
+                    Answers = studentAnswers.Data
+                };
+                return ResponseHandler.Success(userAnswers);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserAnswerSurveyDTO>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
 
         #region Private Methods
         private async Task<string> SendToGroups(int surveyId, ICollection<int>Groups)

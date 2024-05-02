@@ -15,6 +15,8 @@ namespace ELearn.Application.Interfaces
         public Task<ApplicationUser> GetCurrentUserAsync();
         public Task<string> GetCurrentUserIDAsync();
         public Task<ApplicationUser> GetByUserName(string UserName);
+        public Task<ApplicationUser> GetByEmail(string Email);
+        public Task<ApplicationUser> GetByIdAsync(string Id);
         public Task<Response<AddUserDTO>> CreateNewUserAsync(AddUserDTO user);
         public Task<Response<ICollection<AddUserDTO>>> AddMultipleUsersAsync(IFormFile file);
         public Task<Response<ICollection<AddUserDTO>>> GetAllAsync();

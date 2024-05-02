@@ -23,12 +23,19 @@ namespace ELearn.InfraStructure.Configurations
             //one(quiz) to many (questions)
             builder.HasOne(q => q.Quiz)
                 .WithMany(s => s.Questions)
-                .HasForeignKey(q => q.QuizId);
+                .HasForeignKey(q => q.QuizId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(s => s.Survey)
+                .WithMany(q => q.Question)
+                .HasForeignKey(s => s.SurveyId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(u => u.UserQuestion)
                 .WithOne(q => q.Question)
                 .HasForeignKey(q => q.QuestionId)
                 .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 }

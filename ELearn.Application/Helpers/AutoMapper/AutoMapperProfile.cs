@@ -104,6 +104,14 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.GroupId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .ForMember(dest => dest.Questions, opt => opt.Ignore());
+
+
+            CreateMap<ViewQuizDTO, Quiz>()
+              .ForMember(dest => dest.GroupId, opt => opt.Ignore())
+              .ForMember(dest => dest.UserId, opt => opt.Ignore())
+              .ForMember(dest => dest.Questions, opt => opt.Ignore());
+
+            CreateMap<Quiz, CreateQuizDTO>();
             #endregion
 
             #region Question Mapper
@@ -112,6 +120,11 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.SurveyId, opt => opt.Ignore());
 
             CreateMap<Question, QuestionDTO>();
+
+            CreateMap<QuestionAnswerDTO, UserAnswerQuestion>();
+
+            CreateMap<UserAnswerQuestion, QuestionAnswerDTO>()
+                .ForMember(dest => dest.Score, opt => opt.Ignore());
             #endregion
 
             #region File Mapper

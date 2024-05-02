@@ -62,8 +62,10 @@ namespace ELearn.Application.Services
                     foreach (var createQuestionDTO in Model.Questions)
                     {
                         var question = _mapper.Map<QuestionDTO, Question>(createQuestionDTO);
-                        if(question.CorrectOption!=question.Option1 || question.CorrectOption!=question.Option2 || question.CorrectOption != question.Option3 || question.CorrectOption != question.Option4 || question.CorrectOption != question.Option5 || question.CorrectOption == null)
-                            return ResponseHandler.BadRequest<CreateQuizDTO>("Invalid CorrectOption");
+                        if (question.CorrectOption == null || question.CorrectOption == "" || question.CorrectOption == string.Empty)
+                            return ResponseHandler.BadRequest<CreateQuizDTO>("Correct Option is required");
+                        if (question.CorrectOption != question.Option1 && question.CorrectOption != question.Option2 && question.CorrectOption != question.Option3 && question.CorrectOption != question.Option4 && question.CorrectOption != question.Option5)
+                            return ResponseHandler.BadRequest<CreateQuizDTO>("Invalid Correct Option");
                         question.Quiz = quiz;
                         questions.Add(question);
                     }
@@ -147,6 +149,44 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region Get Quiz By ID
+        public async Task<Response<ViewQuizDTO>> GetQuizByIdAsync(int quizId)
+        {
+            try
+            {
+                var quiz = await _unitOfWork.Quizziz.GetByIdAsync(quizId);
+                if (quiz == null)
+                {
+                    return ResponseHandler.NotFound<ViewQuizDTO>();
+                }
+
+                var viewQuizDTO = _mapper.Map<ViewQuizDTO>(quiz);
+                return ResponseHandler.Success(viewQuizDTO);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewQuizDTO>($"An error occurred while retrieving quiz: {ex.Message}");
+            }
+        }
+
+        #endregion
+
+        #region Get All Quizes
+
+        public async Task<Response<ViewQuizDTO>> GetAllQuizzesAsync()
+        {
+            try
+            {
+                var quizzes = await _unitOfWork.Quizziz.GetAllAsync();
+                var quizDtos = _mapper.Map<ViewQuizDTO>(quizzes);
+                return ResponseHandler.Success(quizDtos);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewQuizDTO>($"An error occurred while retrieving materials: {ex.Message}");
+            }
+        }
+        #endregion
 
     }
 }

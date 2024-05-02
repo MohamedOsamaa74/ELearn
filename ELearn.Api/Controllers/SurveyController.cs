@@ -1,4 +1,5 @@
 ﻿using ELearn.Application.DTOs;
+using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +11,13 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class SurveyController : ControllerBase
     {
+        #region Fields and Constructor
         private readonly ISurveyService _surveyService;
         public SurveyController(ISurveyService surveyService)
         {
             _surveyService = surveyService;
         }
+        #endregion
 
         #region Create New
         [HttpPost("CreateSurvey")]
@@ -41,7 +44,7 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region GetSurveyofCurrentUser
-        [HttpGet("GetSurveysByCreator")]
+        [HttpGet("GetByCreator")]
         public async Task<IActionResult> GetSurveysByCreator()
         {
             var response = await _surveyService.GetSurveysByCreator();
@@ -65,13 +68,13 @@ namespace ELearn.Api.Controllers
         [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> GetFromGroups(int GroupId)
         {
-            var response = await _surveyService.GetFromGroups(GroupId);
+            var response = await _surveyService.GetFromGroup(GroupId);
             return this.CreateResponse(response);
         }
         #endregion
 
         #region GetFromUserGroups
-        [HttpGet("GetSurveysFromUserGroup/")]
+        [HttpGet("GetFromUserGroups")]
         [Authorize]
         public async Task<IActionResult> GetFromUserGroups()
         {
@@ -81,11 +84,41 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Delete One
-        [HttpDelete("DeleteSurvey/{Id:int}")]
+        [HttpDelete("Delete/{Id:int}")]
         [Authorize(Roles = "Admin, Staff")]
-        public async Task<IActionResult> Delete(int Id)
+        public async Task<IActionResult> DeleteAsync(int Id)
         {
             var response = await _surveyService.DeleteAsync(Id);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Delete Many
+        [HttpDelete("DeleteMany")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> DeleteManyAsync([FromBody] int[] Ids)
+        {
+            var response = await _surveyService.DeleteManyAsync(Ids);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region RecieveStudentResponse
+        [HttpPost("RecieveStudentResponse")]
+        [Authorize]
+        public async Task<IActionResult> RecieveStudentResponse([FromBody] UserAnswerSurveyDTO Model)
+        {
+            var response = await _surveyService.RecieveStudentResponseAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetUserAnswers
+        [HttpGet("GetUserAnswers/{SurveyId:int}/{UserId}")]
+        [Authorize(Roles ="Admin, Staff")]
+        public async Task<IActionResult> GetUserAnswersAsync(int SurveyId, string UserId)
+        {
+            var response = await _surveyService.GetUserAnswerAsync(SurveyId, UserId);
             return this.CreateResponse(response);
         }
         #endregion
