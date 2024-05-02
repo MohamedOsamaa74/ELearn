@@ -14,6 +14,9 @@ namespace ELearn.Application.Interfaces
         public Task<Response<CreateQuizDTO>> CreateNewAsync(CreateQuizDTO Model, int groupID);
         public Task<Response<EditQuizDTO>> UpdateQuizAsync(EditQuizDTO Model, int quizID);
         public Task<Response<ViewQuizDTO>> GetQuizByIdAsync(int quizId);
-        public Task<Response<ViewQuizDTO>> GetAllQuizzesAsync();
+        public Task<Response<ICollection<ViewQuizDTO>>> GetAllQuizzesAsync();
+
+        public Task<Response<CreateQuizDTO>> DeleteAsync(int Id);
+
     }
 }

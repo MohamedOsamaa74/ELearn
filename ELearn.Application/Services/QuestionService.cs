@@ -194,5 +194,21 @@ namespace ELearn.Application.Services
             }
         }
         #endregion
+
+        #region Get All Quizzes
+        public async Task<Response<ICollection<QuestionDTO>>> GetQuestionsByQuizIdAsync(int quizId)
+        {
+            try
+            {
+                var questions = await _unitOfWork.Questions.GetWhereAsync(q=>q.QuizId==quizId);
+                var questionDtos = _mapper.Map<ICollection<QuestionDTO>>(questions);
+                return ResponseHandler.Success(questionDtos);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<QuestionDTO>>($"An error occurred while retrieving Questions: {ex.Message}");
+            }
+        }
+        #endregion
     }
 }

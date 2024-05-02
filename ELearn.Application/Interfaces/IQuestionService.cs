@@ -11,5 +11,6 @@ namespace ELearn.Application.Interfaces
         public Task<Response<QuestionDTO>> GetByIdAsync(int Id);
         public Task<Response<QuestionAnswerDTO>>RecieveStudentAnswerAsync(QuestionAnswerDTO Model);
         public Task<Response<ICollection<QuestionAnswerDTO>>> GetStudentAnswersAsync(string Parent, int ParentId, string UserId);
+        public Task<Response<ICollection<QuestionDTO>>> GetQuestionsByQuizIdAsync(int quizId);
     }
 }

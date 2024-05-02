@@ -41,21 +41,31 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Get Quiz By ID
-        [HttpGet("GetQuizById/{QuizId:int}")]
+        [HttpGet("GetById/{QuizId:int}")]
         [Authorize(Roles = "Admin ,Staff")]
-        public async Task<IActionResult> GeQuizById(int quizId)
+        public async Task<IActionResult> GeQuizById(int QuizId)
         {
-            var response = await _quizService.GetQuizByIdAsync(quizId);
+            var response = await _quizService.GetQuizByIdAsync(QuizId);
             return this.CreateResponse(response);
         }
         #endregion
 
         #region Get All Quizes
-        [HttpGet]
+        [HttpGet("GetAll")]
         [Authorize(Roles = "Admin ,Staff")]
         public async Task<IActionResult> GetAll()
         {
             var response = await _quizService.GetAllQuizzesAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Delete Quiz
+        [HttpDelete("Delete/{QuizId:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteQuiz(int QuizId)
+        {
+            var response = await _quizService.DeleteAsync(QuizId);
             return this.CreateResponse(response);
         }
         #endregion
