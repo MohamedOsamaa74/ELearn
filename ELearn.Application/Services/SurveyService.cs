@@ -217,7 +217,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region RecieveStudentResponse
-        public async Task<Response<UserAnswerSurveyDTO>> RecieveStudentResponseAsync(UserAnswerSurveyDTO userAnswerDTO)
+        public async Task<Response<UserAnswerSurveyDTO>> RecieveStudentResponseAsync(UserAnswerSurveyDTO userAnswerDTO) 
         {
             try
             {
@@ -225,6 +225,7 @@ namespace ELearn.Application.Services
                 var survey = await _unitOfWork.Surveys.GetByIdAsync(userAnswerDTO.SurveyId);
                 if (survey is null)
                     return ResponseHandler.NotFound<UserAnswerSurveyDTO> ("There is no such Survey");
+
                 foreach (var answer in userAnswerDTO.Answers)
                 {
                     var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);

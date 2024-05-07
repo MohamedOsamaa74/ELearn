@@ -137,6 +137,7 @@ namespace ELearn.Application.Services
                 var userAnswer = _mapper.Map<UserAnswerQuestion>(Model);
                 userAnswer.UserId = user.Id;
                 await _unitOfWork.UserAnswerQuestions.AddAsync(userAnswer);
+
                 if(question.CorrectOption != null && question.CorrectOption == Model.Option)
                      Model.Score = question.Grade;
                 else Model.Score = 0;
@@ -195,7 +196,7 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region Get All Quizzes
+        #region Get All Questions
         public async Task<Response<ICollection<QuestionDTO>>> GetQuestionsByQuizIdAsync(int quizId)
         {
             try

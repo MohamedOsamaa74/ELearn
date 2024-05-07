@@ -2,6 +2,7 @@
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
+using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -31,17 +32,17 @@ namespace ELearn.Application.Services
         #endregion
 
         #region CreateNewAsync
-        public async Task<Response<CreateQuizDTO>> CreateNewAsync(CreateQuizDTO Model,int groupID)
+        public async Task<Response<CreateQuizDTO>> CreateNewAsync(CreateQuizDTO Model, int groupID)
         {
             try
             {
                 var quiz = _mapper.Map<CreateQuizDTO, Quiz>(Model);
                 quiz.UserId = _userService.GetCurrentUserAsync().Result.Id;
-                if(quiz.UserId == null)
+                if (quiz.UserId == null)
                 {
                     return ResponseHandler.BadRequest<CreateQuizDTO>("User not found");
                 }
-                if(quiz.Start > quiz.End || quiz.Start < DateTime.Now)
+                if (quiz.Start > quiz.End || quiz.Start < DateTime.Now)
                 {
                     return ResponseHandler.BadRequest<CreateQuizDTO>("Start date must be less than end date And greater than current date");
                 }
@@ -84,7 +85,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region UpdateQuiz
-        public async Task<Response<EditQuizDTO>> UpdateQuizAsync(EditQuizDTO Model , int QuizId)
+        public async Task<Response<EditQuizDTO>> UpdateQuizAsync(EditQuizDTO Model, int QuizId)
         {
             try
             {
@@ -220,7 +221,128 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region ReceiveStudentQuizResponseAsync
+        //  useranswerquizهنا بحسب الاسكور بتاع كل طال وبخزنه في 
+
+        public async Task<Response<QuizResultDTO>> ReceiveStudentQuizResponsesAsync(QuizResultDTO userAnswerDto)
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                if (user is null)
+                    return ResponseHandler.NotFound<QuizResultDTO>("There is no such User");
+                var quiz = await _unitOfWork.Quizziz.GetByIdAsync(userAnswerDto.QuizId);
+                if (quiz is null)
+                    return ResponseHandler.NotFound<QuizResultDTO>("There is no such Quiz");
+
+        
+                var totalScore = 0;
+                foreach (var answer in userAnswerDto.QuestionAnswers)
+                {
+                    var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);
+                    if (!recieveAnswer.Succeeded)
+                        return ResponseHandler.BadRequest<QuizResultDTO>($"An Error Occurred, {recieveAnswer.Message}");
+                    totalScore += answer.Score ??0;
+                }
+                 var userAnswerQuiz = new UserAnswerQuiz { QuizId =userAnswerDto.QuizId , UserId = user.Id ,Grade=totalScore};
+                await _unitOfWork.UserAnswerQuizziz.AddAsync(userAnswerQuiz);
+                var quizResult = new QuizResultDTO()
+                {
+                    QuizId = userAnswerDto.QuizId,
+                    StudentName = user.UserName,
+                    TotalScore = totalScore,
+                    QuestionAnswers = userAnswerDto.QuestionAnswers
+                };
+
+                return ResponseHandler.Success(quizResult);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<QuizResultDTO>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region Get All Responses
+        public async Task<Response<List<QuizResultDTO>>> GetAllQuizResponsesAsync(int quizId)
+        {
+            try
+            {
+
+                var userResponses = await _unitOfWork.UserAnswerQuizziz
+                    .GetWhereAsync(q => q.QuizId == quizId);
+
+                if (userResponses is null || !userResponses.Any())
+                    return ResponseHandler.NotFound<List<QuizResultDTO>>("No responses found for this quiz");
+
+                var quizResults = new List<QuizResultDTO>();
+
+                foreach (var userResponse in userResponses)
+                {
+                  
+                    var user = await _userService.GetCurrentUserAsync();
+                    if (user is null)
+                        continue; // Skip if user not found
+
+                    var quizResult = new QuizResultDTO
+                    {
+                        QuizId = quizId,
+                        StudentName = user.UserName,
+                        TotalScore = userResponse.Grade 
+                    };
+
+                    quizResults.Add(quizResult);
+                }
+
+                return ResponseHandler.Success(quizResults);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<List<QuizResultDTO>>($"An error occurred: {ex.Message}");
+            }
+        }
+
+        #endregion
+
+        #region GetStudentResponses
+        // وخزنت اجابة الطالب GetStudentAnswersAsyncهنا خزنة الاجابة واستخدمت 
+        //المفروض هنا برجع اجابات طالب في الكويز
+        //get student response by id
+        public async Task<Response<UserAnswerQuizDTO>> GetUserAnswerAsync(int quizId, string UserId)
+        {
+            try
+            {
+                var user = await _userService.GetByIdAsync(UserId);
+                if (user is null)
+                    return ResponseHandler.NotFound<UserAnswerQuizDTO>("There is no such User");
+                var quiz = await _unitOfWork.Surveys.GetByIdAsync(quizId);
+                if (quiz is null)
+                    return ResponseHandler.NotFound<UserAnswerQuizDTO>("There is no such Survey");
+                var studentAnswers = await _questionService.GetStudentAnswersAsync("Quiz", quizId, UserId);
+                var userAnswers = new UserAnswerQuizDTO()
+                {
+                    QuizId = quizId,
+                    Answers = studentAnswers.Data
+                };
+                return ResponseHandler.Success(userAnswers);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserAnswerQuizDTO>($"An Error Occorred, {Ex}");
+            }
+        }
+        #endregion
+ 
+
+
+
+
+
+
+
+
 
 
     }
 }
+

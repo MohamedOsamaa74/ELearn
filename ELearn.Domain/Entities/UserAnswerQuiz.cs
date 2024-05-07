@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ELearn.Domain.Entities
 {
-    public class UserAnswerQuiz
+    public class UserAnswerQuiz   
     {
         public int Id { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
