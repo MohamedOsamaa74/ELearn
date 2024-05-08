@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace ELearn.Application.DTOs.QuizDTOs
 {
-    public class UserAnswerQuizDTO
+    public class QuestionQuizDTO
     {
-        public int QuizId { get; set; }
-        public ICollection<QuestionQuizDTO> Answers { get; set; } = [];
+        public int QuestionId { get; set; }
+        public required string Option { get; set; }
+        
     }
 }

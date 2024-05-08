@@ -67,7 +67,7 @@ namespace ELearn.Application.Services
                             return ResponseHandler.BadRequest<CreateQuizDTO>("Correct Option is required");
                         if (question.CorrectOption != question.Option1 && question.CorrectOption != question.Option2 && question.CorrectOption != question.Option3 && question.CorrectOption != question.Option4 && question.CorrectOption != question.Option5)
                             return ResponseHandler.BadRequest<CreateQuizDTO>("Invalid Correct Option");
-                        question.Quiz = quiz;
+                        question.QuizId = quiz.Id;
                         questions.Add(question);
                     }
                     quiz.Questions = questions;
@@ -163,7 +163,7 @@ namespace ELearn.Application.Services
                 }
                 var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
                 var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
-                quizDto.Questions = questions.Data;
+                quizDto.Questions = (ICollection<QuestionQuizDTO>)questions.Data;
                 return ResponseHandler.Success(quizDto);
             }
             catch (Exception ex)
@@ -189,7 +189,7 @@ namespace ELearn.Application.Services
                 {
                     var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
                     var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
-                    quizDto.Questions = questions.Data;
+                    quizDto.Questions = (ICollection<QuestionQuizDTO>)questions.Data;
                     quizDtos.Add(quizDto);
                 }
 
@@ -224,7 +224,7 @@ namespace ELearn.Application.Services
         #region ReceiveStudentQuizResponseAsync
         //  useranswerquizهنا بحسب الاسكور بتاع كل طال وبخزنه في 
 
-        public async Task<Response<QuizResultDTO>> ReceiveStudentQuizResponsesAsync(QuizResultDTO userAnswerDto)
+        public async Task<Response<QuizResultDTO>> ReceiveStudentQuizResponsesAsync(UserAnswerQuizDTO userAnswerDto)
         {
             try
             {
@@ -237,12 +237,12 @@ namespace ELearn.Application.Services
 
         
                 var totalScore = 0;
-                foreach (var answer in userAnswerDto.QuestionAnswers)
+                foreach (var answer in userAnswerDto.Answers)
                 {
                     var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);
                     if (!recieveAnswer.Succeeded)
                         return ResponseHandler.BadRequest<QuizResultDTO>($"An Error Occurred, {recieveAnswer.Message}");
-                    totalScore += answer.Score ??0;
+                    totalScore += recieveAnswer.Data.Score ??0;
                 }
                  var userAnswerQuiz = new UserAnswerQuiz { QuizId =userAnswerDto.QuizId , UserId = user.Id ,Grade=totalScore};
                 await _unitOfWork.UserAnswerQuizziz.AddAsync(userAnswerQuiz);
@@ -251,7 +251,7 @@ namespace ELearn.Application.Services
                     QuizId = userAnswerDto.QuizId,
                     StudentName = user.UserName,
                     TotalScore = totalScore,
-                    QuestionAnswers = userAnswerDto.QuestionAnswers
+                    
                 };
 
                 return ResponseHandler.Success(quizResult);
@@ -315,14 +315,15 @@ namespace ELearn.Application.Services
                 var user = await _userService.GetByIdAsync(UserId);
                 if (user is null)
                     return ResponseHandler.NotFound<UserAnswerQuizDTO>("There is no such User");
-                var quiz = await _unitOfWork.Surveys.GetByIdAsync(quizId);
+                var quiz = await _unitOfWork.Quizziz.GetByIdAsync(quizId);
                 if (quiz is null)
                     return ResponseHandler.NotFound<UserAnswerQuizDTO>("There is no such Survey");
                 var studentAnswers = await _questionService.GetStudentAnswersAsync("Quiz", quizId, UserId);
+                var studentAnswer = _mapper.Map<ICollection<QuestionAnswerDTO>, ICollection<QuestionQuizDTO>>(studentAnswers.Data);
                 var userAnswers = new UserAnswerQuizDTO()
                 {
                     QuizId = quizId,
-                    Answers = studentAnswers.Data
+                    Answers = studentAnswer
                 };
                 return ResponseHandler.Success(userAnswers);
             }

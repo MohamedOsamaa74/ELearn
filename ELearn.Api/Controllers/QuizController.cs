@@ -75,7 +75,7 @@ namespace ELearn.Api.Controllers
         #region Receive Student Quiz Response
         [HttpPost("ReceiveStudentQuizResponse")]
         [Authorize(Roles = "Admin, Staff")]
-        public async Task<IActionResult> ReceiveStudentQuizResponse([FromBody] QuizResultDTO userAnswerDTO)
+        public async Task<IActionResult> ReceiveStudentQuizResponse([FromBody] UserAnswerQuizDTO userAnswerDTO)
         {
             var response = await _quizService.ReceiveStudentQuizResponsesAsync(userAnswerDTO);
             return this.CreateResponse(response);
