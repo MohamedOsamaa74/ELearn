@@ -119,8 +119,8 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region RecieveStudentAnswerAsync
-        public async Task<Response<QuestionAnswerDTO>> RecieveStudentAnswerAsync(QuestionAnswerDTO Model)
+          #region RecieveStudentAnswerAsync
+        public async Task<Response<QuestionAnswerDTO>> RecieveStudentAnswerAsync(QuestionQuizDTO Model)
         {
             try
             {
@@ -137,10 +137,13 @@ namespace ELearn.Application.Services
                 var userAnswer = _mapper.Map<UserAnswerQuestion>(Model);
                 userAnswer.UserId = user.Id;
                 await _unitOfWork.UserAnswerQuestions.AddAsync(userAnswer);
-                if(question.CorrectOption != null && question.CorrectOption == Model.Option)
-                     Model.Score = question.Grade;
-                else Model.Score = 0;
-                return ResponseHandler.Success(Model);
+                var QuestionAnswerDTO = _mapper.Map<QuestionAnswerDTO>(Model);
+
+
+                if (question.CorrectOption != null && question.CorrectOption == Model.Option)
+                    QuestionAnswerDTO.Score = question.Grade;
+                else QuestionAnswerDTO.Score = 0;
+                return ResponseHandler.Success(QuestionAnswerDTO);
             }
             catch (Exception ex)
             {
@@ -166,7 +169,17 @@ namespace ELearn.Application.Services
                         var allAnswers = await _unitOfWork.UserAnswerQuestions.GetWhereAsync(q=>q.QuestionId == question.Id);
                         var answer = allAnswers.Where(q => q.UserId == UserId).ToList();
                         if (answer != null)
-                            answers.Add(_mapper.Map<QuestionAnswerDTO>(answer));
+                        {
+                            var questionAnswers = _mapper.Map<List<QuestionAnswerDTO>>(answer);
+                            //questionAnswers.Score = answer.
+                            foreach(var q in questionAnswers)
+                            {
+                                if (question.CorrectOption != null && question.CorrectOption == q.Option)
+                                    q.Score = question.Grade;
+                                else q.Score = 0;
+                                answers.Add(q);
+                            }
+                        }
                     }
                 }
                 else if (Parent == "Survey")
@@ -195,7 +208,7 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region Get All Quizzes
+        #region Get All Questions
         public async Task<Response<ICollection<QuestionDTO>>> GetQuestionsByQuizIdAsync(int quizId)
         {
             try

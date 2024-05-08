@@ -1,4 +1,5 @@
 ﻿using ELearn.Application.DTOs.QuestionDTOs;
+using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.Helpers.Response;
 
 namespace ELearn.Application.Interfaces
@@ -9,7 +10,8 @@ namespace ELearn.Application.Interfaces
         public Task<Response<QuestionDTO>> UpdateAsync(int Id, QuestionDTO Model);
         public Task<Response<QuestionDTO>> DeleteAsync(int Id);
         public Task<Response<QuestionDTO>> GetByIdAsync(int Id);
-        public Task<Response<QuestionAnswerDTO>>RecieveStudentAnswerAsync(QuestionAnswerDTO Model);
+        public Task<Response<QuestionAnswerDTO>>RecieveStudentAnswerAsync(QuestionQuizDTO Model);
+
         public Task<Response<ICollection<QuestionAnswerDTO>>> GetStudentAnswersAsync(string Parent, int ParentId, string UserId);
         public Task<Response<ICollection<QuestionDTO>>> GetQuestionsByQuizIdAsync(int quizId);
     }

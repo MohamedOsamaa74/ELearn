@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
+using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
@@ -217,7 +218,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region RecieveStudentResponse
-        public async Task<Response<UserAnswerSurveyDTO>> RecieveStudentResponseAsync(UserAnswerSurveyDTO userAnswerDTO)
+        public async Task<Response<UserAnswerSurveyDTO>> RecieveStudentResponseAsync(UserAnswerSurveyDTO userAnswerDTO) 
         {
             try
             {
@@ -225,9 +226,11 @@ namespace ELearn.Application.Services
                 var survey = await _unitOfWork.Surveys.GetByIdAsync(userAnswerDTO.SurveyId);
                 if (survey is null)
                     return ResponseHandler.NotFound<UserAnswerSurveyDTO> ("There is no such Survey");
+
                 foreach (var answer in userAnswerDTO.Answers)
                 {
-                    var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);
+
+                    var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(_mapper.Map<QuestionQuizDTO>(answer));
                     if(!recieveAnswer.Succeeded)
                         return ResponseHandler.BadRequest<UserAnswerSurveyDTO>($"An Error Occurred, {recieveAnswer.Message}");
                 }
