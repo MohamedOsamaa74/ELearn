@@ -1,4 +1,5 @@
 ﻿using ELearn.Application.DTOs.AnnouncementDTOs;
+using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.Helpers.Response;
 using System;
@@ -17,6 +18,12 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ICollection<ViewQuizDTO>>> GetAllQuizzesAsync();
 
         public Task<Response<CreateQuizDTO>> DeleteAsync(int Id);
+        public Task<Response<QuizResultDTO>> ReceiveStudentQuizResponsesAsync(UserAnswerQuizDTO userAnswerDto);
+        public Task<Response<UserAnswerQuizDTO>> GetUserAnswerAsync(int quizId, string UserId);
+
+        public Task<Response<List<QuizResultDTO>>> GetAllQuizResponsesAsync(int quizId);
+
+
 
     }
 }
