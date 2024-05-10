@@ -144,6 +144,15 @@ builder.Services.AddSwaggerGen(opt =>
 });
 #endregion
 
+#region Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+            builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+        );
+});
+#endregion
+
 var app = builder.Build();
 AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
@@ -156,7 +165,7 @@ AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
 app.UseHttpsRedirection();
 
-//app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 

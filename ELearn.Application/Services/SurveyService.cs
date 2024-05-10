@@ -234,8 +234,7 @@ namespace ELearn.Application.Services
                     if(!recieveAnswer.Succeeded)
                         return ResponseHandler.BadRequest<UserAnswerSurveyDTO>($"An Error Occurred, {recieveAnswer.Message}");
                     
-                    if(recieveAnswer.Data.Score.HasValue)
-                        totalScore += recieveAnswer.Data.Score.Value;
+                    
                 }
                 UserAnswerSurvey userAnswerSurvey= new() { SurveyId = userAnswerDTO.SurveyId, UserId = user.Id };
                 await _unitOfWork.UserAnswerSurveys.AddAsync(userAnswerSurvey);
