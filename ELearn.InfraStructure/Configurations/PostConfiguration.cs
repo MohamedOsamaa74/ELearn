@@ -16,6 +16,15 @@ namespace ELearn.InfraStructure.Configuritions
         {
             builder.HasKey(p => p.Id);
 
+           builder.Property(t => t.Text)
+                .IsRequired();
+
+            builder.Property(t => t.CreationDate)
+                .IsRequired();
+
+            builder.Property(t => t.UserId)
+                .IsRequired();
+
             builder.HasMany(p => p.Reacts)
                    .WithOne(r => r.Post)
                    .HasForeignKey(p => p.PostID)
@@ -28,8 +37,11 @@ namespace ELearn.InfraStructure.Configuritions
                   .IsRequired(false)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
-
+            builder.HasMany(p => p.Files)
+                  .WithOne(r => r.Post)
+                  .HasForeignKey(p => p.PostId)
+                  .IsRequired(false)
+                  .OnDelete(DeleteBehavior.NoAction);
         }
     }
 

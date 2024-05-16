@@ -7,6 +7,7 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -180,7 +181,7 @@ namespace ELearn.Application.Services
             try
             {
                 var quizzes = await _unitOfWork.Quizziz.GetAllAsync();
-                if (quizzes == null)
+                if (quizzes.IsNullOrEmpty())
                 {
                     return ResponseHandler.NotFound<ICollection<ViewQuizDTO>>();
                 }

@@ -1,20 +1,6 @@
-using ELearn.Application.Helpers.Account;
-using ELearn.Application.Helpers.AutoMapper;
-using ELearn.Application.Interfaces;
-using ELearn.Application.Services;
-using ELearn.Data;
-using ELearn.Domain.Entities;
+using ELearn.Application;
 using ELearn.InfraStructure;
-using ELearn.InfraStructure.Repositories.UnitOfWork;
-using ELearn.InfraStructure.Validations;
-using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,94 +9,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add services to the container.
-
-#region Register Services
-var db = builder.Configuration.GetConnectionString("Default Connection");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(db));
-builder.Services.Configure<MailSettings>
-    (builder.Configuration.GetSection("MailSettings"));
-builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IGroupService, GroupService>();
-builder.Services.AddTransient<IMaterialService, MaterialService>();
-builder.Services.AddTransient<IVotingService, VotingService>();
-builder.Services.AddTransient<ISurveyService, SurveyService>();
-builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
-builder.Services.AddTransient<IAssignmentService, AssignmentService>();
-builder.Services.AddTransient<IQuizService, QuizService>();
-builder.Services.AddTransient<IQuestionService, QuestionService>();
-builder.Services.AddTransient<IAccountService, AccountService>();
-builder.Services.AddTransient<IFileService, FilesService>();
-builder.Services.AddTransient<IUserTwoFactorTokenProvider<ApplicationUser>, EmailTokenProvider<ApplicationUser>>();
-builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddTransient<JWT>();
-builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-//builder.Services.AddCors();
-#endregion
-
-#region Validation Services
-builder.Services.AddTransient<IValidator<Announcement>, AnnouncementValidation>();
-builder.Services.AddTransient<IValidator<ApplicationUser>, ApplicationUserValidation>();
-builder.Services.AddTransient<IValidator<Assignment>, AssignmentValidation>();
-builder.Services.AddTransient<IValidator<Comment>, CommentValidation>();
-builder.Services.AddTransient<IValidator<Department>, DepartmentValidation>();
-builder.Services.AddTransient<IValidator<GroupAnnouncment>, GroupAnnouncmentValidation>();
-builder.Services.AddTransient<IValidator<Group>, GroupValidation>();
-builder.Services.AddTransient<IValidator<React>, ReactValidation>();
-builder.Services.AddTransient<IValidator<Survey>, SurveyValidation>();
-builder.Services.AddTransient<IValidator<UserAnswerAssignment>, UserAssignmentValidation>();
-builder.Services.AddTransient<IValidator<UserGroup>, UserGroupValidation>();
-builder.Services.AddTransient<IValidator<UserAnswerQuestion>, UserQuestionValidation>();
-builder.Services.AddTransient<IValidator<UserAnswerSurvey>, UserSurveyValidation>();
-builder.Services.AddTransient<IValidator<UserAnswerVoting>, UserVotingValidation>();
-builder.Services.AddTransient<IValidator<Voting>, VotingValidation>();
-builder.Services.AddTransient<IValidator<GroupSurvey>, GroupSurveyValidation>();
-builder.Services.AddTransient<IValidator<GroupVoting>, GroupVotingValidation>();
-builder.Services.AddTransient<IValidator<Question>, QuestionValidation>();
-builder.Services.AddTransient<IValidator<Material>, MaterialValidation>();
-builder.Services.AddTransient<IValidator<Message>, MessageValidation>();
-//builder.Services.AddTransient<IValidator<Option>, OptionValidation>();
-builder.Services.AddTransient<IValidator<Post>, PostValidation>();
-builder.Services.AddTransient<IValidator<Quiz>, QuizValidation>();
-#endregion
-
-#region authentication&autherization
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-    {
-    options.Tokens.ProviderMap["Default"] = new TokenProviderDescriptor(typeof(IUserTwoFactorTokenProvider<ApplicationUser>));
-    options.Tokens.EmailConfirmationTokenProvider = "Default";
-    }).AddEntityFrameworkStores<AppDbContext>();
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
-});
-builder.Services.AddMemoryCache();
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateLifetime = true,
-        ValidateAudience = false,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
-        ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
-        ClockSkew = TimeSpan.Zero
-    };
-});
+#region Services
+builder.Services.InfrastructureServices(builder.Configuration);
+builder.Services.ApplicationServices(builder.Configuration);
 #endregion
 
 #region swagger config

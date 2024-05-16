@@ -18,7 +18,6 @@ using System.Text;
 using System.Security.Cryptography;
 using ELearn.Application.DTOs.AuthDTOs;
 
-
 namespace ELearn.Application.Services
 {
     public class AccountService : IAccountService
@@ -31,10 +30,10 @@ namespace ELearn.Application.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JWT _jwt;
         private readonly IUserService _userService;
-
-        private static readonly Dictionary<string, (string OTP, DateTime Expiry)> _otpCache
-                = new Dictionary<string, (string OTP, DateTime Expiry)>();
-        public AccountService(IOptions<MailSettings> mailSettings, IOptions<JWT> jwt, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IHttpContextAccessor httpContextAccessor, IUserService userService)
+        private readonly IPasswordHasher<ApplicationUser> _hasher;
+        /*private static readonly Dictionary<string, (string OTP, DateTime Expiry)> _otpCache
+                = new Dictionary<string, (string OTP, DateTime Expiry)>();*/
+        public AccountService(IOptions<MailSettings> mailSettings, IOptions<JWT> jwt, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IHttpContextAccessor httpContextAccessor, IUserService userService, IPasswordHasher<ApplicationUser> hasher)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -43,6 +42,7 @@ namespace ELearn.Application.Services
             _userService = userService;
             _jwt = jwt.Value;
             _mailSettings = mailSettings.Value;
+            _hasher = hasher;
         }
         #endregion
 
@@ -262,24 +262,48 @@ namespace ELearn.Application.Services
         {
             try
             {
-
                 var user = await _userManager.FindByEmailAsync(Email);
-                if (user == null)
+                if (user == null || !user.EmailConfirmed)
                     return ResponseHandler.BadRequest<string>("User not found");
                 var otp = GenerateRandomOTP();
-                _otpCache[Email] = (otp, DateTime.UtcNow.AddMinutes(5));
+                user.OTP = _hasher.HashPassword(user, otp);
+                user.OTPExpiry = DateTime.UtcNow.AddMinutes(5);
+                await _userManager.UpdateAsync(user);
+                
                 var emailModel = new EmailDTO
                 {
                     Email = Email,
                     Subject = "Password Reset",
                     Body = $"<h1>Reset Your Password</h1><br>" +
-                    $"<p>Your OTP is {otp}</p>"
+                           $"<p>Your OTP is {otp}</p>"
                 };
+
                 var response = await SendEmailAsync(emailModel);
-                if (response.StatusCode is HttpStatusCode.BadRequest)
+                if (!response.Succeeded)
                     return ResponseHandler.BadRequest<string>(response.Message);
-                
-                return ResponseHandler.Success("An Email Was Sent To Your Email Containing The OTP To Reseting Your Password");
+                return ResponseHandler.Success("An Email was Sent Containing the OTP to reseting your password");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<string>($"An error occurred, {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Verify OTP
+        public async Task<Response<string>> VerifyOTPAsync(VerifyOTPDTO Model)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(Model.Email);
+                if (user == null)
+                    return ResponseHandler.BadRequest<string>("User not found");
+                if (user.OTPExpiry < DateTime.UtcNow)
+                    return ResponseHandler.BadRequest<string>("OTP Expired");
+                if (_hasher.VerifyHashedPassword(user, user.OTP, Model.OTP) == PasswordVerificationResult.Failed)
+                    return ResponseHandler.BadRequest<string>("Invalid OTP");
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                return ResponseHandler.Success(token);
             }
             catch (Exception ex)
             {
@@ -297,22 +321,18 @@ namespace ELearn.Application.Services
                 if (user == null)
                     return ResponseHandler.BadRequest<string>("User not found");
 
-                if (!VerifyOTP(Model.Email, Model.OTP))
-                    return ResponseHandler.BadRequest<string>("Invalid OTP");
-                
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                
-                if(token == null)
+                //var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                if (Model.Token == null)
                     return ResponseHandler.BadRequest<string>("Token not generated");
 
-                if(Model.NewPassword != Model.ConfirmPassword)
+                if (Model.NewPassword != Model.ConfirmPassword)
                     return ResponseHandler.BadRequest<string>("Passwords do not match");
 
-                var result = await _userManager.ResetPasswordAsync(user, token, Model.NewPassword);
+                var result = await _userManager.ResetPasswordAsync(user, Model.Token, Model.NewPassword);
                 if (!result.Succeeded)
                     return ResponseHandler.BadRequest<string>(result.Errors.FirstOrDefault().Description);
-                
-                return ResponseHandler.Success("Your Password Reset Was Successfull, Please LogIn Using the new Password");
+                return ResponseHandler.Success("Password Reset Successfully");
             }
             catch (Exception ex)
             {
@@ -436,23 +456,7 @@ namespace ELearn.Application.Services
         private string GenerateRandomOTP()
         {
             Random random = new Random();
-            return random.Next(100000, 999999).ToString();
-        }
-        #endregion
-
-        #region Verify OTP
-        private bool VerifyOTP(string email, string otp)
-        {
-            if (_otpCache.ContainsKey(email))
-            {
-                var (cachedOTP, expiry) = _otpCache[email];
-                if (DateTime.UtcNow <= expiry && otp == cachedOTP)
-                {
-                    _otpCache.Remove(email);
-                    return true;
-                }
-            }
-            return false;
+            return random.Next(100000, 999999).ToString().Substring(0, 6);
         }
         #endregion
 

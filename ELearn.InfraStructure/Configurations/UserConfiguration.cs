@@ -78,6 +78,11 @@ namespace ELearn.InfraStructure.Configurations
 
             //many student to many tasks (student) userassignment
           
+            builder.HasMany(f => f.Files)
+                .WithOne(u => u.User)
+                .HasForeignKey(f => f.UserId)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

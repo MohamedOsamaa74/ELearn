@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace ELearn.Application.DTOs.AuthDTOs
 {
-    public class ResetPasswordDTO
+    public class VerifyOTPDTO
     {
         public required string Email { get; set; }
-        public required string Token { get; set; }
-        public required string NewPassword { get; set; }
-        public required string ConfirmPassword { get; set; }
+        public required string OTP { get; set; }
     }
 }

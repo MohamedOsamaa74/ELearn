@@ -25,6 +25,11 @@ namespace ELearn.InfraStructure.Configurations
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasOne(m => m.File)
+                .WithOne(f => f.Message)
+                .HasForeignKey<FileEntity>(m => m.MessageId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -155,26 +155,26 @@ namespace ELearn.InfraStructure
                         new Announcement()
                         {
                             Text="First announcement text",
-                            UserId = "925eda7d-288d-419c-ac7f-bcdc64b45187"
+                            UserId = Admin.Id,
 
                         },
                         new Announcement()
                         {
                             Text = "Second announcement text",
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
+                            UserId = Staff.Id
                         },
                         new Announcement()
                         {
                             Text = "Third announcement text",
-                            UserId = "2eb94dab-3a56-4694-8691-6a880a40cc25"
+                            UserId = Staff.Id
                         }
                     });
 
                 }
 
                 context.SaveChanges();
-                #endregion*/
-
+                #endregion
+                */
 
                 /*
                 #region Assignments

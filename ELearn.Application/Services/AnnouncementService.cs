@@ -7,6 +7,7 @@ using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELearn.Application.Services
@@ -87,6 +88,9 @@ namespace ELearn.Application.Services
                 var userId = await _userService.GetCurrentUserIDAsync();
                 var announcement = _mapper.Map<Announcement>(Model);
                 announcement.UserId = userId;
+                var validate = new AnnouncementValidation().Validate(announcement);
+                if (!validate.IsValid)
+                    return ResponseHandler.BadRequest<ViewAnnouncementDTO>(null, validate.Errors.Select(e => e.ErrorMessage).ToList());
                 await _unitOfWork.Announcments.AddAsync(announcement);
 
                 var ViewAnnouncement = _mapper.Map<ViewAnnouncementDTO>(announcement);

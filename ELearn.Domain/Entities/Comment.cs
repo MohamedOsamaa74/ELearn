@@ -9,7 +9,7 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
-        public DateTime CreationDate => DateTime.UtcNow.ToLocalTime();
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
 
         #region ForeignKeys
         public required int PostId { get; set; }

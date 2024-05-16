@@ -73,13 +73,14 @@ namespace ELearn.Application.Helpers.Response
             };
         }
 
-        public static Response<T> BadRequest<T>(string Message = null)
+        public static Response<T> BadRequest<T>(string Message = null, List<string> Errors = null)
         {
             return new Response<T>()
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Succeeded = false,
-                Message = Message == null ? "Bad Request" : Message
+                Message = Message == null ? "Bad Request" : Message,
+                Errors = Errors
             };
         }
 

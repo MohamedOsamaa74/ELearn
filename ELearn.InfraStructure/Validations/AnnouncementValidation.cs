@@ -17,7 +17,6 @@ namespace ELearn.InfraStructure.Validations
 
             RuleFor(x => x.UserId)
             .NotNull();
-
         }
     }
 }

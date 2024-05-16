@@ -36,6 +36,11 @@ namespace ELearn.InfraStructure.Configurations
                 .HasForeignKey(q => q.QuestionId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasOne(q => q.File)
+                .WithOne(f => f.Question)
+                .HasForeignKey<FileEntity>(q => q.QuestionId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

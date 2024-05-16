@@ -25,6 +25,12 @@ namespace ELearn.InfraStructure.Configurations
                 .HasOne(ua => ua.Assignment)
                 .WithMany(a => a.UserAssignment)
                 .HasForeignKey(ua => ua.AssignmentId);
+
+            builder.HasMany(ua => ua.Files)
+                .WithOne(f => f.UserAssignment)
+                .HasForeignKey(f => f.UserAssignementId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

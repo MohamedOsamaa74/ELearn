@@ -116,6 +116,15 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
+        #region Verify OTP
+        [HttpPost("Verify-OTP")]
+        public async Task<IActionResult> VerifyOTP([FromBody] VerifyOTPDTO Model)
+        {
+            var response = await _accountService.VerifyOTPAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
         #region Reset Password
         [HttpPost("Reset-Password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO Model)
