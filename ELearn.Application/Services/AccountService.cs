@@ -113,22 +113,23 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Refresh Token
-        public async Task<Response<AuthDTO>> RefreshTokenAsync(string Token)
+        public async Task<Response<AuthDTO>> RefreshTokenAsync()
         {
             try
             {
-                var RefreshToken = _httpContextAccessor.HttpContext.Request.Cookies["RefreshToken"];
+                //var RefreshToken = _httpContextAccessor.HttpContext.Request.Cookies["RefreshToken"];
+                var RefreshToken = GetRefreshTokenFromCookie();
                 if (string.IsNullOrEmpty(RefreshToken))
                     return ResponseHandler.BadRequest<AuthDTO>("InValidToken");
-                var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == Token));
+                var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == RefreshToken));
                 if (user == null)
                     return ResponseHandler.BadRequest<AuthDTO>("Invalid Token");
-                var refreshToken = user.RefreshTokens.Single(x => x.Token == Token);
-                if (!refreshToken.IsActive)
+                var oldRefreshToken = user.RefreshTokens.Single(x => x.Token == RefreshToken);
+                if (!oldRefreshToken.IsActive)
                 {
                     return ResponseHandler.BadRequest<AuthDTO>("InActive Token");
                 }
-                refreshToken.RevokedOn = DateTime.UtcNow;
+                oldRefreshToken.RevokedOn = DateTime.UtcNow;
                 var newRefreshToken = GenerateRefreshToken();
                 user.RefreshTokens.Add(newRefreshToken);
                 await _userManager.UpdateAsync(user);
@@ -457,6 +458,13 @@ namespace ELearn.Application.Services
         {
             Random random = new Random();
             return random.Next(100000, 999999).ToString().Substring(0, 6);
+        }
+        #endregion
+
+        #region GetRefreshTokenFromCookie
+        private string GetRefreshTokenFromCookie()
+        {
+            return _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
         }
         #endregion
 

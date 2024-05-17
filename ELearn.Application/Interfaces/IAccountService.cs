@@ -14,7 +14,7 @@ namespace ELearn.Application.Interfaces
         */
         public Task<Response<AuthDTO>> LoginAsync(LogInUserDTO Model);
         public Task<Response<string>> LogoutAsync();
-        public Task<Response<AuthDTO>> RefreshTokenAsync(string Token);
+        public Task<Response<AuthDTO>> RefreshTokenAsync();
         public Task<Response<string>> RevokeTokenAsync(string Token);
         public Task<Response<string>> ChangePasswordAsync(ChangePasswordDTO Model);
         public Task<Response<EmailDTO>> SendEmailAsync(EmailDTO Model);

@@ -1,15 +1,8 @@
 ﻿using ELearn.Application.DTOs.AuthDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
-using ELearn.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace ELearn.Api.Controllers
 {
@@ -48,10 +41,9 @@ namespace ELearn.Api.Controllers
 
         #region Refresh Token
         [HttpPost("Refresh-Token")]
-
-        public async Task<IActionResult> RefreshToken([FromBody] string Token)
+        public async Task<IActionResult> RefreshToken()
         {
-            var response = await _accountService.RefreshTokenAsync(Token);
+            var response = await _accountService.RefreshTokenAsync();
             return this.CreateResponse(response);
         }
         #endregion
