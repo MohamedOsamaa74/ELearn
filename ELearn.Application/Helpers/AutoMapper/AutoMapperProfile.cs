@@ -6,6 +6,7 @@ using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
 using ELearn.Application.DTOs.OptionDTOs;
+using ELearn.Application.DTOs.PostDTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.DTOs.SurveyDTOs;
@@ -171,6 +172,18 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.Questions, opt => opt.Ignore());
 
             CreateMap<ViewSurveyDTO, Survey>();
+            #endregion
+
+            #region PostMapper
+            CreateMap<CreatePostDTO, Post>()
+                .ForMember(dest => dest.Files, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            CreateMap<Post, CreatePostDTO>();
+
+            CreateMap<Post, ViewPostDTO>()
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore())
+                .ForMember(dest => dest.urls, opt => opt.Ignore());
+
             #endregion
         }
     }
