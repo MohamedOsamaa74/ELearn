@@ -52,6 +52,7 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.BadRequest<ViewPostDTO>();
                 }
+                await _unitOfWork.Posts.AddAsync(post);
                 List<string> ViewUrls = [];
                 if (Model.Files != null && Model.Files.Any())
                 {
@@ -66,7 +67,6 @@ namespace ELearn.Application.Services
                     
                 }
 
-                await _unitOfWork.Posts.AddAsync(post);
                 return ResponseHandler.Created(viewpost);
             }
             catch (Exception ex)
