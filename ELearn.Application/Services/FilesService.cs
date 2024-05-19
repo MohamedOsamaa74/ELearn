@@ -62,7 +62,8 @@ namespace ELearn.Application.Services
                     Type = fileDTO.File.ContentType,
                     UserId = await _userService.GetCurrentUserIDAsync(),
                     AnnouncementId = fileDTO.FolderName == "Announcements" ? fileDTO.ParentId : null,
-                    MaterialId = fileDTO.FolderName == "Materials" ? fileDTO.ParentId : null
+                    MaterialId = fileDTO.FolderName == "Materials" ? fileDTO.ParentId : null,
+                    PostId = fileDTO.FolderName == "Posts" ? fileDTO.ParentId : null
                 };
                 await _unitOfWork.Files.AddAsync(file);
                 var dto = _mapper.Map<FileDTO>(file);
