@@ -2,6 +2,7 @@
 using ELearn.Application.DTOs;
 using ELearn.Application.DTOs.AnnouncementDTOs;
 using ELearn.Application.DTOs.AssignmentDTOs;
+using ELearn.Application.DTOs.CommentDTOs;
 using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
@@ -185,6 +186,41 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.urls, opt => opt.Ignore());
 
             #endregion
+
+            #region CommentMapper
+
+            CreateMap<CreateCommentDTO,Comment>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            CreateMap<Comment, CreateCommentDTO>();
+
+            CreateMap<Comment, ViewCommentDTO>()
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore());
+            CreateMap<Comment, ViewCommentDTO>();
+
+
+            
+
+            CreateMap<UpdateCommentDTO, Comment>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            CreateMap<Comment, UpdateCommentDTO>();
+
+            CreateMap<Comment, ViewCommentDTO>()
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore());
+            CreateMap<Comment, ViewCommentDTO>();
+
+
+
+
+
+
+
+
+            #endregion
         }
+
+
+
+
+
     }
 }
