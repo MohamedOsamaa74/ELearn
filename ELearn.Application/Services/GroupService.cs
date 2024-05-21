@@ -163,7 +163,10 @@ namespace ELearn.Application.Services
                 foreach(var item in groups)
                 {
                     var group = await _unitOfWork.Groups.GetByIdAsync(item);
-                    groupsDto.Add(_mapper.Map<GroupDTO>(group));
+                    var groupDTO = _mapper.Map<GroupDTO>(group);
+                    var instructor = await _unitOfWork.Users.GetByIdAsync(group.CreatorId);
+                    groupDTO.InstructorName = instructor.FirstName + " " + instructor.LastName;
+                    groupsDto.Add(groupDTO);
                 }
                 return ResponseHandler.ManySuccess(groupsDto);
             }

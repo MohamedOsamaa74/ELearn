@@ -63,13 +63,13 @@ namespace ELearn.Application.Helpers.Response
                 Meta = meta
             };
         }
-        public static Response<T> Unauthorized<T>()
+        public static Response<T> Unauthorized<T>(string message = "UnAuthorized")
         {
             return new Response<T>()
             {
                 StatusCode = HttpStatusCode.Unauthorized,
                 Succeeded = true,
-                Message = "UnAuthorized"
+                Message = message
             };
         }
 

@@ -53,7 +53,7 @@ namespace ELearn.Application.Services
             {
                 var user = await _userManager.FindByNameAsync(Model.UserName);
                 if (user == null || !await _userManager.CheckPasswordAsync(user, Model.Password))
-                    return ResponseHandler.BadRequest<AuthDTO>("Invalid Credintials");
+                    return ResponseHandler.Unauthorized<AuthDTO>("Invalid username or password");
 
                 var token = await CreateTokenAsync(user);
                 AuthDTO auth = new AuthDTO()
@@ -82,7 +82,7 @@ namespace ELearn.Application.Services
                 if (!string.IsNullOrEmpty(auth.RefreshToken))
                     SetRefreshTokenInCookie(auth.RefreshToken, auth.RefreshTokenExpiration);
 
-                return ResponseHandler.Success(auth, $"Welcome Back,{user.FirstName}");
+                return ResponseHandler.Success(auth, $"Login successful");
             }
             catch (Exception ex)
             {
@@ -96,14 +96,31 @@ namespace ELearn.Application.Services
         {
             try
             {
-                var user = await _userService.GetCurrentUserAsync();
+                var currentUser = await _userService.GetCurrentUserAsync();
 
+                if (currentUser == null)
+                    return ResponseHandler.Unautohrized<string>("Unauthorized");
+
+                var refreshToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+                var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == refreshToken));
                 if (user == null)
-                    return ResponseHandler.BadRequest<string>("User not found");
+                {
+                    return ResponseHandler.BadRequest<string>("Invalid token");
+                }
 
-                await _signInManager.SignOutAsync();
+                var oldRefreshToken = user.RefreshTokens.Single(x => x.Token == refreshToken);
+                if (!oldRefreshToken.IsActive)
+                {
+                    return ResponseHandler.BadRequest<string>( "Inactive token");
+                }
 
-                return ResponseHandler.Success("Logged Out Successfully");
+                oldRefreshToken.RevokedOn = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
+
+                // Clear the refresh token cookie
+                _httpContextAccessor.HttpContext.Response.Cookies.Delete("refreshToken");
+
+                return ResponseHandler.Success("Logged out successfully");
             }
             catch (Exception ex)
             {
@@ -159,7 +176,7 @@ namespace ELearn.Application.Services
         {
             try
             {
-                Token = Token ?? _httpContextAccessor.HttpContext.Request.Cookies["RefreshToken"];
+                Token = Token ?? _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
                 if (string.IsNullOrEmpty(Token))
                     return ResponseHandler.BadRequest<string>("InActiveToken");
 

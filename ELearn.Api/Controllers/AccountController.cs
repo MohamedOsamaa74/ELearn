@@ -24,6 +24,10 @@ namespace ELearn.Api.Controllers
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn([FromBody] LogInUserDTO Model)
         {
+            if(!ModelState.IsValid)
+            {
+                return Unauthorized(ModelState);
+            }
             var response = await _accountService.LoginAsync(Model);
             return this.CreateResponse(response);
         }

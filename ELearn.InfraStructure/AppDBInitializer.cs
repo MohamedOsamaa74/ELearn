@@ -122,7 +122,7 @@ namespace ELearn.InfraStructure
                 
                 var Admin = await UserManager.FindByNameAsync(AdminUserName);
                 var Staff = await UserManager.FindByNameAsync(StaffUserName);
-               
+                var Student = await UserManager.FindByNameAsync(StudentUserName);
                 #region Groups
                 if (!context.Groups.Any())
                 {
@@ -147,6 +147,30 @@ namespace ELearn.InfraStructure
                 context.SaveChanges();
                 #endregion
 
+                #region UserGroups
+                if(!context.UserGroups.Any())
+                {
+                    context.UserGroups.AddRange(new List<UserGroup>()
+                    {
+                        new UserGroup()
+                        {
+                            UserId = Admin.Id,
+                            GroupId = 1
+                        },
+                        new UserGroup()
+                        {
+                            UserId = Student.Id,
+                            GroupId = 2
+                        },
+                        new UserGroup()
+                        {
+                            UserId = Staff.Id,
+                            GroupId = 1
+                        }
+                    });
+                    context.SaveChanges();
+                }
+                #endregion
                 /*#region Announcements
                 if (!context.Announcements.Any())
                 {

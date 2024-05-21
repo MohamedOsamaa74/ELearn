@@ -1,7 +1,5 @@
 ﻿using ELearn.Data;
-using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
-using ELearn.InfraStructure.Validations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

@@ -69,8 +69,8 @@ namespace ELearn.Api.Controllers
 
         #region GetUserGroups
         [HttpGet("GetUserGroups")]
-        [Authorize(Roles ="Staff, Student")]
-        public async Task<IActionResult> GetUserGroups([FromRoute]string UserId = null)
+        [Authorize]
+        public async Task<IActionResult> GetUserGroups(string UserId = null)
         {
             var response = await _groupService.GetUserGroupsAsync(UserId);
             return this.CreateResponse(response);
