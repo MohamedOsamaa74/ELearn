@@ -37,6 +37,12 @@ namespace ELearn.Application.Services
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
+        public async Task<string> GetUserRoleAsync()
+        {
+            var user = await GetCurrentUserAsync();
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles.FirstOrDefault();
+        }
         public async Task<ApplicationUser> GetCurrentUserAsync()
         {
             ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;

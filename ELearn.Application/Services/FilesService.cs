@@ -191,5 +191,30 @@ namespace ELearn.Application.Services
             return ResponseHandler.ManySuccess(filesDTO);
         }
         #endregion
+
+        #region GetFilesByPostId
+        public async Task<Response<List<int>>> GetFilesByPostId(int postId)
+        {
+            try
+            {
+                var post = await _unitOfWork.Posts.GetByIdAsync(postId);
+                if (post == null)
+                {
+                    return ResponseHandler.NotFound<List<int>>("Post not found");
+                }
+                var files = await _unitOfWork.Files.GetWhereAsync(f => f.PostId == postId);
+                if (files == null)
+                {
+                    return ResponseHandler.NotFound<List<int>>("There Are No Files");
+                }
+                var filesIds = files.Select(f => f.Id).ToList();
+                return ResponseHandler.Success(filesIds);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<List<int>>($"An Error Occurred, {ex.Message}");
+            }
+        }
+        #endregion
     }
 }

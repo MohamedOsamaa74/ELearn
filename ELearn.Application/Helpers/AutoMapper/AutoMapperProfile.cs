@@ -183,6 +183,10 @@ namespace ELearn.Application.Helpers.AutoMapper
             CreateMap<Post, ViewPostDTO>()
                 .ForMember(dest => dest.CreatorName, opt => opt.Ignore())
                 .ForMember(dest => dest.urls, opt => opt.Ignore());
+            CreateMap<ViewPostDTO, Post>()
+                .ForMember(dest => dest.Files, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
+
 
             #endregion
         }
