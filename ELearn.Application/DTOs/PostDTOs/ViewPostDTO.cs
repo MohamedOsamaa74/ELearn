@@ -8,9 +8,9 @@ namespace ELearn.Application.DTOs.PostDTOs
 {
     public class ViewPostDTO
     {
-        public string Text { get; set; }
-        public DateTime CreationDate { get; set; }
         public string CreatorName { get; set; }
+        public DateTime CreationDate { get; set; }
+        public string Text { get; set; }
         public ICollection<string> urls { get; set; }
 
         //public int ReactsCount { get; set; }

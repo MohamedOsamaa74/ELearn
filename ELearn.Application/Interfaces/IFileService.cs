@@ -13,6 +13,7 @@ namespace ELearn.Application.Interfaces
         Task<byte[]> DownloadFileAsync(DownloadFileDTO downloadFileDTO);
         Task<Response<FileDTO>> DeleteAsync(int Id);
         Task<string>GetFileType(string fileName);
+        Task<Response<List<int>>> GetFilesByPostId(int postId);
         //Task<string> GetFileNameAsync();
 
     }
