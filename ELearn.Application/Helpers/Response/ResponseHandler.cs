@@ -68,7 +68,7 @@ namespace ELearn.Application.Helpers.Response
             return new Response<T>()
             {
                 StatusCode = HttpStatusCode.Unauthorized,
-                Succeeded = true,
+                Succeeded = false,
                 Message = message
             };
         }

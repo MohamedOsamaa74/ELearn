@@ -99,7 +99,7 @@ namespace ELearn.Application.Services
                 var currentUser = await _userService.GetCurrentUserAsync();
 
                 if (currentUser == null)
-                    return ResponseHandler.Unautohrized<string>("Unauthorized");
+                    return ResponseHandler.Unauthorized<string>();
 
                 var refreshToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
                 var user = _userManager.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == refreshToken));
