@@ -24,8 +24,59 @@ namespace ELearn.Api.Controllers
         {
             var response = await _postService.CreatePostAsync(model);
             return this.CreateResponse(response);
-        } 
+        }
         #endregion
+
+        #region Update Post
+        [HttpPut("UpdatePost/{PostId}")]
+        [Authorize(Roles = "Admin ,Student")]
+        public async Task<IActionResult> UpdatePost(int PostId, [FromForm] CreatePostDTO model)
+        {
+            var response = await _postService.UpdatePostAsync(PostId, model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Delete Post
+        [HttpDelete("DeletePost/{PostId}")]
+        [Authorize(Roles = "Admin ,Student")]
+        public async Task<IActionResult> DeletePost(int PostId)
+        {
+            var response = await _postService.DeletePostAsync(PostId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Get Post By Id
+        [HttpGet("GetPostById/{PostId}")]
+        [Authorize(Roles = "Admin ,Student")]
+        public async Task<IActionResult> GetPostById(int PostId)
+        {
+            var response = await _postService.GetPostByIdAsync(PostId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Get All Posts
+        [HttpGet("GetAllPosts")]
+        [Authorize(Roles = "Admin ,Student")]
+        public async Task<IActionResult> GetAllPosts()
+        {
+            var response = await _postService.GetAllPostsAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Get Posts By User Id
+        [HttpGet("GetPostsByUserId")]
+        [Authorize(Roles = "Admin ,Student")]
+        public async Task<IActionResult> GetPostsByUserId()
+        {
+            var response = await _postService.GetPostsByUserIdAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
 
 
     }

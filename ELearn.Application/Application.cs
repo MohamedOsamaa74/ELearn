@@ -37,6 +37,7 @@ namespace ELearn.Application
             services.AddTransient<IQuestionService, QuestionService>();
             services.AddTransient<IPostService, PostService>();
             services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IFileService, FilesService>();
             services.AddTransient<IUserTwoFactorTokenProvider<ApplicationUser>, EmailTokenProvider<ApplicationUser>>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
