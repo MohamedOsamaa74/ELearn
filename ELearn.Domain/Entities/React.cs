@@ -10,13 +10,19 @@ namespace ELearn.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int PostID { get; set; }
-        public string UserID { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
-        public required ReactType Type { get; set; }
+        //public required ReactType Type { get; set; }
+        
+        #region ForeignKey
+        public int? PostID { get; set; }
+        public int? CommentId { get; set; }
+        public required string UserID { get; set; }
+        #endregion
+
+        #region Navigation Property
         public virtual ApplicationUser User { get; set; }
         public virtual Post Post { get; set; }
-        
-
+        public virtual Comment Comment { get; set; }
+        #endregion
     }
 }

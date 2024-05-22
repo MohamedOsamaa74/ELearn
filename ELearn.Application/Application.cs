@@ -42,6 +42,7 @@ namespace ELearn.Application
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<JWT>();
             services.AddAutoMapper(typeof(AutoMapperProfile));
+            services.AddTransient<IReactService, ReactService>();
             #endregion
 
             #region authentication&autherization

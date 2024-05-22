@@ -9,6 +9,7 @@ using ELearn.Application.DTOs.OptionDTOs;
 using ELearn.Application.DTOs.PostDTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
+using ELearn.Application.DTOs.ReactDTOs;
 using ELearn.Application.DTOs.SurveyDTOs;
 using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.DTOs.VotingDTOs;
@@ -184,6 +185,18 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.CreatorName, opt => opt.Ignore())
                 .ForMember(dest => dest.urls, opt => opt.Ignore());
 
+            #endregion
+
+            #region React Mapper
+            CreateMap<ReactDTO, React>()
+                .ForMember(c => c.CreationDate, opt => opt.Ignore())
+                .ForMember(p => p.PostID, opt => opt.Ignore())
+                .ForMember(cm => cm.CommentId, opt => opt.Ignore())
+                .ForMember(u => u.UserID, opt => opt.Ignore());
+
+            CreateMap<React, ReactDTO>()
+                .ForMember(p => p.ParentId, opt => opt.Ignore())
+                .ForMember(pn => pn.Parent, opt => opt.Ignore());
             #endregion
         }
     }
