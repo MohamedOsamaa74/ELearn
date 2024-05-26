@@ -29,7 +29,7 @@ namespace ELearn.Application.Services
 
         }
         #region CreateComment
-        public async Task<Response<ViewCommentDTO>> CreateCommentAsync(int postId,  CreateCommentDTO Model)
+        public async Task<Response<ViewCommentDTO>> CreateCommentAsync(int postId, CreateCommentDTO Model)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace ELearn.Application.Services
                 var user = _userService.GetCurrentUserAsync();
                 comment.UserId = user.Result.Id;
                 comment.PostId = postId;
-                var userName = user.Result.FirstName+" " + user.Result.LastName;
+                var userName = user.Result.FirstName + " " + user.Result.LastName;
                 var viewComment = _mapper.Map<ViewCommentDTO>(comment);// mapper 
                 viewComment.CreatorName = userName;
 
@@ -120,7 +120,10 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.NotFound<ViewCommentDTO>("Comment not found");
                 }
-                return ResponseHandler.Success<ViewCommentDTO>(_mapper.Map<ViewCommentDTO>(comment));
+                var user = await _userService.GetByIdAsync(comment.UserId);
+                var commentDTO = _mapper.Map<ViewCommentDTO>(comment);
+                commentDTO.CreatorName = user.FirstName + " " + user.LastName;
+                return ResponseHandler.Success(commentDTO);
             }
             catch (Exception ex)
             {
@@ -135,7 +138,19 @@ namespace ELearn.Application.Services
             try
             {
                 var comments = await _unitOfWork.Comments.GetWhereAsync(c => c.PostId == postId);
-                return ResponseHandler.ManySuccess<ViewCommentDTO>(_mapper.Map<ICollection<ViewCommentDTO>>(comments));
+                if (comments == null)
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewCommentDTO>>("Comments not found");
+                }
+                ICollection<ViewCommentDTO> viewComments = new List<ViewCommentDTO>();
+                foreach (var comment in comments)
+                {
+                    var user = await _userService.GetByIdAsync(comment.UserId);
+                    var commentDTO = _mapper.Map<ViewCommentDTO>(comment);
+                    commentDTO.CreatorName = user.FirstName + " " + user.LastName;
+                    viewComments.Add(commentDTO);
+                }
+                return ResponseHandler.ManySuccess(viewComments);
             }
             catch (Exception ex)
             {
@@ -150,7 +165,19 @@ namespace ELearn.Application.Services
             try
             {
                 var comments = await _unitOfWork.Comments.GetWhereAsync(c => c.UserId == userId);
-                return ResponseHandler.ManySuccess<ViewCommentDTO>(_mapper.Map<ICollection<ViewCommentDTO>>(comments));
+                if (comments == null)
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewCommentDTO>>("Comments not found");
+                }
+                ICollection<ViewCommentDTO> viewComments = new List<ViewCommentDTO>();
+                foreach (var comment in comments)
+                {
+                    var user = await _userService.GetByIdAsync(comment.UserId);
+                    var commentDTO = _mapper.Map<ViewCommentDTO>(comment);
+                    commentDTO.CreatorName = user.FirstName + " " + user.LastName;
+                    viewComments.Add(commentDTO);
+                }
+                return ResponseHandler.ManySuccess(viewComments);
             }
             catch (Exception ex)
             {
@@ -165,7 +192,7 @@ namespace ELearn.Application.Services
             try
             {
                 var comments = await _unitOfWork.Comments.GetAllAsync(c => c.PostId == postId);
-                
+
                 if (comments == null)
                 {
                     return ResponseHandler.NotFound<ViewCommentDTO>("Comments not found");
