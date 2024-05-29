@@ -56,13 +56,15 @@ namespace ELearn.Application.Services
                     return ResponseHandler.Unauthorized<AuthDTO>("Invalid username or password");
 
                 var token = await CreateTokenAsync(user);
-                AuthDTO auth = new AuthDTO()
+                var Roles = await _userManager.GetRolesAsync(user) as List<string>;
+                AuthDTO auth = new()
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                     IsAuthenticated = true,
                     UserName = user.UserName,
+                    FullName = user.FirstName + " " + user.LastName,
                     Email = user.Email,
-                    Roles = await _userManager.GetRolesAsync(user) as List<string>,
+                    Role = Roles[0],
                 };
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
@@ -151,6 +153,7 @@ namespace ELearn.Application.Services
                 user.RefreshTokens.Add(newRefreshToken);
                 await _userManager.UpdateAsync(user);
                 var jwtToken = await CreateTokenAsync(user);
+                var Roles = await _userManager.GetRolesAsync(user) as List<string>;
                 AuthDTO auth = new AuthDTO
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
@@ -158,8 +161,9 @@ namespace ELearn.Application.Services
                     RefreshTokenExpiration = newRefreshToken.ExpiresOn,
                     IsAuthenticated = true,
                     UserName = user.UserName,
+                    FullName = user.FirstName + " " + user.LastName,
                     Email = user.Email,
-                    Roles = await _userManager.GetRolesAsync(user) as List<string>,
+                    Role = Roles[0],
                 };
                 SetRefreshTokenInCookie(auth.RefreshToken, auth.RefreshTokenExpiration);
                 return ResponseHandler.Success(auth);
@@ -465,6 +469,8 @@ namespace ELearn.Application.Services
             {
                 HttpOnly = true,
                 Expires = expires,
+                Secure = true,
+                SameSite = SameSiteMode.None // Required for cross-site cookies
             };
             _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", Token, CoockieOptions);
         }

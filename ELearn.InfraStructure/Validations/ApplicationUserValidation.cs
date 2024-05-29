@@ -21,8 +21,6 @@ namespace ELearn.InfraStructure.Validations
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email address is required.")
                 .EmailAddress().WithMessage("Invalid Email address.");
-            RuleFor(x => x.EmailConfirmed)
-                .NotEmpty().WithMessage("Email address is required.");
             RuleFor(x => x.PhoneNumber)
                 .Length(11);
             RuleFor(x => x.Address)
@@ -38,6 +36,5 @@ namespace ELearn.InfraStructure.Validations
                 .NotEmpty();
 
         }
-        
     }
 }
