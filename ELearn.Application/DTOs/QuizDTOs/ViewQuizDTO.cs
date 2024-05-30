@@ -13,6 +13,6 @@ namespace ELearn.Application.DTOs.QuizDTOs
         public required int Grade { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public virtual required ICollection<QuestionQuizDTO> Questions { get; set; } = new HashSet<QuestionQuizDTO>();
+        public virtual required ICollection<QuestionDTO> Questions { get; set; } = [];
     }
 }

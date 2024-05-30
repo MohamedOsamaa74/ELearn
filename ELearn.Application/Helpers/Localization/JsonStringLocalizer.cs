@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Localization;
+using System.Text.Json;
 
 namespace ELearn.Application.Helpers.Localization
 {
-    public class JsonStringLocalizer
-    {
-    }
+    
 }

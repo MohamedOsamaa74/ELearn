@@ -164,7 +164,7 @@ namespace ELearn.Application.Services
                 }
                 var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
                 var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
-                quizDto.Questions = (ICollection<QuestionQuizDTO>)questions.Data;
+                quizDto.Questions = questions.Data;
                 return ResponseHandler.Success(quizDto);
             }
             catch (Exception ex)
@@ -190,7 +190,7 @@ namespace ELearn.Application.Services
                 {
                     var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
                     var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
-                    quizDto.Questions = (ICollection<QuestionQuizDTO>)questions.Data;
+                    quizDto.Questions = questions.Data;
                     quizDtos.Add(quizDto);
                 }
 
