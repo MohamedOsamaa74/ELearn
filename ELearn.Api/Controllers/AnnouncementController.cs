@@ -5,11 +5,13 @@ using ELearn.Data;
 using ELearn.Domain.Const;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ELearn.Api.Controllers
 {
@@ -38,9 +40,9 @@ namespace ELearn.Api.Controllers
         #region Get All
         [HttpGet("Get-All")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
-            var response = await _announcementService.GetAllAnnouncementsAsync();
+            var response = await _announcementService.GetAllAnnouncementsAsync(sort_by, search_term);
             return this.CreateResponse(response);
         }
         #endregion
@@ -48,14 +50,13 @@ namespace ELearn.Api.Controllers
         #region Get Announcements from user groups
         [HttpGet("Get-All-From-Groups")]
         [Authorize]
-        public async Task<IActionResult> GetAllFromGroups()
+        public async Task<IActionResult> GetAllFromGroups([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
             if(User.IsInRole("Admin"))
             {
                 return RedirectToAction("GetAll");
             }
-
-            var responses = await _announcementService.GetFromUserGroupsAsync();
+            var responses = await _announcementService.GetFromUserGroupsAsync(sort_by, search_term);
 
             return this.CreateResponse(responses);
         }
@@ -64,9 +65,9 @@ namespace ELearn.Api.Controllers
         #region Get By Creator
         [HttpGet("GetUserAnnouncement")]
         [Authorize(Roles ="Admin, Staff")]
-        public async Task<IActionResult>GetUserAnnouncement()
+        public async Task<IActionResult>GetUserAnnouncement([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
-            var responses = await _announcementService.GetByCreatorAsync();
+            var responses = await _announcementService.GetByCreatorAsync(sort_by, search_term);
             return this.CreateResponse(responses);
         }
         #endregion

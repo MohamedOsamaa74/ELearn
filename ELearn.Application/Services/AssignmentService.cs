@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ELearn.Application.DTOs.AnnouncementDTOs;
 using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
@@ -31,6 +32,7 @@ namespace ELearn.Application.Services
 
         }
 
+
         #region Delete Assignment 
         public async Task<Response<AssignmentDTO>> DeleteAssignmentAsync(int Id)
         {
@@ -51,7 +53,7 @@ namespace ELearn.Application.Services
 
         #endregion
 
-        #region Update Material
+        #region Update Assignment
         public async Task<Response<AssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, AssignmentDTO Model)
 
         {
@@ -83,7 +85,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetAll
-        public async Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync()
+        public async Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term)
         {
             try
             {
@@ -93,6 +95,39 @@ namespace ELearn.Application.Services
                     return ResponseHandler.NotFound<ICollection<AssignmentDTO>>("There are no assignments yet");
                 }
                 var assignmentDtos = _mapper.Map<ICollection<AssignmentDTO>>(assignments);
+                if (!string.IsNullOrEmpty(sort_by))
+                {
+                    switch (sort_by.ToLower())
+                    {
+                        case "title":
+                            assignmentDtos = assignmentDtos.OrderBy(a => a.Title).ToList();
+                            break;
+                        case "title desc":
+                            assignmentDtos = assignmentDtos.OrderByDescending(a => a.Title).ToList();
+                            break;
+                        case "date":
+                            assignmentDtos = assignmentDtos.OrderBy(a => a.Date).ToList();
+                            break;
+                        case "date desc":
+                            assignmentDtos = assignmentDtos.OrderByDescending(a => a.Date).ToList();
+                            break;
+                        case "active first":
+                            var currentDate = DateTime.UtcNow.ToLocalTime();
+                            assignmentDtos = assignmentDtos.OrderByDescending(a => a.Start <= currentDate && a.End >= currentDate).ThenBy(a => a.Title).ToList();
+                            break;
+                        case "not active":
+                            var currentDate2 = DateTime.UtcNow.ToLocalTime();
+                            assignmentDtos = assignmentDtos.OrderBy(a => a.Start <= currentDate2 && a.End >= currentDate2).ThenBy(a => a.Title).ToList();
+                            break;
+                        default:
+                            assignmentDtos = assignmentDtos.OrderBy(a => a.Title).ToList();
+                            break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(search_term))
+                {
+                    assignmentDtos = assignmentDtos.Where(a => a.Title.Contains(search_term, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
                 return ResponseHandler.Success(assignmentDtos);
             }
             catch (Exception ex)
@@ -110,7 +145,7 @@ namespace ELearn.Application.Services
                 var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
                 if (assignment == null)
                 {
-                    return ResponseHandler.NotFound<AssignmentDTO>();
+                    return ResponseHandler.NotFound<AssignmentDTO>("There is no such Assignment");
                 }
 
                 var assignmentDto = _mapper.Map<AssignmentDTO>(assignment);
@@ -118,13 +153,13 @@ namespace ELearn.Application.Services
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while retrieving material: {ex.Message}");
+                return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while retrieving Assignment: {ex.Message}");
             }
         }
         #endregion
 
         #region GetAssignmentsByCreator
-        public async Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator()
+        public async Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term)
         {
             try
             {
@@ -138,6 +173,39 @@ namespace ELearn.Application.Services
                 {
                     var Assignmentto = await GetAssignmentByIdAsync(Assignment);
                     AssignmentsDto.Add(Assignmentto.Data);
+                }
+                if (!string.IsNullOrEmpty(sort_by))
+                {
+                    switch (sort_by.ToLower())
+                    {
+                        case "title":
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Title).ToList();
+                            break;
+                        case "title desc":
+                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.Title).ToList();
+                            break;
+                        case "date":
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Date).ToList();
+                            break;
+                        case "date desc":
+                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.Date).ToList();
+                            break;
+                        case "active first":
+                            var currentDate = DateTime.UtcNow.ToLocalTime();
+                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.Start <= currentDate && a.End >= currentDate).ThenBy(a => a.Title).ToList();
+                            break;
+                        case "not active":
+                            var currentDate2 = DateTime.UtcNow.ToLocalTime();
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Start <= currentDate2 && a.End >= currentDate2).ThenBy(a => a.Title).ToList();
+                            break;
+                        default:
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Title).ToList();
+                            break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(search_term))
+                {
+                    AssignmentsDto = AssignmentsDto.Where(a => a.Title.Contains(search_term, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
                 return ResponseHandler.Success(AssignmentsDto);
             }
@@ -181,7 +249,8 @@ namespace ELearn.Application.Services
                     assignments.Add(entity);
             }
             return assignments;
-        } 
+        }
+
         #endregion
     }
 }

@@ -8,6 +8,7 @@ using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using ELearn.InfraStructure.Validations;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELearn.Application.Services
@@ -53,7 +54,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetAll
-        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetAllAnnouncementsAsync()
+        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetAllAnnouncementsAsync(string sort_by,string search_term)
         {
             try
             {
@@ -71,6 +72,34 @@ namespace ELearn.Application.Services
                     dto.FilesUrls = await GetAnnouncementFiles(item.Id);
                     viewAnnouncementDTOs.Add(dto);
                 }
+
+                if (!string.IsNullOrEmpty(sort_by))
+                {
+                    switch (sort_by.ToLower())
+                    {
+                        case "text":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.Text).ToList();
+                            break;
+                        case "text desc":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderByDescending(a => a.Text).ToList();
+                            break;
+                        case "date":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.CreationDate).ToList();
+                            break;
+                        case "date desc":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderByDescending(a => a.CreationDate).ToList();
+                            break;
+                        default:
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.Text).ToList();
+                            break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(search_term))
+                {
+                    viewAnnouncementDTOs = viewAnnouncementDTOs.Where(a => a.Text.Contains(search_term, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+
                 return ResponseHandler.ManySuccess(viewAnnouncementDTOs);
             }
             catch (Exception ex)
@@ -165,7 +194,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetFromGroups
-        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetFromUserGroupsAsync()
+        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetFromUserGroupsAsync(string sort_by, string search_term)
         {
             try
             {
@@ -188,6 +217,33 @@ namespace ELearn.Application.Services
                     dto.FilesUrls = await GetAnnouncementFiles(item.Id);
                     viewAnnouncementDTOs.Add(dto);
                 }
+
+                if (!string.IsNullOrEmpty(sort_by))
+                {
+                    switch (sort_by.ToLower())
+                    {
+                        case "text":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.Text).ToList();
+                            break;
+                        case "text desc":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderByDescending(a => a.Text).ToList();
+                            break;
+                        case "date":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.CreationDate).ToList();
+                            break;
+                        case "date desc":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderByDescending(a => a.CreationDate).ToList();
+                            break;
+                        default:
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.Text).ToList();
+                            break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(search_term))
+                {
+                    viewAnnouncementDTOs = viewAnnouncementDTOs.Where(a => a.Text.Contains(search_term, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
                 return ResponseHandler.ManySuccess(viewAnnouncementDTOs);
             }
             catch(Exception Ex)
@@ -198,7 +254,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetByCreator
-        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetByCreatorAsync()
+        public async Task<Response<ICollection<ViewAnnouncementDTO>>> GetByCreatorAsync(string sort_by, string search_term)
         {
             try
             {
@@ -217,6 +273,32 @@ namespace ELearn.Application.Services
                     dto.FilesUrls = await GetAnnouncementFiles(item.Id);
                     viewAnnouncementDTOs.Add(dto);
                 }
+                if (!string.IsNullOrEmpty(sort_by))
+                {
+                    switch (sort_by.ToLower())
+                    {
+                        case "text":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.Text).ToList();
+                            break;
+                        case "text desc":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderByDescending(a => a.Text).ToList();
+                            break;
+                        case "date":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.CreationDate).ToList();
+                            break;
+                        case "date desc":
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderByDescending(a => a.CreationDate).ToList();
+                            break;
+                        default:
+                            viewAnnouncementDTOs = viewAnnouncementDTOs.OrderBy(a => a.Text).ToList();
+                            break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(search_term))
+                {
+                    viewAnnouncementDTOs = viewAnnouncementDTOs.Where(a => a.Text.Contains(search_term, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
                 return ResponseHandler.ManySuccess(viewAnnouncementDTOs);
             }
             catch(Exception Ex)

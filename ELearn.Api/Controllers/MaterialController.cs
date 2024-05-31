@@ -31,7 +31,7 @@ namespace ELearn.Api.Controllers
         }
        
         #region Get Mateial By ID
-        [HttpGet("GetMaterialById/{MaterialId:int}")]
+        [HttpGet("GetMaterialById/{materialId:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetMaterialById(int materialId)
         {
