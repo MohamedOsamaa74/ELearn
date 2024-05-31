@@ -12,10 +12,10 @@ namespace ELearn.Application.Interfaces
     {
         public Task<Response<AssignmentDTO>>DeleteAssignmentAsync(int Id);
         public Task<Response<AssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, AssignmentDTO Model);
-        public Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync();
+        public Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term);
         public Task<Response<AssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId);
         //public Task<IEnumerable<AssignmentDTO>> GetAssignmentsByStaffId(string staffId);
-        public Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator();
+        public Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term);
         public Task<Response<ICollection<AssignmentDTO>>> DeleteManyAsync(List<int> Ids);
     }
 }

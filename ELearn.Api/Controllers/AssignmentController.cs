@@ -28,6 +28,7 @@ namespace ELearn.Api.Controllers
             _assignmentService = AssignmentService;
         }
 
+
         #region Delete Assignment
         [HttpDelete("Delete/{AssignmentId:int}")]
         [Authorize(Roles = "Admin")]
@@ -58,16 +59,16 @@ namespace ELearn.Api.Controllers
         #region GetAll Assignments
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
-            var response = await _assignmentService.GetAllAssignmentsAsync();
+            var response = await _assignmentService.GetAllAssignmentsAsync(sort_by, search_term);
 
             return this.CreateResponse(response);
         }
         #endregion
 
         #region Get Assignment By ID
-        [HttpGet("GetAssignmentById/{AssignmentId:int}")]
+        [HttpGet("{assignmentId:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAssignmentById(int assignmentId)
         {
@@ -115,9 +116,9 @@ namespace ELearn.Api.Controllers
 
         #region GetAssignmentsOfCurrentUser
         [HttpGet("GetAssignmentsByCreator")]
-        public async Task<IActionResult> GetAssignmentsByCreator()
+        public async Task<IActionResult> GetAssignmentsByCreator([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
-            var response = await _assignmentService.GetAssignmentsByCreator();
+            var response = await _assignmentService.GetAssignmentsByCreator(sort_by, search_term);
             return this.CreateResponse(response);
         }
         #endregion
