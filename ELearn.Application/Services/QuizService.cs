@@ -43,9 +43,9 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.BadRequest<CreateQuizDTO>("User not found");
                 }
-                if (quiz.Start > quiz.End || quiz.Start < DateTime.Now)
+                if (quiz.Start >= quiz.End || quiz.Start <= DateTime.Now)
                 {
-                    return ResponseHandler.BadRequest<CreateQuizDTO>("Start date must be less than end date And greater than current date");
+                    return ResponseHandler.BadRequest<CreateQuizDTO>("Start date must be less than end date, greater than current date and not equal to end date");
                 }
                 var group = await _unitOfWork.Groups.GetByIdAsync(groupID);
                 if (group is null)
@@ -99,12 +99,15 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.Unauthorized<EditQuizDTO>();
                 }
-                if (Model.Start > Model.End || Model.Start < DateTime.Now)
+                if (Model.Start >= Model.End || Model.Start <= DateTime.Now)
                 {
-                    return ResponseHandler.BadRequest<EditQuizDTO>("Start date must be less than end date And greater than current date");
+                    return ResponseHandler.BadRequest<EditQuizDTO>("Start date must be less than end date, greater than current date and not equal to end date");
                 }
-                var totalQuestionGrade = oldquiz.Questions.Sum(q => q.Grade);
-                if (totalQuestionGrade != Model.Grade)
+               
+                var t= _questionService.GetQuestionsByQuizIdAsync(QuizId);
+                var tt = t.Result.Data.Sum(q => q.Grade);
+                //var totalQuestionGrade = oldquiz.Questions.Sum(q => q.Grade);
+                if (tt != Model.Grade )
                 {
                     return ResponseHandler.BadRequest<EditQuizDTO>("Sum of question grades doesn't match quiz grade");
                 }
