@@ -59,9 +59,9 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region ViewFile
-        [HttpGet("ViewFile")]
-        [Authorize]
-        public async Task<IActionResult> ViewFile([FromQuery] DownloadFileDTO downloadFileDTO)
+        [HttpGet("ViewFile/{FolderName}/{FileName}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ViewFile([FromRoute] DownloadFileDTO downloadFileDTO)
         {
             var type = await _fileService.GetFileType(downloadFileDTO.FileName);
             var response = await _fileService.DownloadFileAsync(downloadFileDTO);
@@ -70,9 +70,9 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region DownloadFile
-        [HttpGet("DownloadFile")]
+        [HttpGet("DownloadFile/{FolderName}/{FileName}")]
         [Authorize]
-        public async Task<IActionResult> DownloadFile([FromQuery] DownloadFileDTO downloadFileDTO)
+        public async Task<IActionResult> DownloadFile([FromRoute]DownloadFileDTO downloadFileDTO)
         {
             var type = await _fileService.GetFileType(downloadFileDTO.FileName);
             var response = await _fileService.DownloadFileAsync(downloadFileDTO);

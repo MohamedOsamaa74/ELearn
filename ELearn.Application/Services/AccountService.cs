@@ -68,6 +68,7 @@ namespace ELearn.Application.Services
                 var userDepartment = await _unitOfWork.Departments.GetByIdAsync(user.DepartmentId);
                 var token = await CreateTokenAsync(user);
                 var Roles = await _userManager.GetRolesAsync(user) as List<string>;
+                var profilePicture = await _unitOfWork.Files.GetWhereSelectAsync(u => u.UserId == user.Id, f => f.FileName);
                 AuthDTO auth = new()
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -83,7 +84,8 @@ namespace ELearn.Application.Services
                     Faculty = user.Faculty,
                     NId = user.NId,
                     Department = userDepartment.Title,
-                    Grade = user.Grade
+                    Grade = user.Grade,
+                    ProfilePictureName = profilePicture.SingleOrDefault()
                 };
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
