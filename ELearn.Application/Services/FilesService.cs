@@ -51,6 +51,7 @@ namespace ELearn.Application.Services
                           $"/api/files";
                 var viewUrl = $"{url}/ViewFile/{folderName}/{fileName}";
                 var downloadUrl = $"{url}/DownloadFile/{folderName}/{fileName}";
+                var user = await _userService.GetCurrentUserAsync();
                 var file = new FileEntity()
                 {
                     Title = fileDTO.File.FileName,
@@ -60,10 +61,11 @@ namespace ELearn.Application.Services
                     ViewUrl = viewUrl,
                     DownloadUrl = downloadUrl,
                     Type = fileDTO.File.ContentType,
-                    UserId = await _userService.GetCurrentUserIDAsync(),
+                    CreatorId = await _userService.GetCurrentUserIDAsync(),
                     AnnouncementId = fileDTO.FolderName == "Announcements" ? fileDTO.ParentId : null,
                     MaterialId = fileDTO.FolderName == "Materials" ? fileDTO.ParentId : null,
-                    PostId = fileDTO.FolderName == "Posts" ? fileDTO.ParentId : null
+                    PostId = fileDTO.FolderName == "Posts" ? fileDTO.ParentId : null,
+                    UserId = fileDTO.FolderName == "ProfilePictures" ? user.Id : null
                 };
                 await _unitOfWork.Files.AddAsync(file);
                 var dto = _mapper.Map<FileDTO>(file);

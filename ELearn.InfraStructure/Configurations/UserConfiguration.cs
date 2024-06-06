@@ -79,10 +79,17 @@ namespace ELearn.InfraStructure.Configurations
             //many student to many tasks (student) userassignment
           
             builder.HasMany(f => f.Files)
-                .WithOne(u => u.User)
-                .HasForeignKey(f => f.UserId)
+                .WithOne(c => c.Creator)
+                .HasForeignKey(f => f.CreatorId)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(f => f.ProfilePicture)
+                .WithOne(u => u.User)
+                .HasForeignKey<FileEntity>(f => f.UserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 }

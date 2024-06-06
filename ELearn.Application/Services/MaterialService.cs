@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
@@ -23,12 +24,47 @@ namespace ELearn.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public MaterialService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
+        private readonly IFileService _fileService;
+        public MaterialService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IFileService fileService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        }
+        #endregion
+
+        #region Add Material
+        public async Task<Response<ViewMaterialDTO>> AddMaterialAsync(int GroupId, AddMaterialDTO Model)
+        {
+            try
+            {
+                var material = _mapper.Map<Material>(Model);
+                material.GroupId = GroupId;
+                material.UserId = await _userService.GetCurrentUserIDAsync();
+                await _unitOfWork.Materials.AddAsync(material);
+                var fileDto = new UploadFileDTO
+                {
+                    File = Model.File,
+                    FolderName = "Materials",
+                    ParentId = material.Id
+                };
+                var file = await _fileService.UploadFileAsync(fileDto);
+                if (!file.Succeeded)
+                {
+                    return ResponseHandler.BadRequest<ViewMaterialDTO>($"An error occurred while adding material: {file.Message}");
+                }
+                var viewMaterial = _mapper.Map<ViewMaterialDTO>(material);
+                viewMaterial.ViewUrl = file.Data.ViewUrl;
+                viewMaterial.DownloadUrl = file.Data.DownloadUrl;
+                viewMaterial.Title = file.Data.Title;
+                return ResponseHandler.Success(viewMaterial);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewMaterialDTO>($"An error occurred while adding material: {ex.Message}");
+            }
         }
         #endregion
            

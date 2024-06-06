@@ -10,6 +10,7 @@ namespace ELearn.Application.Interfaces
 {
     public interface IMaterialService
     {
+        public Task<Response<ViewMaterialDTO>> AddMaterialAsync(int GroupId, AddMaterialDTO Model);
         public Task<Response<AddMaterialDTO>> DeleteMaterialAsync(int Id);
         public Task<Response<UpdateMaterialDTO>> UpdateMaterialAsync(int materialId, UpdateMaterialDTO Model);
         public Task<Response<AddMaterialDTO>> GetMaterialByIdAsync(int materialId);

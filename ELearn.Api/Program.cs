@@ -57,12 +57,14 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
+app.UseDeveloperExceptionPage();
 // Configure the HTTP request pipeline.
 //if(app.Environment.IsDevelopment())
 //{
     app.UseSwagger();
     app.UseSwaggerUI();
 //}
+
 
 app.UseHttpsRedirection();
 

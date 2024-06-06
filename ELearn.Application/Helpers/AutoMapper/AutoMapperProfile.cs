@@ -46,6 +46,13 @@ namespace ELearn.Application.Helpers.AutoMapper
             CreateMap<AddUserDTO, ApplicationUser>();
 
             CreateMap<EditUserDTO, ApplicationUser>();
+
+            CreateMap<ApplicationUser, UserProfileDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.Ignore())
+                .ForMember(dest => dest.Level, opt => opt.MapFrom(src => src.Grade))
+                .ForMember(dest => dest.Department, opt => opt.Ignore())
+                .ForMember(dest => dest.ProfilePictureName, opt => opt.Ignore());
+
             #endregion
 
             #region Group Mapper
@@ -75,6 +82,13 @@ namespace ELearn.Application.Helpers.AutoMapper
             #endregion
 
             #region Material Mapper
+            CreateMap<Material, AddMaterialDTO>()
+                .ForMember(dest => dest.File, opt => opt.Ignore());
+
+            CreateMap<AddMaterialDTO, Material>()
+                .ForMember(dest => dest.GroupId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+
             CreateMap<UpdateMaterialDTO, Material>()
                 .ForMember(dest => dest.GroupId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
@@ -82,6 +96,11 @@ namespace ELearn.Application.Helpers.AutoMapper
             CreateMap<Material, UpdateMaterialDTO>()
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Link, opt => opt.Ignore());
+
+            CreateMap<Material, ViewMaterialDTO>()
+                .ForMember(dest => dest.Title, opt => opt.Ignore())
+                .ForMember(dest => dest.DownloadUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.ViewUrl, opt => opt.Ignore());
             #endregion
 
             #region Assignment Mapper 

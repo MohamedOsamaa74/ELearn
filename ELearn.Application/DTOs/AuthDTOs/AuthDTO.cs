@@ -13,7 +13,15 @@ namespace ELearn.Application.DTOs.AuthDTOs
         public bool IsAuthenticated { get; set; }
         public required string UserName { get; set; }
         public required string FullName { get; set; }
+        public required string Address { get; set; }
+        public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
+        public required string Nationality { get; set; }
+        public required string Religion { get; set; }
+        public required string Faculty { get; set; }
+        public required string NId { get; set; }
+        public required string Department { get; set; }
+        public required string Grade { get; set; }
         public required string Role { get; set; }
         public required string Token { get; set; }
         //public DateTime ExpiresOn { get; set; }

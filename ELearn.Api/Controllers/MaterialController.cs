@@ -22,14 +22,28 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class MaterialController : ControllerBase
     {
+        #region Fields
         private readonly IMaterialService _materialService;
-       
         public MaterialController(IMaterialService MaterialService)
         {
             _materialService = MaterialService;
-           
         }
-       
+        #endregion
+
+        #region Add Material
+        [HttpPost("{GroupId:int}/AddMaterial")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> AddMaterial(int GroupId, [FromForm] AddMaterialDTO Model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _materialService.AddMaterialAsync(GroupId, Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
         #region Get Mateial By ID
         [HttpGet("GetMaterialById/{materialId:int}")]
         [Authorize(Roles = "Admin")]
@@ -60,63 +74,6 @@ namespace ELearn.Api.Controllers
             return this.CreateResponse(response);
         }
         #endregion
-
-        //#region Upload
-
-        //[HttpPost("UploadMaterial")]
-        //[Authorize(Roles = "Admin , Staff")]
-        //public async Task<IActionResult> UploaldMaterial(AddMaterialDTO materialDTO)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    else
-        //    {
-
-        //        var material = new Material
-        //        {
-        //            Title = materialDTO.Title,
-        //            Week = materialDTO.Week,
-        //            File = materialDTO.File,
-        //            FilePath = await WriteFile(materialDTO.File),
-        //            GroupId =1,
-        //            UserId =
-
-        //        };
-        //        await _unitOfWork.Materials.AddAsync(material);
-        //        return Ok(material.FilePath);
-
-        //    }
-        //}
-
-        //private async Task<string> WriteFile(IFormFile file)
-        //{
-        //    string filename = "";
-        //    try
-        //    {
-        //        var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-        //        filename = DateTime.Now.Ticks.ToString() + extension;
-
-        //        var filepath = Path.Combine(Directory.GetCurrentDirectory(), "Upload");
-
-        //        if (!Directory.Exists(filepath))
-        //        {
-        //            Directory.CreateDirectory(filepath);
-        //        }
-
-        //        var exactpath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", filename);
-        //        using (var stream = new FileStream(exactpath, FileMode.Create))
-        //        {
-        //            await file.CopyToAsync(stream);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //    }
-        //    return filename;
-        //}
-        //#endregion
 
         #region DownloadFile
         [HttpGet]
@@ -165,7 +122,5 @@ namespace ELearn.Api.Controllers
 
       
         #endregion        
-
-        // view material in browser لسة مش معمول هنشوف تيم الفرونت 
     }
 }

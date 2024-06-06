@@ -17,6 +17,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
 using ELearn.Application.DTOs.AuthDTOs;
+using ELearn.Application.DTOs.UserDTOs;
+using AutoMapper;
+using ELearn.Application.DTOs.FileDTOs;
 
 namespace ELearn.Application.Services
 {
@@ -31,9 +34,11 @@ namespace ELearn.Application.Services
         private readonly JWT _jwt;
         private readonly IUserService _userService;
         private readonly IPasswordHasher<ApplicationUser> _hasher;
+        private readonly IMapper _mapper;
+        private readonly IFileService _fileService;
         /*private static readonly Dictionary<string, (string OTP, DateTime Expiry)> _otpCache
                 = new Dictionary<string, (string OTP, DateTime Expiry)>();*/
-        public AccountService(IOptions<MailSettings> mailSettings, IOptions<JWT> jwt, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IHttpContextAccessor httpContextAccessor, IUserService userService, IPasswordHasher<ApplicationUser> hasher)
+        public AccountService(IOptions<MailSettings> mailSettings, IOptions<JWT> jwt, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IHttpContextAccessor httpContextAccessor, IUserService userService, IPasswordHasher<ApplicationUser> hasher, IMapper mapper, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -43,6 +48,8 @@ namespace ELearn.Application.Services
             _jwt = jwt.Value;
             _mailSettings = mailSettings.Value;
             _hasher = hasher;
+            _mapper = mapper;
+            _fileService = fileService;
         }
         #endregion
 
@@ -52,9 +59,13 @@ namespace ELearn.Application.Services
             try
             {
                 var user = await _userManager.FindByNameAsync(Model.UserName);
+                var userByEmail = await _userManager.FindByEmailAsync(Model.UserName);
+                if (userByEmail != null)
+                    user = userByEmail;
                 if (user == null || !await _userManager.CheckPasswordAsync(user, Model.Password))
                     return ResponseHandler.Unauthorized<AuthDTO>("Invalid username or password");
 
+                var userDepartment = await _unitOfWork.Departments.GetByIdAsync(user.DepartmentId);
                 var token = await CreateTokenAsync(user);
                 var Roles = await _userManager.GetRolesAsync(user) as List<string>;
                 AuthDTO auth = new()
@@ -65,6 +76,14 @@ namespace ELearn.Application.Services
                     FullName = user.FirstName + " " + user.LastName,
                     Email = user.Email,
                     Role = Roles[0],
+                    Address = user.Address,
+                    PhoneNumber = user.PhoneNumber,
+                    Nationality = user.Nationality,
+                    Religion = user.Relegion,
+                    Faculty = user.Faculty,
+                    NId = user.NId,
+                    Department = userDepartment.Title,
+                    Grade = user.Grade
                 };
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
@@ -154,7 +173,8 @@ namespace ELearn.Application.Services
                 await _userManager.UpdateAsync(user);
                 var jwtToken = await CreateTokenAsync(user);
                 var Roles = await _userManager.GetRolesAsync(user) as List<string>;
-                AuthDTO auth = new AuthDTO
+                var userDepartment = await _unitOfWork.Departments.GetByIdAsync(user.DepartmentId);
+                AuthDTO auth = new ()
                 {
                     Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
                     RefreshToken = newRefreshToken.Token,
@@ -164,6 +184,14 @@ namespace ELearn.Application.Services
                     FullName = user.FirstName + " " + user.LastName,
                     Email = user.Email,
                     Role = Roles[0],
+                    Address = user.Address,
+                    PhoneNumber = user.PhoneNumber,
+                    Nationality = user.Nationality,
+                    Religion = user.Relegion,
+                    Faculty = user.Faculty,
+                    NId = user.NId,
+                    Department = userDepartment.Title,
+                    Grade = user.Grade
                 };
                 SetRefreshTokenInCookie(auth.RefreshToken, auth.RefreshTokenExpiration);
                 return ResponseHandler.Success(auth);
@@ -224,6 +252,30 @@ namespace ELearn.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.BadRequest<string>( $"An error occurred, {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Upload Profile Picture
+        public async Task<Response<string>> UploadProfilePictureAsync(IFormFile Image)
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                if (user == null)
+                    return ResponseHandler.Unauthorized<string>();
+                var uploadFileDTO = new UploadFileDTO()
+                {
+                    File = Image,
+                    FolderName = "ProfilePictures",
+                    ParentId = 0
+                };
+                var response = await _fileService.UploadFileAsync(uploadFileDTO);
+                return ResponseHandler.Success("Profile Picture Updated Successfully");
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<string>($"An error occurred, {ex.Message}");
             }
         }
         #endregion
@@ -405,6 +457,29 @@ namespace ELearn.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.BadRequest<EmailDTO>($"An error occurred, {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Get Profile
+        public async Task<Response<UserProfileDTO>> GetUserProfileAsync()
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                if (user == null)
+                    return ResponseHandler.Unauthorized<UserProfileDTO>();
+                var department = await _unitOfWork.Departments.GetByIdAsync(user.DepartmentId);
+                var userProfile = _mapper.Map<UserProfileDTO>(user);
+                var profilePicture = await _unitOfWork.Files.GetWhereSelectAsync(u => u.UserId == user.Id, f => f.FileName);
+                userProfile.FullName = user.FirstName + ' ' + user.LastName;
+                userProfile.Department = department.Title;
+                userProfile.ProfilePictureName = profilePicture.SingleOrDefault();
+                return ResponseHandler.Success(userProfile);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<UserProfileDTO>($"An error occurred, {ex.Message}");
             }
         }
         #endregion

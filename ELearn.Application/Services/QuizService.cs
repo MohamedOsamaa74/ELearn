@@ -240,6 +240,9 @@ namespace ELearn.Application.Services
                 var totalScore = 0;
                 foreach (var answer in userAnswerDto.Answers)
                 {
+                    var question = await _unitOfWork.Questions.GetByIdAsync(answer.QuestionId);
+                    if (question is null || question.QuizId != userAnswerDto.QuizId )
+                        return ResponseHandler.NotFound<QuizResultDTO>("There is no such Question in this Quiz");
                     var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);
                     if (!recieveAnswer.Succeeded)
                         return ResponseHandler.BadRequest<QuizResultDTO>($"An Error Occurred, {recieveAnswer.Message}");

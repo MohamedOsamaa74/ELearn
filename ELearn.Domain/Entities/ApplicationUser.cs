@@ -8,10 +8,11 @@ namespace ELearn.Domain.Entities
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public string? Image { get; set; }
         public DateTime BirthDate { get; set; }
         public required string Address { get; set; }
         public required string Nationality { get; set; }
+        public required string Relegion { get; set; }
+        public required string Faculty { get; set; }
         public required string NId { get; set; }
         public string? Grade { get; set; }
         public string? OTP { get; set; }
@@ -28,7 +29,8 @@ namespace ELearn.Domain.Entities
         public ICollection<Post>? Posts { get; set; }
         public ICollection<Material>? Materials { get; set; }
         public ICollection<Quiz>? Quizzes { get; set; }
-        public ICollection<FileEntity> Files { get;} = new List<FileEntity>();
+        public ICollection<FileEntity> Files { get; } = [];
+        public FileEntity? ProfilePicture { get; set; }
         public ICollection<Message>? SentMessages { get; set; }
         public ICollection<Message>? ReceivedMessages { get; set; }
         public ICollection<Voting>? Votings { get; set; }

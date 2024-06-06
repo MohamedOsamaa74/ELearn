@@ -8,16 +8,11 @@ namespace ELearn.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController(IAccountService accountService) : ControllerBase
     {
 
         #region Fields & Constructor
-        private readonly IAccountService _accountService;
-
-        public AccountController(IAccountService accountService)
-        {
-            _accountService = accountService;
-        }
+        private readonly IAccountService _accountService = accountService;
         #endregion
 
         #region LogIn
@@ -130,6 +125,26 @@ namespace ELearn.Api.Controllers
                 return BadRequest(ModelState);
             }
             var response = await _accountService.ResetPasswordAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+ 
+        #region Get User Profile
+        [HttpGet("Get-User-Profile")]
+        [Authorize]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var response = await _accountService.GetUserProfileAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Upload Profile Picture
+        [HttpPost("Upload-Profile-Picture")]
+        [Authorize]
+        public async Task<IActionResult> UploadProfilePicture(IFormFile Image)
+        {
+            var response = await _accountService.UploadProfilePictureAsync(Image);
             return this.CreateResponse(response);
         }
         #endregion

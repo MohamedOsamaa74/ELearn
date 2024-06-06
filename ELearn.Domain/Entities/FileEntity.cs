@@ -13,7 +13,8 @@
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
 
         #region ForeignKeys
-        public required string UserId { get; set; }
+        public required string CreatorId { get; set; }
+        public string? UserId { get; set; }
         public int? MaterialId { get; set; }
         public int? AnnouncementId { get; set; }
         public int? AssignmentId { get; set; }
@@ -25,7 +26,8 @@
         #endregion
 
         #region NavigationProperties
-        public ApplicationUser User { get; set; }
+        public ApplicationUser Creator { get; set; }
+        public ApplicationUser? User { get; set; }
         public Material? Material { get; set; }
         public Announcement? Announcement { get; set; }
         public Assignment? Assignment { get; set; }

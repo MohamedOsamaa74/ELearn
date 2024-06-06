@@ -27,9 +27,14 @@ namespace ELearn.InfraStructure.Configurations
                 .HasForeignKey<FileEntity>(f => f.MessageId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(u => u.User)
+            builder.HasOne(c => c.Creator)
                 .WithMany(f => f.Files)
-                .HasForeignKey(f => f.UserId)
+                .HasForeignKey(f => f.CreatorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(u => u.User)
+                .WithOne(f => f.ProfilePicture)
+                .HasForeignKey<FileEntity>(f => f.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(M => M.Material)
