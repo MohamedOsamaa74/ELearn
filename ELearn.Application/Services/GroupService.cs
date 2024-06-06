@@ -166,6 +166,7 @@ namespace ELearn.Application.Services
                     var groupDTO = _mapper.Map<GroupDTO>(group);
                     var instructor = await _unitOfWork.Users.GetByIdAsync(group.CreatorId);
                     groupDTO.InstructorName = instructor.FirstName + " " + instructor.LastName;
+                    groupDTO.Id = item;
                     groupsDto.Add(groupDTO);
                 }
                 return ResponseHandler.ManySuccess(groupsDto);
