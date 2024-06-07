@@ -36,7 +36,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Add Material
-        public async Task<Response<ViewMaterialDTO>> AddMaterialAsync(int GroupId, AddMaterialDTO Model)
+        public async Task<Response<MaterialDTO>> AddMaterialAsync(int GroupId, AddMaterialDTO Model)
         {
             try
             {
@@ -53,9 +53,9 @@ namespace ELearn.Application.Services
                 var file = await _fileService.UploadFileAsync(fileDto);
                 if (!file.Succeeded)
                 {
-                    return ResponseHandler.BadRequest<ViewMaterialDTO>($"An error occurred while adding material: {file.Message}");
+                    return ResponseHandler.BadRequest<MaterialDTO>($"An error occurred while adding material: {file.Message}");
                 }
-                var viewMaterial = _mapper.Map<ViewMaterialDTO>(material);
+                var viewMaterial = _mapper.Map<MaterialDTO>(material);
                 viewMaterial.ViewUrl = file.Data.ViewUrl;
                 viewMaterial.DownloadUrl = file.Data.DownloadUrl;
                 viewMaterial.Title = file.Data.Title;
@@ -63,7 +63,7 @@ namespace ELearn.Application.Services
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<ViewMaterialDTO>($"An error occurred while adding material: {ex.Message}");
+                return ResponseHandler.BadRequest<MaterialDTO>($"An error occurred while adding material: {ex.Message}");
             }
         }
         #endregion
@@ -157,7 +157,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Get All From Group
-        public async Task<Response<ICollection<UpdateMaterialDTO>>> GetAllMaterialsFromGroupAsync(int groupId)
+        public async Task<Response<ICollection<MaterialDTO>>> GetAllMaterialsFromGroupAsync(int groupId)
         {
             try
             {
@@ -165,20 +165,31 @@ namespace ELearn.Application.Services
                     .Where(x => x.GroupId == groupId)
                     .ToListAsync();
 
-                if (materials == null || !materials.Any())
+                if (materials == null || materials.Count == 0)
                 {
-                    return ResponseHandler.NotFound<ICollection<UpdateMaterialDTO>>($"No materials found for group with ID {groupId}");
+                    return ResponseHandler.NotFound<ICollection<MaterialDTO>>($"No materials found for group with ID {groupId}");
                 }
 
-                var materialDtos = _mapper.Map<ICollection<UpdateMaterialDTO>>(materials);
-                return ResponseHandler.Success(materialDtos);
+                ICollection<MaterialDTO> materialDTOs = [];
+                foreach(var material in materials)
+                {
+                    var materialDTO = _mapper.Map<MaterialDTO>(material);
+                    var file = await _unitOfWork.Files.GetWhereSingleAsync(f => f.MaterialId == material.Id);
+                    if (file != null)
+                    {
+                        materialDTO.Title = file.Title;
+                        materialDTO.DownloadUrl = file.DownloadUrl;
+                        materialDTO.ViewUrl = file.ViewUrl;
+                    }
+                    materialDTOs.Add(materialDTO);
+                }
+                return ResponseHandler.Success(materialDTOs);
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<ICollection<UpdateMaterialDTO>>($"An error occurred while retrieving materials: {ex.Message}");
+                return ResponseHandler.BadRequest<ICollection<MaterialDTO>>($"An error occurred while retrieving materials: {ex.Message}");
             }
         }
-
         #endregion
     }
 }

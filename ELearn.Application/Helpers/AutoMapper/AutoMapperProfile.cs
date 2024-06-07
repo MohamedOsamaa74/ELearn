@@ -97,7 +97,7 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.File, opt => opt.Ignore())
                 .ForMember(dest => dest.Link, opt => opt.Ignore());
 
-            CreateMap<Material, ViewMaterialDTO>()
+            CreateMap<Material, MaterialDTO>()
                 .ForMember(dest => dest.Title, opt => opt.Ignore())
                 .ForMember(dest => dest.DownloadUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.ViewUrl, opt => opt.Ignore());
@@ -253,10 +253,5 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(pn => pn.Parent, opt => opt.Ignore());
             #endregion
         }
-
-
-
-
-
     }
 }
