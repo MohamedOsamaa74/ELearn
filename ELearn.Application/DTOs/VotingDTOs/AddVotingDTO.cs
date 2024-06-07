@@ -2,7 +2,8 @@
 {
     public class AddVotingDTO
     {
-        public required string Text { get; set; }
+        public required string Title { get; set; }
+        public required string Description { get; set; }
         public DateTime CreateDate => DateTime.UtcNow.ToLocalTime();
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }

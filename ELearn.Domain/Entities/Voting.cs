@@ -8,7 +8,8 @@ namespace ELearn.Domain.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public required string Text { get; set; }
+        public required string Title { get; set; }
+        public required string Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }

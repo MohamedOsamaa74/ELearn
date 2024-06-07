@@ -344,7 +344,8 @@ namespace ELearn.InfraStructure
                 {
                     new()
                     {
-                        Text = "Voting 1",
+                        Title = "Voting 1",
+                        Description = "First Voting Description",
                         Start = DateTime.Now,
                         End = DateTime.Now.AddDays(2),
                         CreatorId = Admin.Id,
@@ -354,7 +355,8 @@ namespace ELearn.InfraStructure
                     },
                     new ()
                     {
-                        Text = "Voting 2",
+                        Title = "Voting 2",
+                        Description = "Second Voting Description",
                         Start = DateTime.Now,
                         End = DateTime.Now.AddDays(3),
                         CreatorId = Staff.Id,
@@ -363,7 +365,8 @@ namespace ELearn.InfraStructure
                     },
                     new ()
                     {
-                        Text = "Voting 3",
+                        Title = "Voting 3",
+                        Description = "Third Voting Description",
                         Start = DateTime.Now,
                         End = DateTime.Now.AddDays(4),
                         CreatorId = Staff.Id,
@@ -379,9 +382,9 @@ namespace ELearn.InfraStructure
             #endregion
 
             var votings = context.Votings.ToList();
-            var voting1 = votings.FirstOrDefault(v => v.Text == "Voting 1");
-            var voting2 = votings.FirstOrDefault(v => v.Text == "Voting 2");
-            var voting3 = votings.FirstOrDefault(v => v.Text == "Voting 3");
+            var voting1 = votings.FirstOrDefault(v => v.Description == "Voting 1");
+            var voting2 = votings.FirstOrDefault(v => v.Description == "Voting 2");
+            var voting3 = votings.FirstOrDefault(v => v.Description == "Voting 3");
 
             #region VotingGroups
             if (!context.GroupVotings.Any())

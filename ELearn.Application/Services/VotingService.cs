@@ -195,7 +195,7 @@ namespace ELearn.Application.Services
                     var userVoteDto = new UserVotingDTO()
                     {
                         UserName = user.UserName,
-                        Voting = vote.Text,
+                        Voting = vote.Description,
                         Option = userVote.Option
                     };
                     userVotesDto.Add(userVoteDto);
@@ -230,7 +230,7 @@ namespace ELearn.Application.Services
                 var userVoteDto = new UserVotingDTO()
                 {
                     UserName = user.UserName,
-                    Voting = vote.Text,
+                    Voting = vote.Description,
                     Option = Option
                 };
                 return ResponseHandler.Created(userVoteDto);
@@ -250,7 +250,7 @@ namespace ELearn.Application.Services
                 var originalVote = await _unitOfWork.Votings.GetByIdAsync(Id);
                 if (originalVote is null)
                     return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
-                originalVote.Text = Model.Text;
+                originalVote.Description = Model.Title;
                 originalVote.Start = Model.Start;
                 originalVote.End = Model.End;
                 var editOptions = AddOptions(originalVote, Model.Options);
