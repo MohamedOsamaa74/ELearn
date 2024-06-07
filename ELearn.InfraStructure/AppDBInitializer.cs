@@ -382,9 +382,9 @@ namespace ELearn.InfraStructure
             #endregion
 
             var votings = context.Votings.ToList();
-            var voting1 = votings.FirstOrDefault(v => v.Description == "Voting 1");
-            var voting2 = votings.FirstOrDefault(v => v.Description == "Voting 2");
-            var voting3 = votings.FirstOrDefault(v => v.Description == "Voting 3");
+            var voting1 = votings.FirstOrDefault(v => v.Title == "Voting 1");
+            var voting2 = votings.FirstOrDefault(v => v.Title == "Voting 2");
+            var voting3 = votings.FirstOrDefault(v => v.Title == "Voting 3");
 
             #region VotingGroups
             if (!context.GroupVotings.Any())

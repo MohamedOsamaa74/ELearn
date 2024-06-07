@@ -45,6 +45,7 @@ namespace ELearn.Application.Services
 
                 var viewVote = _mapper.Map<ViewVotingDTO>(vote);
                 viewVote.Groups = Model.groups;
+                viewVote.CreatorName = user.FirstName + " " + user.LastName;
                 return ResponseHandler.Created(viewVote);
             }
             catch (Exception Ex)
@@ -63,9 +64,11 @@ namespace ELearn.Application.Services
                 if (vote is null)
                     return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
 
+                var user = await _unitOfWork.Users.GetByIdAsync(vote.CreatorId);
                 var viewVote = _mapper.Map<ViewVotingDTO>(vote);
                 viewVote.Groups = await _unitOfWork.GroupVotings
                     .GetWhereSelectAsync(v => v.Id == Id, v => v.GroupId);
+                viewVote.CreatorName = user.FirstName + " " + user.LastName;
                 return ResponseHandler.Success(viewVote);
             }
             catch (Exception Ex)
@@ -131,14 +134,20 @@ namespace ELearn.Application.Services
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
+                if(user == null)
+                    return ResponseHandler.NotFound<ICollection<ViewVotingDTO>>("There is no such User");
                 var groups = await _unitOfWork.UserGroups.GetWhereSelectAsync(g => g.UserId == user.Id, g => g.GroupId);
                 if (groups.IsNullOrEmpty())
                     return ResponseHandler.NotFound<ICollection<ViewVotingDTO>>("There are no Votings yet");
-                ICollection<ViewVotingDTO> votesDto = new List<ViewVotingDTO>();
+                ICollection<ViewVotingDTO> votesDto = [];
                 foreach (var group in groups)
                 {
                     var votes = await GetFromGroup(group);
-                    votesDto.Concat(votes.Data);
+                    foreach(var vote in votes.Data)
+                    {
+                        if(!votesDto.Any(v => v.Id == vote.Id))
+                            votesDto.Add(vote);
+                    }
                 }
                 return ResponseHandler.Success(votesDto);
             }

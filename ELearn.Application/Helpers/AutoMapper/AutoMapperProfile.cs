@@ -73,7 +73,8 @@ namespace ELearn.Application.Helpers.AutoMapper
             //.ForMember(dest => dest.Options, opt => opt.Ignore())
 
             CreateMap<Voting, ViewVotingDTO>()
-                .ForMember(dest => dest.Groups, opt => opt.Ignore());
+                .ForMember(dest => dest.Groups, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore());
 
             CreateMap<ViewVotingDTO, Voting>();
 

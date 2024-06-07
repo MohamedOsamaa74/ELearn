@@ -8,11 +8,12 @@ namespace ELearn.Application.DTOs.VotingDTOs
 {
     public class ViewVotingDTO
     {
+        public int Id { get; set; }
         public required string Title { get; set; }
         public required string Description { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public required string CreatorId { get; set; }
+        public required string CreatorName { get; set; }
         public bool IsActive { get; set; }
         public required ICollection<int> Groups { get; set; }
         public required string Option1 { get; set; }
