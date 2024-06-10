@@ -11,6 +11,7 @@ namespace ELearn.Application.DTOs.MaterialDTOs
     {
         public int Id { get; set; }
         public required string Title { get; set; }
+        public required int Week { get; set; }
         public required MaterialType Type { get; set; }
         public required string DownloadUrl { get; set; }
         public required string ViewUrl { get; set; }

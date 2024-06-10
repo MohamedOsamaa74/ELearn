@@ -1,4 +1,5 @@
 ﻿using ELearn.Application.DTOs.GroupDTOs;
+using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.Helpers.Response;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,6 @@ namespace ELearn.Application.Interfaces
         public Task<Response<GroupDTO>> GetByIdAsync(int Id);
         public Task<Response<ICollection<GroupDTO>>> GetByNameAsync(string Name);
         public Task<Response<ICollection<GroupDTO>>> GetUserGroupsAsync(string UserName = null);
+        public Task<Response<ICollection<ParticipantDTO>>> GetGroupParticipantsAsync(int GroupId);
     }
 }

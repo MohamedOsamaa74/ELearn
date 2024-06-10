@@ -67,10 +67,10 @@ namespace ELearn.Api.Controllers
 
         #region GetAllFromGroup
         
-        [HttpGet("GetAllFromGroup")]
-        public async Task<IActionResult> GetAllFromGroup(int id)
+        [HttpGet("GetAllFromGroup/{groupId:int}")]
+        public async Task<IActionResult> GetAllFromGroup(int groupId)
         {
-            var response = await _materialService.GetAllMaterialsFromGroupAsync(id);
+            var response = await _materialService.GetAllMaterialsFromGroupAsync(groupId);
             return this.CreateResponse(response);
         }
         #endregion

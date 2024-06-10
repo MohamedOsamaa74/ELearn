@@ -38,12 +38,20 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-
         #region GetById
-        [HttpGet("GetById{Id:int}")]
+        [HttpGet("GetById/{Id:int}")]
         public async Task<IActionResult>GetById(int Id)
         {
             var response = await _groupService.GetByIdAsync(Id);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region GetGroupParticipants
+        [HttpGet("GetGroupParticipants/{GroupId:int}")]
+        public async Task<IActionResult> GetGroupParticipants(int GroupId)
+        {
+            var response = await _groupService.GetGroupParticipantsAsync(GroupId);
             return this.CreateResponse(response);
         }
         #endregion

@@ -53,6 +53,8 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.Department, opt => opt.Ignore())
                 .ForMember(dest => dest.ProfilePictureName, opt => opt.Ignore());
 
+            CreateMap<ApplicationUser, ParticipantDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FirstName + ' ' + src.LastName));
             #endregion
 
             #region Group Mapper
