@@ -98,7 +98,7 @@ namespace ELearn.Api.Controllers
 
         #region Delete Mateial
         [HttpDelete("Delete/{MaterialId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Staff, Admin")]
         public async Task<IActionResult> DeleteMaterial(int MaterialId)
         {
             var response = await _materialService.DeleteMaterialAsync(MaterialId);

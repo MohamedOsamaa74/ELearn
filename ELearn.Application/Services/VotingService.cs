@@ -31,8 +31,15 @@ namespace ELearn.Application.Services
                 var user = await _userService.GetCurrentUserAsync();
                 var vote = _mapper.Map<Voting>(Model);
                 vote.CreatorId = user.Id;
-                if (Model.Options.IsNullOrEmpty() || Model.Options.Count() < 2)
-                    return ResponseHandler.BadRequest<ViewVotingDTO>("You have to insert at least two options");
+                if (Model.Options.IsNullOrEmpty() || Model.Options.Count() < 2 || Model.Options.Count()>5)
+                    return ResponseHandler.BadRequest<ViewVotingDTO>("You have to insert at least two options and at most five options");
+
+
+                if (vote.Title.IsNullOrEmpty())
+                    return ResponseHandler.BadRequest<ViewVotingDTO>("Title Is Required");
+
+                if (vote.Description.IsNullOrEmpty())
+                    return ResponseHandler.BadRequest<ViewVotingDTO>("Description Is Required");
 
                 var addOptions = AddOptions(vote, Model.Options);
                 if (addOptions != "Success")
@@ -143,10 +150,13 @@ namespace ELearn.Application.Services
                 foreach (var group in groups)
                 {
                     var votes = await GetFromGroup(group);
-                    foreach(var vote in votes.Data)
+                    if (votes.Data != null)
                     {
-                        if(!votesDto.Any(v => v.Id == vote.Id))
-                            votesDto.Add(vote);
+                        foreach (var vote in votes.Data)
+                        {
+                            if (!votesDto.Any(v => v.Id == vote.Id))
+                                votesDto.Add(vote);
+                        }
                     }
                 }
                 return ResponseHandler.Success(votesDto);

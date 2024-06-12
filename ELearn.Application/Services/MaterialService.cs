@@ -71,7 +71,14 @@ namespace ELearn.Application.Services
         #region Delete Material
         public async Task<Response<AddMaterialDTO>> DeleteMaterialAsync(int Id)
         {
+            var user = await _userService.GetCurrentUserAsync();
+            if (user is null)
+                return ResponseHandler.NotFound<AddMaterialDTO>();
+
+            var userRole = await _userService.GetUserRoleAsync();
             var material = await _unitOfWork.Materials.GetByIdAsync(Id);
+            if(userRole == "Staff" && material.UserId != user.Id)
+                return ResponseHandler.Unauthorized<AddMaterialDTO>("You are not authorized to delete this material");
             if (material is null)
                 return ResponseHandler.NotFound<AddMaterialDTO>();
             try
@@ -84,8 +91,6 @@ namespace ELearn.Application.Services
                 return ResponseHandler.BadRequest<AddMaterialDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
             }
         }
-
-       
         #endregion
 
         #region Update Material

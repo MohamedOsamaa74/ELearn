@@ -25,6 +25,7 @@ namespace ELearn.Application.Services
 {
     public class UserService : IUserService
     {
+        #region Fields
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -36,40 +37,55 @@ namespace ELearn.Application.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
+        #endregion
 
+        #region GetUserRole
         public async Task<string> GetUserRoleAsync()
         {
             var user = await GetCurrentUserAsync();
             var roles = await _userManager.GetRolesAsync(user);
             return roles.FirstOrDefault();
         }
+        #endregion
+
+        #region GetCurrentUser
         public async Task<ApplicationUser> GetCurrentUserAsync()
         {
             ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
             return await _userManager.GetUserAsync(currentUser);
         }
+        #endregion
 
+        #region GetCurrentUserID
         public async Task<string> GetCurrentUserIDAsync()
         {
             ClaimsPrincipal currentUser = _httpContextAccessor.HttpContext.User;
             return _userManager.GetUserId(currentUser);
         }
+        #endregion
 
+        #region GetByUserName
         public async Task<ApplicationUser> GetByUserName(string UserName)
         {
             return await _userManager.FindByNameAsync(UserName);
         }
+        #endregion
 
+        #region GetByEmail
         public async Task<ApplicationUser> GetByEmail(string Email)
         {
             return await _userManager.FindByEmailAsync(Email);
         }
+        #endregion
 
+        #region GetById
         public async Task<ApplicationUser> GetByIdAsync(string Id)
         {
             return await _userManager.FindByIdAsync(Id);
         }
+        #endregion
 
+        #region CreateNewUser
         public async Task<Response<AddUserDTO>> CreateNewUserAsync(AddUserDTO Model)
         {
             if (Model == null)
@@ -95,7 +111,9 @@ namespace ELearn.Application.Services
             }
 
         }
+        #endregion
 
+#region AddMultipleUsers
         public async Task<Response<ICollection<AddUserDTO>>> AddMultipleUsersAsync(IFormFile file)
         {
             if (file == null)
@@ -126,7 +144,9 @@ namespace ELearn.Application.Services
             }
 
         }
+        #endregion
 
+        #region GetAll
         public async Task<Response<ICollection<AddUserDTO>>> GetAllAsync()
         {
             var users = await _unitOfWork.Users.GetAllAsync();
@@ -147,7 +167,9 @@ namespace ELearn.Application.Services
                 return ResponseHandler.BadRequest<ICollection<AddUserDTO>>($"An Error Occurred,{Ex}");
             }
         }
+        #endregion
 
+        #region DeleteUser
         public async Task<Response<AddUserDTO>> DeleteUserAsync(string Id)
         {
             var user = await _unitOfWork.Users.GetByIdAsync(Id);
@@ -164,7 +186,9 @@ namespace ELearn.Application.Services
             }
 
         }
+        #endregion
 
+        #region EditUser
         public async Task<Response<AddUserDTO>> EditUserAsync(string id, EditUserDTO NewData)
         {
             var user = await _unitOfWork.Users.GetByIdAsync(id);
@@ -188,22 +212,25 @@ namespace ELearn.Application.Services
                 return ResponseHandler.BadRequest<AddUserDTO>($"An Error Occurred, {Ex}");
             }
         }
+        #endregion
 
+        #region DeleteMany
         public async Task<Response<ICollection<AddUserDTO>>> DeleteManyAsync(List<string> Ids)
         {
             var users = await GetSelectedUsersAsync(Ids);
-            if(users.IsNullOrEmpty())
+            if (users.IsNullOrEmpty())
                 return ResponseHandler.NotFound<ICollection<AddUserDTO>>();
             try
             {
                 await _unitOfWork.Users.DeleteRangeAsync(users);
                 return ResponseHandler.Deleted<ICollection<AddUserDTO>>();
             }
-            catch(Exception Ex)
+            catch (Exception Ex)
             {
                 return ResponseHandler.BadRequest<ICollection<AddUserDTO>>($"An Error Occurred, {Ex}");
             }
         }
+        #endregion
 
         #region Private Methods
         private async Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file)
