@@ -405,12 +405,12 @@ namespace ELearn.Application.Services
         #region CheckOption
         private bool CheckOption(Voting vote, string Option)
         {
-            if (Option is null ||
-                (Option != vote.Option1 && Option != vote.Option2
-                && (vote.Option3 != null && Option != vote.Option3)
-                && (vote.Option4 != null && Option != vote.Option4)
-                && (vote.Option5 != null && Option != vote.Option5)))
+            if (Option is null)
                 return false;
+                if (Option != vote.Option1 && Option == vote.Option2) return true;
+                if (vote.Option3 != null && Option == vote.Option3) return true;
+                if (vote.Option4 != null && Option == vote.Option4) return true;
+                if (vote.Option5 != null && Option == vote.Option5) return true;
 
             /*if(vote.Option3 != null && Option!=vote.Option3)
                 return false;
@@ -419,7 +419,7 @@ namespace ELearn.Application.Services
             if (vote.Option5 != null && Option != vote.Option5)
                 return false;*/
 
-            return true;
+            return false;
         }
         #endregion
 
