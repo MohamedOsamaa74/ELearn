@@ -1,23 +1,16 @@
 ﻿using AutoMapper;
-using ELearn.Application.DTOs.AnnouncementDTOs;
 using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ELearn.Application.Services
 {
     public class AssignmentService : IAssignmentService
     {
+        #region Fields
         private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
@@ -31,7 +24,7 @@ namespace ELearn.Application.Services
 
 
         }
-
+        #endregion
 
         #region Delete Assignment 
         public async Task<Response<AssignmentDTO>> DeleteAssignmentAsync(int Id)
@@ -154,6 +147,35 @@ namespace ELearn.Application.Services
             catch (Exception ex)
             {
                 return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while retrieving Assignment: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Get All From Group
+        public async Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsFromGroupAsync(int GroupId)
+        {
+            try
+            {
+                var assignments = await _unitOfWork.Assignments.GetWhereAsync(g => g.GroupId == GroupId);
+                if (assignments == null || assignments.Any())
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentDTO>>();
+                }
+
+                ICollection<ViewAssignmentDTO> viewAssignmentDTOs = [];
+                foreach(var assignemnt in assignments)
+                {
+                    var dto = _mapper.Map<ViewAssignmentDTO>(assignemnt);
+                    var user = await _unitOfWork.Users.GetByIdAsync(assignemnt.UserId);
+                    dto.CreatorName = user.FirstName + ' ' + user.LastName;
+                    viewAssignmentDTOs.Add(dto);
+                }
+                return ResponseHandler.Success(viewAssignmentDTOs);
+
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<ViewAssignmentDTO>>();
             }
         }
         #endregion
