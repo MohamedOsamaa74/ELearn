@@ -78,26 +78,13 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Get assignment By GroupID
-        //[HttpGet("GetAssignmentByGroupId/{groupID:int}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> GetAssignmentByGroupId(int groupID)
-        //{
-        //    try
-        //    {
-        //        var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.GroupId == groupID);
-        //        if (Assignment == null)
-        //        {
-        //            return NotFound($"This group has no assignments");
-        //        }
-        //        return Ok(Assignment);
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        return StatusCode(500, "An error occurred while processing your request");
-        //    }
-
-        //}
+        [HttpGet("GetByGroupId/{GroupId:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetByGroupId(int GroupId)
+        {
+            var response = await _assignmentService.GetFromGroupAsync(GroupId);
+            return this.CreateResponse(response);
+        }
         #endregion
 
         #region Delete All Assignments

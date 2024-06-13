@@ -58,7 +58,6 @@ namespace ELearn.Api.Controllers
 
         #region Get By Id
         [HttpGet("GetVoting/{Id:int}")]
-        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult>GetById(int Id)
         {
             var response = await _votingService.GetByIdAsync(Id);

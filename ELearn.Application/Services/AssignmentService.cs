@@ -152,14 +152,18 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Get All From Group
-        public async Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsFromGroupAsync(int GroupId)
+        public async Task<Response<ICollection<ViewAssignmentDTO>>> GetFromGroupAsync(int GroupId)
         {
             try
             {
-                var assignments = await _unitOfWork.Assignments.GetWhereAsync(g => g.GroupId == GroupId);
-                if (assignments == null || assignments.Any())
+                if(await _unitOfWork.Groups.GetByIdAsync(GroupId) == null)
                 {
-                    return ResponseHandler.NotFound<ICollection<ViewAssignmentDTO>>();
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentDTO>>("No Group Found with this Id");
+                }
+                var assignments = await _unitOfWork.Assignments.GetWhereAsync(g => g.GroupId == GroupId);
+                if (assignments == null || !assignments.Any())
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentDTO>>("No Assignments Found for this Group");
                 }
 
                 ICollection<ViewAssignmentDTO> viewAssignmentDTOs = [];
@@ -175,7 +179,7 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<ViewAssignmentDTO>>();
+                return ResponseHandler.BadRequest<ICollection<ViewAssignmentDTO>>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
