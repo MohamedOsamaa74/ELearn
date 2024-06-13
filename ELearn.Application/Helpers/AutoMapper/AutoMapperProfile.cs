@@ -113,6 +113,9 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             CreateMap<Assignment, AssignmentDTO>()
                 .ForMember(dest => dest.File, opt => opt.Ignore());
+
+            CreateMap<Assignment, ViewAssignmentDTO>()
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore());
             #endregion
 
             #region Quiz Mapper
