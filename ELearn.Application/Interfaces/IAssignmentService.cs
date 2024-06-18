@@ -10,13 +10,14 @@ namespace ELearn.Application.Interfaces
 {
     public interface IAssignmentService
     {
-        public Task<Response<AssignmentDTO>>DeleteAssignmentAsync(int Id);
-        public Task<Response<AssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, AssignmentDTO Model);
+        public Task<Response<ViewAssignmentDTO>> CreateAssignmentAsync(UploadAssignmentDTO Model);
+        public Task<Response<UploadAssignmentDTO>>DeleteAssignmentAsync(int Id);
+        public Task<Response<UploadAssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, UploadAssignmentDTO Model);
+        public Task<Response<ViewAssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId);
         public Task<Response<ICollection<ViewAssignmentDTO>>> GetFromGroupAsync(int GroupId);
-        public Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term);
-        public Task<Response<AssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId);
+        public Task<Response<ICollection<UploadAssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term);
         //public Task<IEnumerable<AssignmentDTO>> GetAssignmentsByStaffId(string staffId);
-        public Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term);
-        public Task<Response<ICollection<AssignmentDTO>>> DeleteManyAsync(List<int> Ids);
+        public Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term);
+        public Task<Response<ICollection<UploadAssignmentDTO>>> DeleteManyAsync(List<int> Ids);
     }
 }

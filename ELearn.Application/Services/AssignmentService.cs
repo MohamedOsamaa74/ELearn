@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs.AssignmentDTOs;
+using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using MailKit;
 
 namespace ELearn.Application.Services
 {
@@ -15,31 +17,87 @@ namespace ELearn.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public AssignmentService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
+        private readonly IFileService _fileService;
+        private readonly IGroupService _groupService;
+        public AssignmentService(AppDbContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper, IFileService fileService, IGroupService groupService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _groupService = groupService ?? throw new ArgumentNullException(nameof(groupService));
+        }
+        #endregion
 
+        #region Create Assignment
+        public async Task<Response<ViewAssignmentDTO>> CreateAssignmentAsync(UploadAssignmentDTO Model)
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                if (user is null)
+                    return ResponseHandler.NotFound<ViewAssignmentDTO>("User does Not Exist");
 
+                if(await _unitOfWork.Groups.GetByIdAsync(Model.GroupId) == null)
+                    return ResponseHandler.NotFound<ViewAssignmentDTO>("Group does Not Exist");
+
+                if (Model.End <= DateTime.UtcNow.ToLocalTime())
+                    return ResponseHandler.BadRequest<ViewAssignmentDTO>($"End Date {Model.End} Must be in the Future");
+
+                if(!await _groupService.UserInGroupAsync(Model.GroupId, user.UserName))
+                    return ResponseHandler.Unauthorized<ViewAssignmentDTO>("You are not a member of this group");
+                var assignment = _mapper.Map<Assignment>(Model);
+                assignment.UserId = user.Id;
+                await _unitOfWork.Assignments.AddAsync(assignment);
+                ICollection<string> ViewURLs = [];
+                if (Model.Attachements != null && Model.Attachements.Count != 0)
+                {
+                    foreach (var file in Model.Attachements)
+                    {
+                        var uploadFileDTO = new UploadFileDTO
+                        {
+                            ParentId = assignment.Id,
+                            File = file,
+                            FolderName = "Assignments"
+                        };
+                        var uploadResult = await _fileService.UploadFileAsync(uploadFileDTO);
+                        if (uploadResult.Succeeded)
+                        {
+                            ViewURLs.Add(uploadResult.Data.ViewUrl);
+                        }
+                    }
+                }
+                var assignmentDto = _mapper.Map<ViewAssignmentDTO>(assignment);
+                assignmentDto.CreatorName = user.FirstName + ' ' + user.LastName;
+                assignmentDto.FilesURLs = ViewURLs;
+                return ResponseHandler.Created(assignmentDto);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewAssignmentDTO>($"An error occurred while creating Assignment: {ex.Message}");
+            }
         }
         #endregion
 
         #region Delete Assignment 
-        public async Task<Response<AssignmentDTO>> DeleteAssignmentAsync(int Id)
+        public async Task<Response<UploadAssignmentDTO>> DeleteAssignmentAsync(int Id)
         {
             var assignment = await _unitOfWork.Assignments.GetByIdAsync(Id);
             if (assignment is null)
-                return ResponseHandler.NotFound<AssignmentDTO>();
+                return ResponseHandler.NotFound<UploadAssignmentDTO>();
+
+            var user = await _userService.GetCurrentUserAsync();
+            if(assignment.UserId != user.Id)
+                return ResponseHandler.Unauthorized<UploadAssignmentDTO>();
             try
             {
                 await _unitOfWork.Assignments.DeleteAsync(assignment);
-                return ResponseHandler.Deleted<AssignmentDTO>();
+                return ResponseHandler.Deleted<UploadAssignmentDTO>();
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<AssignmentDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+                return ResponseHandler.BadRequest<UploadAssignmentDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
             }
         }
 
@@ -47,76 +105,75 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Update Assignment
-        public async Task<Response<AssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, AssignmentDTO Model)
+        public async Task<Response<UploadAssignmentDTO>> UpdateAssignmentAsync(int AssignmentId, UploadAssignmentDTO Model)
 
         {
             var AssignmentToUpdate = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
             if (AssignmentToUpdate == null)
-                return ResponseHandler.NotFound<AssignmentDTO>();
-
+                return ResponseHandler.NotFound<UploadAssignmentDTO>();
+            var user = await _userService.GetCurrentUserAsync();
+            if (AssignmentToUpdate.UserId != user.Id)
+                return ResponseHandler.Unauthorized<UploadAssignmentDTO>();
             try
             {
-
                 _mapper.Map(Model, AssignmentToUpdate);
-
-
                 await _unitOfWork.Assignments.UpdateAsync(AssignmentToUpdate);
-                await _context.SaveChangesAsync();
-
-                var updatedDto = _mapper.Map<AssignmentDTO>(AssignmentToUpdate);
-
-
+                var updatedDto = _mapper.Map<UploadAssignmentDTO>(AssignmentToUpdate);
                 return ResponseHandler.Updated(updatedDto);
             }
             catch (Exception ex)
             {
-                // Handle exception
-                return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while updating material: {ex.Message}");
+                return ResponseHandler.BadRequest<UploadAssignmentDTO>($"An error occurred while updating material: {ex.Message}");
             }
         }
-
         #endregion
 
         #region GetAll
-        public async Task<Response<ICollection<AssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term)
+        public async Task<Response<ICollection<UploadAssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term)
         {
             try
             {
                 var assignments = await _unitOfWork.Assignments.GetAllAsync();
                 if (assignments == null)
                 {
-                    return ResponseHandler.NotFound<ICollection<AssignmentDTO>>("There are no assignments yet");
+                    return ResponseHandler.NotFound<ICollection<UploadAssignmentDTO>>("There are no assignments yet");
                 }
-                var assignmentDtos = _mapper.Map<ICollection<AssignmentDTO>>(assignments);
                 if (!string.IsNullOrEmpty(sort_by))
                 {
                     switch (sort_by.ToLower())
                     {
                         case "title":
-                            assignmentDtos = assignmentDtos.OrderBy(a => a.Title).ToList();
+                            assignments = assignments.OrderBy(a => a.Title).ToList();
                             break;
                         case "title desc":
-                            assignmentDtos = assignmentDtos.OrderByDescending(a => a.Title).ToList();
+                            assignments = assignments.OrderByDescending(a => a.Title).ToList();
                             break;
-                        case "date":
-                            assignmentDtos = assignmentDtos.OrderBy(a => a.Date).ToList();
+                        case "start date":
+                            assignments = assignments.OrderBy(a => a.CreationDate).ToList();
                             break;
                         case "date desc":
-                            assignmentDtos = assignmentDtos.OrderByDescending(a => a.Date).ToList();
+                            assignments = assignments.OrderByDescending(a => a.CreationDate).ToList();
+                            break;
+                        case "end date":
+                            assignments = assignments.OrderBy(a => a.End).ToList();
+                            break;
+                        case "end desc":
+                            assignments = assignments.OrderByDescending(a => a.End).ToList();
                             break;
                         case "active first":
                             var currentDate = DateTime.UtcNow.ToLocalTime();
-                            assignmentDtos = assignmentDtos.OrderByDescending(a => a.Start <= currentDate && a.End >= currentDate).ThenBy(a => a.Title).ToList();
+                            assignments = assignments.OrderByDescending(a => a.CreationDate <= currentDate && a.End >= currentDate).ThenBy(a => a.Title).ToList();
                             break;
                         case "not active":
                             var currentDate2 = DateTime.UtcNow.ToLocalTime();
-                            assignmentDtos = assignmentDtos.OrderBy(a => a.Start <= currentDate2 && a.End >= currentDate2).ThenBy(a => a.Title).ToList();
+                            assignments = assignments.OrderBy(a => a.CreationDate <= currentDate2 && a.End >= currentDate2).ThenBy(a => a.Title).ToList();
                             break;
                         default:
-                            assignmentDtos = assignmentDtos.OrderBy(a => a.Title).ToList();
+                            assignments = assignments.OrderBy(a => a.Title).ToList();
                             break;
                     }
                 }
+                var assignmentDtos = _mapper.Map<ICollection<UploadAssignmentDTO>>(assignments);
                 if (!string.IsNullOrEmpty(search_term))
                 {
                     assignmentDtos = assignmentDtos.Where(a => a.Title.Contains(search_term, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -125,28 +182,31 @@ namespace ELearn.Application.Services
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<ICollection<AssignmentDTO>>($"An error occurred while retrieving materials: {ex.Message}");
+                return ResponseHandler.BadRequest<ICollection<UploadAssignmentDTO>>($"An error occurred while retrieving materials: {ex.Message}");
             }
         }
         #endregion
 
         #region Get Assignment By ID
-        public async Task<Response<AssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId)
+        public async Task<Response<ViewAssignmentDTO>> GetAssignmentByIdAsync(int AssignmentId)
         {
             try
             {
                 var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
                 if (assignment == null)
                 {
-                    return ResponseHandler.NotFound<AssignmentDTO>("There is no such Assignment");
+                    return ResponseHandler.NotFound<ViewAssignmentDTO>("There is no such Assignment");
                 }
 
-                var assignmentDto = _mapper.Map<AssignmentDTO>(assignment);
+                var assignmentDto = _mapper.Map<ViewAssignmentDTO>(assignment);
+                var user = await _unitOfWork.Users.GetByIdAsync(assignment.UserId);
+                assignmentDto.CreatorName = user.FirstName + ' ' + user.LastName;
+                assignmentDto.FilesURLs = await GetAssignmentFilesAsync(AssignmentId);
                 return ResponseHandler.Success(assignmentDto);
             }
             catch (Exception ex)
             {
-                return ResponseHandler.BadRequest<AssignmentDTO>($"An error occurred while retrieving Assignment: {ex.Message}");
+                return ResponseHandler.BadRequest<ViewAssignmentDTO>($"An error occurred while retrieving Assignment: {ex.Message}");
             }
         }
         #endregion
@@ -174,6 +234,10 @@ namespace ELearn.Application.Services
                     dto.CreatorName = user.FirstName + ' ' + user.LastName;
                     viewAssignmentDTOs.Add(dto);
                 }
+                viewAssignmentDTOs = GetActiveAssignments(viewAssignmentDTOs);
+                if (viewAssignmentDTOs is null)
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentDTO>>("No Active Assignments Found for this Group");
+
                 return ResponseHandler.Success(viewAssignmentDTOs);
 
             }
@@ -185,7 +249,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetAssignmentsByCreator
-        public async Task<Response<ICollection<AssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term)
+        public async Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term)
         {
             try
             {
@@ -193,8 +257,8 @@ namespace ELearn.Application.Services
                 var Assignments = await _unitOfWork.Assignments.GetWhereSelectAsync(v => v.UserId == user.Id, v => v.Id);
 
                 if (Assignments is null)
-                    return ResponseHandler.NotFound<ICollection<AssignmentDTO>>("There are No Assignments yet");
-                ICollection<AssignmentDTO> AssignmentsDto = new List<AssignmentDTO>();
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentDTO>>("There are No Assignments yet");
+                ICollection<ViewAssignmentDTO> AssignmentsDto = [];
                 foreach (var Assignment in Assignments)
                 {
                     var Assignmentto = await GetAssignmentByIdAsync(Assignment);
@@ -205,24 +269,30 @@ namespace ELearn.Application.Services
                     switch (sort_by.ToLower())
                     {
                         case "title":
-                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Title).ToList();
+                            AssignmentsDto = [.. AssignmentsDto.OrderBy(a => a.Title)];
                             break;
                         case "title desc":
                             AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.Title).ToList();
                             break;
-                        case "date":
-                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Date).ToList();
+                        case "start date":
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.CreationDate).ToList();
                             break;
                         case "date desc":
-                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.Date).ToList();
+                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.CreationDate).ToList();
+                            break;
+                        case "end date":
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.End).ToList();
+                            break;
+                        case "end desc":
+                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.End).ToList();
                             break;
                         case "active first":
                             var currentDate = DateTime.UtcNow.ToLocalTime();
-                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.Start <= currentDate && a.End >= currentDate).ThenBy(a => a.Title).ToList();
+                            AssignmentsDto = AssignmentsDto.OrderByDescending(a => a.CreationDate <= currentDate && a.End >= currentDate).ThenBy(a => a.Title).ToList();
                             break;
                         case "not active":
                             var currentDate2 = DateTime.UtcNow.ToLocalTime();
-                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.Start <= currentDate2 && a.End >= currentDate2).ThenBy(a => a.Title).ToList();
+                            AssignmentsDto = AssignmentsDto.OrderBy(a => a.CreationDate <= currentDate2 && a.End >= currentDate2).ThenBy(a => a.Title).ToList();
                             break;
                         default:
                             AssignmentsDto = AssignmentsDto.OrderBy(a => a.Title).ToList();
@@ -237,7 +307,7 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<AssignmentDTO>>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<ViewAssignmentDTO>>($"An Error Occurred, {Ex}");
             }
 
 
@@ -246,26 +316,28 @@ namespace ELearn.Application.Services
         #endregion
 
         #region Delete Delete All Assignments
-        public async Task<Response<ICollection<AssignmentDTO>>> DeleteManyAsync(List<int> Ids)
+        public async Task<Response<ICollection<UploadAssignmentDTO>>> DeleteManyAsync(List<int> Ids)
         {
             try
             {
-                var assignments = await GetAssignmentByIdAsync(Ids); 
+                var assignments = await GetAssignmentsByIdsAsync(Ids); 
                 if (assignments is null || !assignments.Any())
-                    return ResponseHandler.NotFound<ICollection<AssignmentDTO>>();
+                    return ResponseHandler.NotFound<ICollection<UploadAssignmentDTO>>();
 
                 await _unitOfWork.Assignments.DeleteRangeAsync(assignments);
-                return ResponseHandler.Deleted<ICollection<AssignmentDTO>>();
+                return ResponseHandler.Deleted<ICollection<UploadAssignmentDTO>>();
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<AssignmentDTO>>($"An Error Occured, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<UploadAssignmentDTO>>($"An Error Occured, {Ex}");
             }
         }
         #endregion
 
         #region Methods
-        private async Task<ICollection<Assignment>> GetAssignmentByIdAsync(IEnumerable<int> Ids)
+
+        #region GetAssignmentsByIdsAsync
+        private async Task<ICollection<Assignment>> GetAssignmentsByIdsAsync(IEnumerable<int> Ids)
         {
             List<Assignment> assignments = new List<Assignment>();
             foreach (var Id in Ids)
@@ -276,6 +348,34 @@ namespace ELearn.Application.Services
             }
             return assignments;
         }
+        #endregion
+
+        #region Get Assignment Files
+        private async Task<ICollection<string>?> GetAssignmentFilesAsync(int AssignmentId)
+        {
+            var files = await _unitOfWork.Files.GetWhereAsync(a => a.AssignmentId == AssignmentId);
+            if (files is null || !files.Any())
+                return null;
+            List<string> filesUrls = [];
+            foreach (var file in files)
+            {
+                filesUrls.Add(file.ViewUrl);
+            }
+            return filesUrls;
+        }
+        #endregion
+
+        #region Get Active Assignments
+        private ICollection<ViewAssignmentDTO>? GetActiveAssignments(ICollection<ViewAssignmentDTO> viewAssignmentDTOs)
+        {
+            var currentDate = DateTime.UtcNow.ToLocalTime();
+            var activeAssignment = viewAssignmentDTOs.Where(a => a.CreationDate <= currentDate && a.End >= currentDate).ToList();
+            if (activeAssignment is null || activeAssignment.Count == 0)
+                return null;
+
+            return activeAssignment;
+        }
+        #endregion
 
         #endregion
     }

@@ -18,11 +18,13 @@ namespace ELearn.Api.Controllers
     [Authorize]
     public class GroupController : ControllerBase
     {
+        #region Fields
         private readonly IGroupService _groupService;
         public GroupController(IGroupService groupService)
         {
             _groupService = groupService;
         }
+        #endregion
 
         #region Create
         [HttpPost("CreateNew")]
@@ -34,6 +36,20 @@ namespace ELearn.Api.Controllers
                 return BadRequest(ModelState);
             }
             var response = await _groupService.CreateAsync(Group);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region AddUserToGroup
+        [HttpPost("AddUserToGroup")]
+        [Authorize(Roles = "Staff, Admin")]
+        public async Task<IActionResult> AddUserToGroup([FromBody] UserGroupDTO Model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _groupService.AddUserToGroupAsync(Model);
             return this.CreateResponse(response);
         }
         #endregion

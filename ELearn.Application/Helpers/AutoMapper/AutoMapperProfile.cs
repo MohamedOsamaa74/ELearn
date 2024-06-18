@@ -107,15 +107,16 @@ namespace ELearn.Application.Helpers.AutoMapper
             #endregion
 
             #region Assignment Mapper 
-            CreateMap<AssignmentDTO, Assignment>()
-                .ForMember(dest => dest.GroupId, opt => opt.Ignore())
-                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            CreateMap<UploadAssignmentDTO, Assignment>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreationDate, opt => opt.Ignore());
 
-            CreateMap<Assignment, AssignmentDTO>()
-                .ForMember(dest => dest.File, opt => opt.Ignore());
+            CreateMap<Assignment, UploadAssignmentDTO>()
+                .ForMember(dest => dest.Attachements, opt => opt.Ignore());
 
             CreateMap<Assignment, ViewAssignmentDTO>()
-                .ForMember(dest => dest.CreatorName, opt => opt.Ignore());
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore())
+                .ForMember(dest => dest.FilesURLs,  opt => opt.Ignore());
             #endregion
 
             #region Quiz Mapper

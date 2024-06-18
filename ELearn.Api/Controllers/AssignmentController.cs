@@ -28,10 +28,23 @@ namespace ELearn.Api.Controllers
             _assignmentService = AssignmentService;
         }
 
+        #region Create Assignment
+        [HttpPost("Create")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> CreateAssignment([FromForm] UploadAssignmentDTO Model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _assignmentService.CreateAssignmentAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
 
         #region Delete Assignment
         [HttpDelete("Delete/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteAssignment(int AssignmentId)
         {
             var response = await _assignmentService.DeleteAssignmentAsync(AssignmentId);
@@ -41,9 +54,9 @@ namespace ELearn.Api.Controllers
 
         #region update Assignment
         [HttpPut("UpdateAssignment/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
 
-        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] AssignmentDTO Model)
+        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] UploadAssignmentDTO Model)
         {
             if (!ModelState.IsValid)
             {
@@ -68,8 +81,8 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Get Assignment By ID
-        [HttpGet("{assignmentId:int}")]
-        [Authorize(Roles = "Admin")]
+        [HttpGet("GetById/{assignmentId:int}")]
+        [Authorize]
         public async Task<IActionResult> GetAssignmentById(int assignmentId)
         {
             var response = await _assignmentService.GetAssignmentByIdAsync(assignmentId);

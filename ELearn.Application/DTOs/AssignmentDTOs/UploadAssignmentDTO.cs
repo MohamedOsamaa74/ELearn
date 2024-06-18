@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace ELearn.Application.DTOs.AssignmentDTOs
 {
-    public class AssignmentDTO
+    public class UploadAssignmentDTO
     {
         public required string Title { get; set; }
-        public required DateTime Date { get; set; }
-        public required DateTime Start { get; set; }
+        public required string Description { get; set; }
+        public int? Grade { get; set; }
+        public required int GroupId { get; set; }
         public required DateTime End { get; set; }
-
-        public required IFormFile File { get; set; }
+        public ICollection<IFormFile>? Attachements { get; set; }
     }
 }

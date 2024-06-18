@@ -12,17 +12,25 @@ namespace ELearn.InfraStructure.Validations
     {
         public AssignmentValidation() 
         {
-            RuleFor(x=>x.Start)
+            RuleFor(x=>x.CreationDate)
                 .NotNull();
+
+            RuleFor(x => x.End)
+                .NotNull();
+
             RuleFor(x => x.Title)
                 .NotEmpty()
                 .Length(1,25);
+
+            RuleFor(x => x.Description)
+                .NotEmpty()
+                .Length(1, 250);
+
             RuleFor(x => x.UserId)
                 .NotNull();
+
             RuleFor(x => x.GroupId)
                 .NotNull();
-
-
         }
     }
 }

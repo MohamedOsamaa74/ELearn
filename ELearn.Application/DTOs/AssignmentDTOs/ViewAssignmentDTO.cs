@@ -11,5 +11,10 @@ namespace ELearn.Application.DTOs.AssignmentDTOs
         public int Id { get; set; }
         public required string Title { get; set; }
         public required string CreatorName { get; set; }
+        public required string Description { get; set; }
+        public int? Grade { get; set; }
+        public DateTime CreationDate { get; set; }
+        public required DateTime End { get; set; }
+        public ICollection<string>? FilesURLs { get; set; }
     }
 }
