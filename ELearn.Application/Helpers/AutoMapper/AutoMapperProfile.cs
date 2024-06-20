@@ -6,6 +6,7 @@ using ELearn.Application.DTOs.CommentDTOs;
 using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
+using ELearn.Application.DTOs.MessageDTOs;
 using ELearn.Application.DTOs.OptionDTOs;
 using ELearn.Application.DTOs.PostDTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
@@ -255,6 +256,20 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(p => p.ParentId, opt => opt.Ignore())
                 .ForMember(pn => pn.Parent, opt => opt.Ignore());
             #endregion
+
+            #region MessageMapper
+
+            CreateMap<SendMessageDTO, Message>()
+                .ForMember(dest => dest.File, opt => opt.Ignore())
+                .ForMember(dest => dest.ReceiverId, opt => opt.Ignore())
+                .ForMember(dest => dest.SenderId, opt => opt.Ignore());
+
+            CreateMap<Message, SendMessageDTO>();
+
+            CreateMap<Message, ViewMessageDTO>()
+                .ForMember(dest => dest.url, opt => opt.Ignore());
+            CreateMap<ViewMessageDTO, Message>();
+            #endregion 
         }
     }
 }
