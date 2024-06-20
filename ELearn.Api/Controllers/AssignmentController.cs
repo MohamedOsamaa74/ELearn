@@ -21,12 +21,13 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class AssignmentController : ControllerBase
     {
+        #region Fields
         private readonly IAssignmentService _assignmentService;
-
         public AssignmentController(IAssignmentService AssignmentService)
         {
             _assignmentService = AssignmentService;
         }
+        #endregion
 
         #region Create Assignment
         [HttpPost("Create")]
@@ -38,6 +39,36 @@ namespace ELearn.Api.Controllers
                 return BadRequest(ModelState);
             }
             var response = await _assignmentService.CreateAssignmentAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Submit Assignment Response
+        [HttpPost("SubmitAssignmentResponse")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> SubmitAssignmentResponseAsync([FromForm]SubmitAssignmentResponseDTO submitAssignmentResponse)
+        {
+            var response = await _assignmentService.SubmitAssignmentResponseAsync(submitAssignmentResponse.AssignmentId, submitAssignmentResponse.file);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Give Grade To Student
+        [HttpPost("GiveGradeToStudent/{ResponseId:int}")]
+        [Authorize(Roles ="Admin, Staff")]
+        public async Task<IActionResult>GiveGradeToStudentResponse(int ResponseId, int Mark)
+        {
+            var response = await _assignmentService.GiveGradeToStudentResponseAsync(ResponseId, Mark);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Get Assignment Responses
+        [HttpGet("GetAssignmentResponses/{AssignmentId:int}")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> GetAssignmentResponsesAsync(int AssignmentId, [FromQuery] string filter_by = null, [FromQuery] string sort_by = null)
+        {
+            var response = await _assignmentService.GetAssignmentResponsesAsync(AssignmentId, filter_by, sort_by);
             return this.CreateResponse(response);
         }
         #endregion
@@ -65,8 +96,6 @@ namespace ELearn.Api.Controllers
             var response = await _assignmentService.UpdateAssignmentAsync(AssignmentId, Model);
             return this.CreateResponse(response);
         }
-
-
         #endregion
 
         #region GetAll Assignments
@@ -118,7 +147,7 @@ namespace ELearn.Api.Controllers
         [HttpGet("GetAssignmentsByCreator")]
         public async Task<IActionResult> GetAssignmentsByCreator([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
-            var response = await _assignmentService.GetAssignmentsByCreator(sort_by, search_term);
+            var response = await _assignmentService.GetAssignmentsByCreatorAsync(sort_by, search_term);
             return this.CreateResponse(response);
         }
         #endregion

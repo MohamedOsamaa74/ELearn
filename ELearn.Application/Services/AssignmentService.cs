@@ -7,6 +7,7 @@ using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using MailKit;
+using Microsoft.AspNetCore.Http;
 
 namespace ELearn.Application.Services
 {
@@ -211,6 +212,137 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region Submit Assignment Response
+        public async Task<Response<ViewAssignmentResponseDTO>> SubmitAssignmentResponseAsync(int AssignmentId, IFormFile file)
+        {
+            try
+            {
+                var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+                if (assignment is null)
+                    return ResponseHandler.NotFound<ViewAssignmentResponseDTO>("Assignment does Not Exist");
+
+                var user = await _userService.GetCurrentUserAsync();
+                if (user is null)
+                    return ResponseHandler.NotFound<ViewAssignmentResponseDTO>("User does Not Exist");
+
+                var userAnswerAssignment = new UserAnswerAssignment
+                {
+                    UserId = user.Id,
+                    AssignmentId = AssignmentId
+                };
+                await _unitOfWork.UserAnswerAssignments.AddAsync(userAnswerAssignment);
+                var uploadFileDTO = new UploadFileDTO
+                {
+                    ParentId = userAnswerAssignment.Id,
+                    File = file,
+                    FolderName = "AssignmentsResponses"
+                };
+                var uploadResult = await _fileService.UploadFileAsync(uploadFileDTO);
+                if (!uploadResult.Succeeded)
+                {
+                    await _unitOfWork.UserAnswerAssignments.DeleteAsync(userAnswerAssignment);
+                    return ResponseHandler.BadRequest<ViewAssignmentResponseDTO>($"An error occurred while uploading the file: {uploadResult.Message}");
+                }
+                var responseDto = _mapper.Map<ViewAssignmentResponseDTO>(userAnswerAssignment);
+                responseDto.FullName = user.FirstName + ' ' + user.LastName;
+                responseDto.UserName = user.UserName;
+                responseDto.UploadDate = DateOnly.FromDateTime(userAnswerAssignment.CreationDate.Date);
+                responseDto.UploadTime = TimeOnly.FromTimeSpan(userAnswerAssignment.CreationDate.TimeOfDay);
+                responseDto.FileURL = uploadResult.Data.ViewUrl;
+                return ResponseHandler.Created(responseDto);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewAssignmentResponseDTO>($"An error occurred while submitting the response: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Give Grade To Student Response
+        public async Task<Response<int>> GiveGradeToStudentResponseAsync(int userAnswerAssignmentId, int Mark)
+        {
+            try
+            {
+                var response = await _unitOfWork.UserAnswerAssignments.GetByIdAsync(userAnswerAssignmentId);
+                if(response is null)
+                {
+                    return ResponseHandler.NotFound<int>("The Response Does Not Exist");
+                }
+                var assignment = await _unitOfWork.Assignments.GetByIdAsync(response.AssignmentId);
+                if (Mark < 0 || Mark > assignment.Grade)
+                    return ResponseHandler.BadRequest<int>($"Mark is Invalid, it has to be between 0 and {assignment.Grade}");
+                
+                response.Grade = Mark;
+                await _unitOfWork.UserAnswerAssignments.UpdateAsync(response);
+                return ResponseHandler.Success(Mark);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<int>($"An error Occurred, {Ex}");
+            }
+        }
+        #endregion
+
+        #region Get Assignment Responses
+        public async Task<Response<ICollection<ViewAssignmentResponseDTO>>> GetAssignmentResponsesAsync(int AssignmentId, string filter_by = null, string sort_by = null)
+        {
+            try
+            {
+                var assignment = await _unitOfWork.Assignments.GetByIdAsync(AssignmentId);
+                if (assignment == null)
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentResponseDTO>>("There is no such Assignment");
+                }
+                var responses = await _unitOfWork.UserAnswerAssignments.GetWhereAsync(a => a.AssignmentId == AssignmentId);
+                if (responses == null || !responses.Any())
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentResponseDTO>>("There are no responses for this Assignment");
+                }
+
+                ICollection<ViewAssignmentResponseDTO> responseDtos = [];
+                foreach (var response in responses)
+                {
+                    var user = await _unitOfWork.Users.GetByIdAsync(response.UserId);
+                    var responseDto = _mapper.Map<ViewAssignmentResponseDTO>(response);
+                    responseDto.UserName = user.UserName;
+                    responseDto.FullName = user.FirstName + ' ' + user.LastName;
+                    responseDto.UploadDate = DateOnly.FromDateTime(response.CreationDate.Date);
+                    responseDto.UploadTime = TimeOnly.FromTimeSpan(response.CreationDate.TimeOfDay);
+                    responseDto.FileURL = await GetAssignmentResponseFileUrlAsync(response.Id);
+                    responseDtos.Add(responseDto);
+                }
+                if (!string.IsNullOrEmpty(sort_by))
+                {
+                    responseDtos = sort_by.ToLower() switch
+                    {
+                        "name" => responseDtos.OrderBy(a => a.FullName).ToList(),
+                        "name desc" => responseDtos.OrderByDescending(a => a.FullName).ToList(),
+                        "date" => responseDtos.OrderBy(a => a.UploadDate).ToList(),
+                        "date desc" => responseDtos.OrderByDescending(a => a.UploadDate).ThenByDescending(a => a.UploadTime).ToList(),
+                        _ => responseDtos.OrderBy(a => a.FullName).ToList(),
+                    };
+                }
+                if (!string.IsNullOrEmpty(filter_by))
+                {
+                    responseDtos = filter_by.ToLower() switch
+                    {
+                        "graded" => responseDtos.Where(a => a.Mark != null).ToList(),
+                        "not graded" => responseDtos.Where(a => a.Mark == null).ToList(),
+                        _ => [.. responseDtos],
+                    };
+                }
+                if(responseDtos.Count == 0) 
+                    return ResponseHandler.NotFound<ICollection<ViewAssignmentResponseDTO>>($"there is no Responses");
+
+                return ResponseHandler.Success(responseDtos);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<ViewAssignmentResponseDTO>>($"an Error Occurred, {ex}");
+            }
+        }
+        #endregion
+
         #region Get All From Group
         public async Task<Response<ICollection<ViewAssignmentDTO>>> GetFromGroupAsync(int GroupId)
         {
@@ -249,7 +381,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetAssignmentsByCreator
-        public async Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term)
+        public async Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsByCreatorAsync(string sort_by, string search_term)
         {
             try
             {
@@ -362,6 +494,17 @@ namespace ELearn.Application.Services
                 filesUrls.Add(file.ViewUrl);
             }
             return filesUrls;
+        }
+        #endregion
+
+        #region Get User Response File URL
+        private async Task<string?> GetAssignmentResponseFileUrlAsync(int UserAnswerAssignmentId)
+        {
+            var files = await _unitOfWork.Files.GetWhereAsync(a => a.UserAssignementId == UserAnswerAssignmentId);
+            var file = files.FirstOrDefault();
+            if (file is null)
+                return null;
+            return file.ViewUrl;
         }
         #endregion
 

@@ -1,5 +1,6 @@
 ﻿using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.Helpers.Response;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,10 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ICollection<ViewAssignmentDTO>>> GetFromGroupAsync(int GroupId);
         public Task<Response<ICollection<UploadAssignmentDTO>>> GetAllAssignmentsAsync(string sort_by, string search_term);
         //public Task<IEnumerable<AssignmentDTO>> GetAssignmentsByStaffId(string staffId);
-        public Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsByCreator(string sort_by, string search_term);
+        public Task<Response<ICollection<ViewAssignmentDTO>>> GetAssignmentsByCreatorAsync(string sort_by, string search_term);
         public Task<Response<ICollection<UploadAssignmentDTO>>> DeleteManyAsync(List<int> Ids);
+        public Task<Response<ViewAssignmentResponseDTO>> SubmitAssignmentResponseAsync(int AssignmentId, IFormFile file);
+        public Task<Response<int>> GiveGradeToStudentResponseAsync(int userAnswerAssignmentId, int Mark);
+        public Task<Response<ICollection<ViewAssignmentResponseDTO>>> GetAssignmentResponsesAsync(int AssignmentId, string filter_by = null, string sort_by = null); 
     }
 }
