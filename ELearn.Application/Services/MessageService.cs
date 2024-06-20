@@ -188,6 +188,58 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region DeleteMessage
+        public async Task<Response<ViewMessageDTO>> DeleteMessageAsync(int Id)
+        {
+            try
+            {
+                var message = await _unitOfWork.Messages.GetByIdAsync(Id);
+                if (message == null)
+                {
+                    return ResponseHandler.NotFound<ViewMessageDTO>("Message not found");
+                }
+                var sender = await _userService.GetCurrentUserAsync();
+                if (message.SenderId != sender.Id)
+                {
+                    return ResponseHandler.Unauthorized<ViewMessageDTO>("You are not allowed to delete this message");
+                }
+                await _unitOfWork.Messages.DeleteAsync(message);
+                return ResponseHandler.Success(_mapper.Map<ViewMessageDTO>(message));
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewMessageDTO>(ex.Message);
+            }
+        }
+        #endregion
+
+        #region DeleteAllMessages
+        public async Task<Response<bool>> DeleteAllMessagesAsync(string ReceiverId)
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var Receiver = await _unitOfWork.Users.GetByIdAsync(ReceiverId);
+                if (ReceiverId == null)
+                {
+                    return ResponseHandler.NotFound<bool>("Chat Not Found");
+                }
+                var messages = await _unitOfWork.Messages.GetWhereAsync(m =>
+                                           (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
+                                                                      (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
+                foreach (var message in messages)
+                {
+                    await _unitOfWork.Messages.DeleteAsync(message);
+                }
+                return ResponseHandler.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<bool>(ex.Message);
+            }
+        }
+        #endregion
+
 
         #region EncryptionHelper
         public static class EncryptionHelper

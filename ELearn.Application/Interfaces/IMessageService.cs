@@ -16,6 +16,15 @@ namespace ELearn.Application.Interfaces
         public Task<Response<List<ViewMessageDTO>>> GetMessagesByReceiverIdAsync(string ReceiverId);
 
         public Task<Response<ViewMessageDTO>> EditMessageAsync(int Id,SendMessageDTO Model);
+        public Task<Response<ViewMessageDTO>> DeleteMessageAsync(int Id);
+        public Task<Response<bool>> DeleteAllMessagesAsync(string ReceiverId);
+
+
+
+
+
+
+
 
 
 

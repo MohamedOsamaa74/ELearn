@@ -48,5 +48,25 @@ namespace ELearn.Api.Controllers
             return this.CreateResponse(response);
         }
         #endregion
+
+        #region DeleteMessage
+        [HttpDelete("DeleteMessage/{Id}")]
+        [Authorize(Roles = "Admin ,Staff ,Student")]
+        public async Task<IActionResult> DeleteMessage([FromRoute] int Id)
+        {
+            var response = await _messageService.DeleteMessageAsync(Id);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region DeleteAllMessages
+        [HttpDelete("DeleteAllMessages/{ReceiverId}")]
+        [Authorize(Roles = "Admin ,Staff ,Student")]
+        public async Task<IActionResult> DeleteAllMessages([FromRoute] string ReceiverId)
+        {
+            var response = await _messageService.DeleteAllMessagesAsync(ReceiverId);
+            return this.CreateResponse(response);
+        }
+        #endregion
     }
 }
