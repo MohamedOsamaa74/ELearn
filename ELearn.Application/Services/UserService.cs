@@ -94,6 +94,9 @@ namespace ELearn.Application.Services
             {
                 var NewUser = _mapper.Map<ApplicationUser>(Model);
                 NewUser.SecurityStamp = Guid.NewGuid().ToString();
+                var (publicKey, privateKey) = MessageService.EncryptionHelper.GenerateKeyPair();
+                NewUser.PublicKey = publicKey;
+                NewUser.PrivateKey = privateKey;
                 var result = await _userManager.CreateAsync(NewUser, NewUser.NId);
                 if (!result.Succeeded)
                 {

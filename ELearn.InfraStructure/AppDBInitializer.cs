@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ELearn.Domain.Const;
+using System.Security.Cryptography;
 using ELearn.Domain.Entities;
 using ELearn.Data;
 using Group = ELearn.Domain.Entities.Group;
@@ -68,6 +69,7 @@ namespace ELearn.InfraStructure
             var AdminUser = await UserManager.FindByNameAsync(AdminUserName);
             if (AdminUser == null)
             {
+                var (publicKey, privateKey) = GenerateKeyPair();
                 var newAdmin = new ApplicationUser()
                 {
                     UserName = AdminUserName,
@@ -78,7 +80,9 @@ namespace ELearn.InfraStructure
                     Nationality = "test",
                     NId = "test",
                     Relegion = "Muslim",
-                    Faculty = "Compuer Science"
+                    Faculty = "Compuer Science",
+                    PublicKey = publicKey,
+                    PrivateKey = privateKey
                 };
                 await UserManager.CreateAsync(newAdmin, "Admin@123");
                 await UserManager.AddToRoleAsync(newAdmin, UserRoles.Admin);
@@ -90,6 +94,7 @@ namespace ELearn.InfraStructure
             var StaffUser = await UserManager.FindByNameAsync(StaffUserName);
             if (StaffUser == null)
             {
+                var (publicKey, privateKey) = GenerateKeyPair();
                 var newStaffUser = new ApplicationUser()
                 {
                     UserName = StaffUserName,
@@ -101,7 +106,9 @@ namespace ELearn.InfraStructure
                     Nationality = "test",
                     NId = "test",
                     Relegion = "christian",
-                    Faculty = "Compuer Science"
+                    Faculty = "Compuer Science",
+                    PublicKey = publicKey,
+                    PrivateKey = privateKey
                 };
                 await UserManager.CreateAsync(newStaffUser, "Staff@123");
                 await UserManager.AddToRoleAsync(newStaffUser, UserRoles.Staff);
@@ -113,6 +120,7 @@ namespace ELearn.InfraStructure
             var StudentUser = await UserManager.FindByNameAsync(StudentUserName);
             if (StudentUser == null)
             {
+                var (publicKey, privateKey) = GenerateKeyPair();
                 var newStudentUser = new ApplicationUser()
                 {
                     UserName = StudentUserName,
@@ -124,7 +132,9 @@ namespace ELearn.InfraStructure
                     Nationality = "test",
                     NId = "test",
                     Relegion = "Muslim",
-                    Faculty = "Compuer Science"
+                    Faculty = "Compuer Science",
+                    PublicKey = publicKey,
+                    PrivateKey = privateKey
                 };
                 await UserManager.CreateAsync(newStudentUser, "Student@123");
                 await UserManager.AddToRoleAsync(newStudentUser, UserRoles.Student);
@@ -430,6 +440,17 @@ namespace ELearn.InfraStructure
             }
             context.SaveChanges();
             #endregion
+
+            static (string publicKey, string privateKey) GenerateKeyPair()
+            {
+                using (var rsa = new RSACryptoServiceProvider(2048))
+                {
+                    return (
+                        publicKey: Convert.ToBase64String(rsa.ExportRSAPublicKey()),
+                        privateKey: Convert.ToBase64String(rsa.ExportRSAPrivateKey())
+                    );
+                }
+            }
         }
     }
 }

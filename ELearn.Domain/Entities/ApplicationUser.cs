@@ -17,6 +17,8 @@ namespace ELearn.Domain.Entities
         public string? Grade { get; set; }
         public string? OTP { get; set; }
         public DateTime? OTPExpiry { get; set; }
+        public string PublicKey { get; set; }
+        public string PrivateKey { get; set; }
 
         #region Foreign Key
         public int DepartmentId { get; set; }

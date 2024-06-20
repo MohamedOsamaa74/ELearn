@@ -65,6 +65,8 @@ namespace ELearn.Application.Services
                     AnnouncementId = fileDTO.FolderName == "Announcements" ? fileDTO.ParentId : null,
                     MaterialId = fileDTO.FolderName == "Materials" ? fileDTO.ParentId : null,
                     PostId = fileDTO.FolderName == "Posts" ? fileDTO.ParentId : null,
+                    MessageId = fileDTO.FolderName == "Messages" ? fileDTO.ParentId : null,
+                    UserId = fileDTO.FolderName == "ProfilePictures" ? user.Id : null
                     UserId = fileDTO.FolderName == "ProfilePictures" ? user.Id : null,
                     AssignmentId = fileDTO.FolderName == "Assignments" ? fileDTO.ParentId : null,
                     UserAssignementId = fileDTO.FolderName == "AssignmentsResponses" ? fileDTO.ParentId : null,
