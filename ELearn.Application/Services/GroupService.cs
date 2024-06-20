@@ -244,5 +244,49 @@ namespace ELearn.Application.Services
             }
         }
         #endregion
+
+        #region AddUserToGroup
+        public async Task<Response<UserGroupDTO>> AddUserToGroupAsync(UserGroupDTO Model)
+        {
+            try
+            {
+                var user = await _userService.GetByUserName(Model.UserName);
+                if (user is null)
+                    return ResponseHandler.NotFound<UserGroupDTO>("The User Doesn't Exist");
+
+                var group = await _unitOfWork.Groups.GetByIdAsync(Model.GroupId);
+                if (group is null)
+                    return ResponseHandler.NotFound<UserGroupDTO>("The Group Doesn't Exist");
+
+                var userGroup = new UserGroup()
+                {
+                    UserId = user.Id,
+                    GroupId = Model.GroupId
+                };
+                await _unitOfWork.UserGroups.AddAsync(userGroup);
+                return ResponseHandler.Created(Model);
+            }
+            catch(Exception Ex)
+            {
+                return ResponseHandler.BadRequest<UserGroupDTO>($"An Error Occurred While Proccessing The Request, {Ex}");
+            }
+        }
+        #endregion
+
+        #region UserInGroup
+        public async Task<bool> UserInGroupAsync(int GroupId, string UserName)
+        {
+            var user = await _userService.GetByUserName(UserName);
+            if (user is null)
+                return false;
+            var group = await _unitOfWork.Groups.GetByIdAsync(GroupId);
+            if (group is null)
+                return false;
+            var userGroup = await _unitOfWork.UserGroups.GetWhereAsync(u => u.UserId == user.Id && u.GroupId == GroupId);
+            if (userGroup is null)
+                return false;
+            return true;
+        }
+        #endregion
     }
 }

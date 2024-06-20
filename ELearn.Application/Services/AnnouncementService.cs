@@ -127,7 +127,7 @@ namespace ELearn.Application.Services
                 ViewAnnouncement.Groups = (ICollection<int>)Model.Groups;
 
                 List<string> ViewUrls = [];
-                if (Model.Files != null && Model.Files.Any())
+                if (Model.Files != null && Model.Files.Count != 0)
                 {
                     foreach (var file in Model.Files)
                     {

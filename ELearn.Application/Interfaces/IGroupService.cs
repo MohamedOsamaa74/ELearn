@@ -20,5 +20,8 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ICollection<GroupDTO>>> GetByNameAsync(string Name);
         public Task<Response<ICollection<GroupDTO>>> GetUserGroupsAsync(string UserName = null);
         public Task<Response<ICollection<ParticipantDTO>>> GetGroupParticipantsAsync(int GroupId);
+        //public Task<bool> IsActiveAsync();
+        public Task<Response<UserGroupDTO>> AddUserToGroupAsync(UserGroupDTO Model);
+        public Task<bool> UserInGroupAsync(int GroupId, string UserName);
     }
 }

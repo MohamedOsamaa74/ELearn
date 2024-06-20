@@ -311,6 +311,7 @@ namespace ELearn.InfraStructure
                         new ()
                         {
                             Title = "Assignment 1",
+                            Description = "First Assignment Description",
                             UserId = Admin.Id,
                             GroupId = group1.Id,
                             End = DateTime.Now.AddDays(5)
@@ -318,6 +319,7 @@ namespace ELearn.InfraStructure
                         new ()
                         {
                             Title = "Assignment 2",
+                            Description = "Second Assignment Description",
                             UserId = Staff.Id,
                             GroupId = group3.Id,
                             End = DateTime.Now.AddDays(3)
@@ -325,6 +327,7 @@ namespace ELearn.InfraStructure
                         new ()
                         {
                             Title = "Assignment 3",
+                            Description = "Third Assignment Description",
                             UserId = Staff.Id,
                             GroupId = group3.Id,
                             End = DateTime.Now.AddDays(7)
@@ -332,6 +335,7 @@ namespace ELearn.InfraStructure
                         new()
                         {
                             Title = "Assignment 4",
+                            Description = "Fourth Assignment Description",
                             UserId = Staff.Id,
                             GroupId = group1.Id,
                             End = DateTime.Now.AddDays(5)
@@ -339,6 +343,7 @@ namespace ELearn.InfraStructure
                         new()
                         {
                             Title = "Assignment 5",
+                            Description = "Fifth Assignment Description",
                             UserId = Admin.Id,
                             GroupId = group2.Id,
                             End = DateTime.Now.AddDays(3)

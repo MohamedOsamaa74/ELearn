@@ -21,17 +21,61 @@ namespace ELearn.Api.Controllers
     [ApiController]
     public class AssignmentController : ControllerBase
     {
+        #region Fields
         private readonly IAssignmentService _assignmentService;
-
         public AssignmentController(IAssignmentService AssignmentService)
         {
             _assignmentService = AssignmentService;
         }
+        #endregion
 
+        #region Create Assignment
+        [HttpPost("Create")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> CreateAssignment([FromForm] UploadAssignmentDTO Model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await _assignmentService.CreateAssignmentAsync(Model);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Submit Assignment Response
+        [HttpPost("SubmitAssignmentResponse")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> SubmitAssignmentResponseAsync([FromForm]SubmitAssignmentResponseDTO submitAssignmentResponse)
+        {
+            var response = await _assignmentService.SubmitAssignmentResponseAsync(submitAssignmentResponse.AssignmentId, submitAssignmentResponse.file);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Give Grade To Student
+        [HttpPost("GiveGradeToStudent/{ResponseId:int}")]
+        [Authorize(Roles ="Admin, Staff")]
+        public async Task<IActionResult>GiveGradeToStudentResponse(int ResponseId, int Mark)
+        {
+            var response = await _assignmentService.GiveGradeToStudentResponseAsync(ResponseId, Mark);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Get Assignment Responses
+        [HttpGet("GetAssignmentResponses/{AssignmentId:int}")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> GetAssignmentResponsesAsync(int AssignmentId, [FromQuery] string filter_by = null, [FromQuery] string sort_by = null)
+        {
+            var response = await _assignmentService.GetAssignmentResponsesAsync(AssignmentId, filter_by, sort_by);
+            return this.CreateResponse(response);
+        }
+        #endregion
 
         #region Delete Assignment
         [HttpDelete("Delete/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteAssignment(int AssignmentId)
         {
             var response = await _assignmentService.DeleteAssignmentAsync(AssignmentId);
@@ -41,9 +85,9 @@ namespace ELearn.Api.Controllers
 
         #region update Assignment
         [HttpPut("UpdateAssignment/{AssignmentId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
 
-        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] AssignmentDTO Model)
+        public async Task<IActionResult> UpdateAssignment(int AssignmentId, [FromBody] UploadAssignmentDTO Model)
         {
             if (!ModelState.IsValid)
             {
@@ -52,8 +96,6 @@ namespace ELearn.Api.Controllers
             var response = await _assignmentService.UpdateAssignmentAsync(AssignmentId, Model);
             return this.CreateResponse(response);
         }
-
-
         #endregion
 
         #region GetAll Assignments
@@ -68,8 +110,8 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Get Assignment By ID
-        [HttpGet("{assignmentId:int}")]
-        [Authorize(Roles = "Admin")]
+        [HttpGet("GetById/{assignmentId:int}")]
+        [Authorize]
         public async Task<IActionResult> GetAssignmentById(int assignmentId)
         {
             var response = await _assignmentService.GetAssignmentByIdAsync(assignmentId);
@@ -78,26 +120,13 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Get assignment By GroupID
-        //[HttpGet("GetAssignmentByGroupId/{groupID:int}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> GetAssignmentByGroupId(int groupID)
-        //{
-        //    try
-        //    {
-        //        var Assignment = await _unitOfWork.Assignments.GetWhereAsync(a=>a.GroupId == groupID);
-        //        if (Assignment == null)
-        //        {
-        //            return NotFound($"This group has no assignments");
-        //        }
-        //        return Ok(Assignment);
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        return StatusCode(500, "An error occurred while processing your request");
-        //    }
-
-        //}
+        [HttpGet("GetByGroupId/{GroupId:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetByGroupId(int GroupId)
+        {
+            var response = await _assignmentService.GetFromGroupAsync(GroupId);
+            return this.CreateResponse(response);
+        }
         #endregion
 
         #region Delete All Assignments
@@ -118,7 +147,7 @@ namespace ELearn.Api.Controllers
         [HttpGet("GetAssignmentsByCreator")]
         public async Task<IActionResult> GetAssignmentsByCreator([FromQuery] string sort_by = null, [FromQuery] string search_term = null)
         {
-            var response = await _assignmentService.GetAssignmentsByCreator(sort_by, search_term);
+            var response = await _assignmentService.GetAssignmentsByCreatorAsync(sort_by, search_term);
             return this.CreateResponse(response);
         }
         #endregion

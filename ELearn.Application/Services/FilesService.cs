@@ -67,6 +67,10 @@ namespace ELearn.Application.Services
                     PostId = fileDTO.FolderName == "Posts" ? fileDTO.ParentId : null,
                     MessageId = fileDTO.FolderName == "Messages" ? fileDTO.ParentId : null,
                     UserId = fileDTO.FolderName == "ProfilePictures" ? user.Id : null
+                    UserId = fileDTO.FolderName == "ProfilePictures" ? user.Id : null,
+                    AssignmentId = fileDTO.FolderName == "Assignments" ? fileDTO.ParentId : null,
+                    UserAssignementId = fileDTO.FolderName == "AssignmentsResponses" ? fileDTO.ParentId : null,
+                    CommentId = fileDTO.FolderName == "Comments" ? fileDTO.ParentId : null
                 };
                 await _unitOfWork.Files.AddAsync(file);
                 var dto = _mapper.Map<FileDTO>(file);

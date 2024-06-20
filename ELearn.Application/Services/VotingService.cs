@@ -207,15 +207,16 @@ namespace ELearn.Application.Services
                 if (userVotes.IsNullOrEmpty())
                     return ResponseHandler.NotFound<ICollection<UserVotingDTO>>("There are no Responses yet");
 
-                ICollection<UserVotingDTO> userVotesDto = new List<UserVotingDTO>();
+                ICollection<UserVotingDTO> userVotesDto = [];
                 foreach (var userVote in userVotes)
                 {
                     var user = await _unitOfWork.Users.GetByIdAsync(userVote.UserId);
                     var userVoteDto = new UserVotingDTO()
                     {
-                        UserName = user.UserName,
+                        FullName = user.FirstName + ' ' + user.LastName,
                         Voting = vote.Description,
-                        Option = userVote.Option
+                        Option = userVote.Option,
+                        Created = userVote.CreationDate
                     };
                     userVotesDto.Add(userVoteDto);
                 }
@@ -248,9 +249,10 @@ namespace ELearn.Application.Services
                 await _unitOfWork.UserAnswerVotings.AddAsync(userVote);
                 var userVoteDto = new UserVotingDTO()
                 {
-                    UserName = user.UserName,
+                    FullName = user.FirstName + ' ' + user.LastName,
                     Voting = vote.Description,
-                    Option = Option
+                    Option = Option,
+                    Created = DateTime.UtcNow
                 };
                 return ResponseHandler.Created(userVoteDto);
             }
