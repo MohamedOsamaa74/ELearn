@@ -10,6 +10,6 @@
         public string? Option4 { get; set; }
         public string? Option5 { get; set; }
         public string? CorrectOption { get; set; }
-        public int? Grade { get; set; }
+        public double? Grade { get; set; }
     }
 }

@@ -4,6 +4,6 @@
     {
         public int QuestionId { get; set; }
         public required string Option { get; set; }
-        public int? Score { get; set; }
+        public double? Score { get; set; }
     }
 }
