@@ -206,6 +206,34 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region Get All Quizes From Group
+        public async Task<Response<ICollection<ViewQuizDTO>>> GetAllQuizzesFromGroupAsync(int groupId)
+        {
+            try
+            {
+                var quizzes = await _unitOfWork.Quizziz.GetWhereAsync(q => q.GroupId == groupId);
+                if (quizzes.IsNullOrEmpty())
+                {
+                    return ResponseHandler.NotFound<ICollection<ViewQuizDTO>>("No quizzes found for this group");
+                }
+                ICollection<ViewQuizDTO> quizDtos = [];
+                foreach (var quiz in quizzes)
+                {
+                    var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
+                    var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
+                    quizDto.Questions = questions.Data;
+                    quizDtos.Add(quizDto);
+                }
+
+                return ResponseHandler.Success(quizDtos);
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<ViewQuizDTO>>($"An error occurred: {ex.Message}");
+            }
+        }
+        #endregion
+
         #region Delete
         public async Task<Response<CreateQuizDTO>> DeleteAsync(int Id)
         {
@@ -228,7 +256,7 @@ namespace ELearn.Application.Services
         #region ReceiveStudentQuizResponseAsync
         //  useranswerquizهنا بحسب الاسكور بتاع كل طال وبخزنه في 
 
-        public async Task<Response<QuizResultDTO>> ReceiveStudentQuizResponsesAsync(UserAnswerQuizDTO userAnswerDto)
+        public async Task<Response<QuizResultDTO>> SubmitResponsesAsync(UserAnswerQuizDTO userAnswerDto)
         {
             try
             {

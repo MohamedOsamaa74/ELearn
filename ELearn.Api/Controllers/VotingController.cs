@@ -37,11 +37,11 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Recieve Student Response
-        [HttpPost("RecieveStudentResponse/{VoteId:int}/{Option}")]
+        [HttpPost("SubmitResponse/{VoteId:int}/{Option}")]
         [Authorize]
-        public async Task<IActionResult> RecieveStudentResponse(int VoteId, string Option)
+        public async Task<IActionResult> SubmitResponse(int VoteId, string Option)
         {
-            var response = await _votingService.RecieveStudentResponse(VoteId, Option);
+            var response = await _votingService.SubmitResponseAsync(VoteId, Option);
             return this.CreateResponse(response);
         }
         #endregion

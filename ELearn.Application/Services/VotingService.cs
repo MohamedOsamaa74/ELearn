@@ -230,7 +230,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region RecieveStudentResponse
-        public async Task<Response<UserVotingDTO>> RecieveStudentResponse(int VotingId, string Option)
+        public async Task<Response<UserVotingDTO>> SubmitResponseAsync(int VotingId, string Option)
         {
             try
             {

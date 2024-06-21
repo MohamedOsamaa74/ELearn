@@ -54,10 +54,22 @@ namespace ELearn.Api.Controllers
 
         #region Get All Quizes
         [HttpGet("GetAll")]
-        [Authorize(Roles = "Admin ,Staff")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var response = await _quizService.GetAllQuizzesAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region Get Quizzes From Group
+        [HttpPost("GetQuizzesFromGroup")]
+        [Authorize]
+        public async Task<IActionResult> GetQuizzesFromGroup([FromQuery] int groupId)
+        {
+            if(User.IsInRole("Admin"))
+                RedirectToAction("GetAll");
+            var response = await _quizService.GetAllQuizzesFromGroupAsync(groupId);
             return this.CreateResponse(response);
         }
         #endregion
@@ -73,11 +85,11 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Receive Student Quiz Response
-        [HttpPost("ReceiveStudentQuizResponse")]
+        [HttpPost("SubmitResponse")]
         [Authorize(Roles = "Student")]
-        public async Task<IActionResult> ReceiveStudentQuizResponse([FromBody] UserAnswerQuizDTO userAnswerDTO)
+        public async Task<IActionResult> SubmitResponseAsync([FromBody] UserAnswerQuizDTO userAnswerDTO)
         {
-            var response = await _quizService.ReceiveStudentQuizResponsesAsync(userAnswerDTO);
+            var response = await _quizService.SubmitResponsesAsync(userAnswerDTO);
             return this.CreateResponse(response);
         }
         #endregion

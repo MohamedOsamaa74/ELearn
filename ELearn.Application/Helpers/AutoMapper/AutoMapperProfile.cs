@@ -205,9 +205,14 @@ namespace ELearn.Application.Helpers.AutoMapper
             CreateMap<CreateSurveyDTO, Survey>();
 
             CreateMap<Survey, ViewSurveyDTO>()
-                .ForMember(dest => dest.Questions, opt => opt.Ignore());
+                .ForMember(dest => dest.Questions, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatorName, opt => opt.Ignore());
 
             CreateMap<ViewSurveyDTO, Survey>();
+
+            CreateMap<CreateSurveyDTO, ViewSurveyDTO>()
+                .ForMember(dest => dest.Id, src => src.Ignore())
+                .ForMember(dest => dest.CreatorName, src => src.Ignore());
             #endregion
 
             #region PostMapper

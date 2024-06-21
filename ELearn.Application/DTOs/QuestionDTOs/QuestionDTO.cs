@@ -2,6 +2,7 @@
 {
     public class QuestionDTO
     {
+        public int Id { get; set; }
         public required string Text { get; set; }
         //file
         public required string Option1 { get; set; }

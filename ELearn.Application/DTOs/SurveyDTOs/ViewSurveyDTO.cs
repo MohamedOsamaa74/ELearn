@@ -10,9 +10,10 @@ namespace ELearn.Application.DTOs.SurveyDTOs
     public class ViewSurveyDTO
     {
         public int Id { get; set; }
-        public string Text { get; set; }
+        public required string Text { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public ICollection<QuestionDTO> Questions { get; set; } = new HashSet<QuestionDTO>();
+        public required string CreatorName { get; set; }
+        public ICollection<QuestionDTO> Questions { get; set; } = [];
     }
 }

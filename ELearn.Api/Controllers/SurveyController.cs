@@ -63,7 +63,7 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        #region GetFromGroups
+        #region GetFromGroup
         [HttpGet("GetSurveysFromGroup/{GroupId:int}")]
         [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> GetFromGroups(int GroupId)
@@ -103,12 +103,12 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
-        #region RecieveStudentResponse
-        [HttpPost("RecieveStudentResponse")]
+        #region Submit Response
+        [HttpPost("SubmitResponse")]
         [Authorize]
-        public async Task<IActionResult> RecieveStudentResponse([FromBody] UserAnswerSurveyDTO Model)
+        public async Task<IActionResult> SubnitResponseAsync([FromBody] UserAnswerSurveyDTO Model)
         {
-            var response = await _surveyService.RecieveStudentResponseAsync(Model);
+            var response = await _surveyService.SubmitResponseAsync(Model);
             return this.CreateResponse(response);
         }
         #endregion

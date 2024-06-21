@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Collections.ObjectModel;
 
 namespace ELearn.Application.Services
-{
+{ 
     public class SurveyService : ISurveyService
     {
         #region Fields & Constructor
@@ -29,7 +29,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region CreateNew
-        public async Task<Response<CreateSurveyDTO>> CreateNewAsync(CreateSurveyDTO Model)
+        public async Task<Response<ViewSurveyDTO>> CreateNewAsync(CreateSurveyDTO Model)
         {
             try
             {
@@ -43,33 +43,38 @@ namespace ELearn.Application.Services
                 {
                     await _questionService.CreateNewAsync(question, "Survey", survey.Id);
                 }
-                return ResponseHandler.Success(Model);
+                var surveyDto = _mapper.Map<ViewSurveyDTO>(survey);
+                surveyDto.Id = survey.Id;
+                surveyDto.CreatorName = user.FirstName + ' ' + user.LastName;
+                if (result != "Success")
+                    return ResponseHandler.BadRequest<ViewSurveyDTO>(result);
+                return ResponseHandler.Success(surveyDto);
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<CreateSurveyDTO>($"An Error Occurred, {Ex}");
+                return ResponseHandler.BadRequest<ViewSurveyDTO>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
         #region GetById
-        public async Task<Response<CreateSurveyDTO>> GetByIdAsync(int Id)
+        public async Task<Response<ViewSurveyDTO>> GetByIdAsync(int Id)
         {
             try
             {
                 var survey = await _unitOfWork.Surveys.GetByIdAsync(Id);
                 if (survey is null)
-                    return ResponseHandler.NotFound<CreateSurveyDTO>("There is no such Survey");
-                var surveyDto = _mapper.Map<CreateSurveyDTO>(survey);
-                surveyDto.GroupIds = await _unitOfWork.GroupSurveys
-                    .GetWhereSelectAsync(v => v.SurveyId == Id, v => v.GroupId);
+                    return ResponseHandler.NotFound<ViewSurveyDTO>("There is no such Survey");
+                var creator = await _userService.GetByIdAsync(survey.CreatorId);
+                var surveyDto = _mapper.Map<ViewSurveyDTO>(survey);
                 var Questions = await _unitOfWork.Questions.GetWhereAsync(q => q.SurveyId == Id);
                 surveyDto.Questions = _mapper.Map<ICollection<QuestionDTO>>(Questions);
+                surveyDto.CreatorName = creator.FirstName + ' ' + creator.LastName;
                 return ResponseHandler.Success(surveyDto);
             }
             catch(Exception Ex)
             {
-                return ResponseHandler.BadRequest<CreateSurveyDTO>($"An Error Occorred, {Ex}");
+                return ResponseHandler.BadRequest<ViewSurveyDTO>($"An Error Occorred, {Ex}");
             }
         }
         #endregion
@@ -114,19 +119,20 @@ namespace ELearn.Application.Services
         #endregion
 
         #region GetAll
-        public async Task<Response<ICollection<CreateSurveyDTO>>> GetAllAsync()
+        public async Task<Response<ICollection<ViewSurveyDTO>>> GetAllAsync()
         {
             try
             {
                 var surveys = await _unitOfWork.Surveys.GetAllAsync();
                 if (surveys.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are no Surveys yet");
+                    return ResponseHandler.NotFound<ICollection<ViewSurveyDTO>>("There are no Surveys yet");
 
-                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                ICollection<ViewSurveyDTO> surveysDto = [];
                 foreach (var survey in surveys)
                 {
-                    var surveydto = _mapper.Map<CreateSurveyDTO>(survey);
-                    surveydto.GroupIds = await _unitOfWork.GroupSurveys.GetWhereSelectAsync(g => g.SurveyId == survey.Id, g => g.GroupId);
+                    var surveydto = _mapper.Map<ViewSurveyDTO>(survey);
+                    var creator = await _userService.GetByIdAsync(survey.CreatorId);
+                    surveydto.CreatorName = creator.FirstName + ' ' + creator.LastName;
                     surveydto.Questions = _mapper.Map<ICollection<QuestionDTO>>(await _unitOfWork.Questions.GetWhereAsync(q => q.SurveyId == survey.Id));
                     surveysDto.Add(surveydto);
                 }
@@ -134,20 +140,20 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<ViewSurveyDTO>>($"An Error Occorred, {Ex}");
             }
         }
         #endregion
 
         #region GetFromGroup
-        public async Task<Response<ICollection<CreateSurveyDTO>>> GetFromGroup(int GroupId)
+        public async Task<Response<ICollection<ViewSurveyDTO>>> GetFromGroup(int GroupId)
         {
             try
             {
                 var surveys = await _unitOfWork.GroupSurveys.GetWhereSelectAsync(g => g.GroupId == GroupId, g => g.SurveyId);
                 if (surveys.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are no Surveys yet");
-                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                    return ResponseHandler.NotFound<ICollection<ViewSurveyDTO>>("There are no Surveys yet");
+                ICollection<ViewSurveyDTO> surveysDto = [];
                 foreach (var survey in surveys)
                 {
                     var surveydto = GetByIdAsync(survey);
@@ -157,52 +163,60 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<ViewSurveyDTO>>($"An Error Occorred, {Ex}");
             }
         }
         #endregion
 
         #region GetFromUserGroups
-        public async Task<Response<ICollection<CreateSurveyDTO>>> GetFromUserGroups()
+        public async Task<Response<ICollection<ViewSurveyDTO>>> GetFromUserGroups()
         {
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
                 var groups = await _unitOfWork.UserGroups.GetWhereSelectAsync(u => u.UserId == user.Id, g => g.GroupId);
-                if(groups.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("You Are Not in Any Groups");
-                var surveys = new List<int>();
+                if (groups.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<ViewSurveyDTO>>("You Are Not in Any Groups");
+
+                var surveys = new HashSet<int>(); // Use HashSet to ensure uniqueness
                 foreach (var group in groups)
                 {
-                    surveys.AddRange(await _unitOfWork.GroupSurveys.GetWhereSelectAsync(v => v.GroupId == group, v => v.SurveyId));
+                    var groupSurveys = await _unitOfWork.GroupSurveys.GetWhereSelectAsync(v => v.GroupId == group, v => v.SurveyId);
+                    foreach (var surveyId in groupSurveys)
+                    {
+                        surveys.Add(surveyId); // HashSet.Add ignores duplicates
+                    }
                 }
-                if (surveys.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are no Surveys yet");
-                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+
+                if (surveys.Count == 0) // Check if HashSet is empty
+                    return ResponseHandler.NotFound<ICollection<ViewSurveyDTO>>("There are no Surveys yet");
+
+                ICollection<ViewSurveyDTO> surveysDto = []; // Initialize the list
                 foreach (var survey in surveys)
                 {
-                    var surveydto = GetByIdAsync(survey);
-                    surveysDto.Add(surveydto.Result.Data);
+                    var surveydto = await GetByIdAsync(survey); // Assuming GetByIdAsync is an async method
+                    surveysDto.Add(surveydto.Data);
                 }
+
                 return ResponseHandler.Success(surveysDto);
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<ViewSurveyDTO>>($"An Error Occurred, {Ex}");
             }
         }
         #endregion
 
         #region GetByCreator
-        public async Task<Response<ICollection<CreateSurveyDTO>>> GetSurveysByCreator()
+        public async Task<Response<ICollection<ViewSurveyDTO>>> GetSurveysByCreator()
         {
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
                 var surveys = await _unitOfWork.Surveys.GetWhereSelectAsync(v => v.CreatorId == user.Id, v => v.Id);
                 if (surveys.IsNullOrEmpty())
-                    return ResponseHandler.NotFound<ICollection<CreateSurveyDTO>>("There are No Surveys yet");
-                ICollection<CreateSurveyDTO> surveysDto = new List<CreateSurveyDTO>();
+                    return ResponseHandler.NotFound<ICollection<ViewSurveyDTO>>("There are No Surveys yet");
+                ICollection<ViewSurveyDTO> surveysDto = [];
                 foreach (var survey in surveys)
                 {
                     var surveydto = await GetByIdAsync(survey);
@@ -212,13 +226,13 @@ namespace ELearn.Application.Services
             }
             catch (Exception Ex)
             {
-                return ResponseHandler.BadRequest<ICollection<CreateSurveyDTO>>($"An Error Occorred, {Ex}");
+                return ResponseHandler.BadRequest<ICollection<ViewSurveyDTO>>($"An Error Occorred, {Ex}");
             }
         }
         #endregion
 
         #region RecieveStudentResponse
-        public async Task<Response<UserAnswerSurveyDTO>> RecieveStudentResponseAsync(UserAnswerSurveyDTO userAnswerDTO) 
+        public async Task<Response<UserAnswerSurveyDTO>> SubmitResponseAsync(UserAnswerSurveyDTO userAnswerDTO) 
         {
             try
             {

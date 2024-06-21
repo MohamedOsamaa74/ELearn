@@ -16,14 +16,10 @@ namespace ELearn.Application.Interfaces
         public Task<Response<EditQuizDTO>> UpdateQuizAsync(EditQuizDTO Model, int quizID);
         public Task<Response<ViewQuizDTO>> GetQuizByIdAsync(int quizId);
         public Task<Response<ICollection<ViewQuizDTO>>> GetAllQuizzesAsync();
-
+        public Task<Response<ICollection<ViewQuizDTO>>> GetAllQuizzesFromGroupAsync(int groupId);
         public Task<Response<CreateQuizDTO>> DeleteAsync(int Id);
-        public Task<Response<QuizResultDTO>> ReceiveStudentQuizResponsesAsync(UserAnswerQuizDTO userAnswerDto);
+        public Task<Response<QuizResultDTO>> SubmitResponsesAsync(UserAnswerQuizDTO userAnswerDto);
         public Task<Response<UserAnswerQuizDTO>> GetUserAnswerAsync(int quizId, string UserId);
-
         public Task<Response<List<QuizResultDTO>>> GetAllQuizResponsesAsync(int quizId);
-
-
-
     }
 }

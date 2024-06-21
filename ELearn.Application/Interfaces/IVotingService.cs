@@ -17,7 +17,7 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ViewVotingDTO>> DeleteManyAsync(ICollection<int> Id);
         public Task<Response<ViewVotingDTO>> UpdateAsync(int Id, AddVotingDTO Model);
         public Task<Response<OptionDTO>> EditOption(int Id, OptionDTO Model);
-        public Task<Response<UserVotingDTO>> RecieveStudentResponse(int VotingId, string Option);
+        public Task<Response<UserVotingDTO>> SubmitResponseAsync(int VotingId, string Option);
         public Task<Response<ICollection<UserVotingDTO>>> GetVotingResponses(int VotingId);
     }
 }

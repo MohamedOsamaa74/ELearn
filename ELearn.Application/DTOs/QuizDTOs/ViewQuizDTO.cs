@@ -9,6 +9,7 @@ namespace ELearn.Application.DTOs.QuizDTOs
 {
     public class ViewQuizDTO
     {
+        public int Id { get; set; }
         public required string title { get; set; }
         public required int Grade { get; set; }
         public DateTime Start { get; set; }
