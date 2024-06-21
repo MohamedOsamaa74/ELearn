@@ -7,6 +7,7 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -74,6 +75,11 @@ namespace ELearn.Application.Services
                     quiz.Questions = questions;
                 }
 
+                var validation = new QuizValidation().Validate(quiz);
+                if (!validation.IsValid)
+                {
+                    return ResponseHandler.BadRequest<CreateQuizDTO>(null,validation.Errors.Select(e => e.ErrorMessage).ToList());
+                }
                 await _unitOfWork.Quizziz.AddAsync(quiz);
                 return ResponseHandler.Created(Model);
 
@@ -116,34 +122,11 @@ namespace ELearn.Application.Services
                 oldquiz.End = Model.End;
                 oldquiz.Grade = Model.Grade;
 
-                #region Old
-                //if (Model.Questions != null && Model.Questions.Any())
-                //{
-                //    var totalQuestionGrade = Model.Questions.Sum(q => q.Grade);
-                //    if (totalQuestionGrade != Model.Grade)
-                //    {
-                //        return ResponseHandler.BadRequest<CreateQuizDTO>("Sum of question grades doesn't match quiz grade");
-                //    }
-                //    var questions = new List<Question>();
-                //    foreach (var createQuestionDTO in Model.Questions)
-                //    {
-                //        var question = _mapper.Map<CreateQuestionDTO, Question>(createQuestionDTO);
-                //        if (question.CorrectOption == null || question.CorrectOption == "" || question.CorrectOption == string.Empty)
-                //            return ResponseHandler.BadRequest<CreateQuizDTO>("Correct Option is required");
-                //        if (question.CorrectOption != question.Option1 && question.CorrectOption != question.Option2 && question.CorrectOption != question.Option3 && question.CorrectOption != question.Option4 && question.CorrectOption != question.Option5)
-                //            return ResponseHandler.BadRequest<CreateQuizDTO>("Invalid Correct Option");
-                //        question.Quiz = oldquiz;
-                //        questions.Add(question);
-                //    }
-                //    oldquiz.Questions = questions;
-                //}
-
-                //oldquiz.IsPublished = Model.IsPublished;
-                //oldquiz.IsClosed = Model.IsClosed;
-                //oldquiz.IsDeleted = Model.IsDeleted;
-                //oldquiz.UpdatedAt = DateTime.Now; 
-                #endregion
-
+                var validation = new QuizValidation().Validate(oldquiz);
+                if (!validation.IsValid)
+                {
+                    return ResponseHandler.BadRequest<EditQuizDTO>(null, validation.Errors.Select(e => e.ErrorMessage).ToList());
+                }
                 await _unitOfWork.Quizziz.UpdateAsync(oldquiz);
                 return ResponseHandler.Updated(Model);
             }

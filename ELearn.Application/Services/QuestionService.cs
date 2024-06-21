@@ -5,6 +5,7 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,9 @@ namespace ELearn.Application.Services
                 else
                     return ResponseHandler.BadRequest<QuestionDTO>("Parent is not valid");
 
+                var validate = new QuestionValidation().Validate(question);
+                if (!validate.IsValid)
+                    return ResponseHandler.BadRequest<QuestionDTO>(null, validate.Errors.Select(x => x.ErrorMessage).ToList());
                 await _unitOfWork.Questions.AddAsync(question);
                 return ResponseHandler.Success(Model);
             }

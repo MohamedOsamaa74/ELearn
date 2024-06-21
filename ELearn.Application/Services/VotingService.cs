@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using ELearn.Application.DTOs;
 using ELearn.Application.DTOs.OptionDTOs;
 using ELearn.Application.DTOs.VotingDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ELearn.Application.Services
@@ -44,6 +46,10 @@ namespace ELearn.Application.Services
                 var addOptions = AddOptions(vote, Model.Options);
                 if (addOptions != "Success")
                     return ResponseHandler.BadRequest<ViewVotingDTO>($"An Error Occurred, {addOptions}");
+
+                var validation = new VotingValidation().Validate(vote);
+                if (!validation.IsValid)
+                    return ResponseHandler.BadRequest<ViewVotingDTO>(null, validation.Errors.Select(x => x.ErrorMessage).ToList());
 
                 await _unitOfWork.Votings.AddAsync(vote);
                 var sendVote = await SendToGroupsAsync(vote.Id, Model.groups);

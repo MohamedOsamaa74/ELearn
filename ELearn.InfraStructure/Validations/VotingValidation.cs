@@ -12,9 +12,10 @@ namespace ELearn.InfraStructure.Validations
     {
         public VotingValidation()
         {
-            RuleFor(v => v.Description).NotEmpty();
-            RuleFor(v => v.CreationDate).NotEmpty();
-            RuleFor(v => v.CreatorId).NotEmpty();
+            RuleFor(v => v.Description).NotEmpty().NotNull();
+            RuleFor(v => v.CreationDate).NotEmpty().NotNull();
+            RuleFor(v => v.CreatorId).NotEmpty().NotNull();
+
         }
     }
 }
