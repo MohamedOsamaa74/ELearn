@@ -13,8 +13,11 @@ namespace ELearn.InfraStructure.Validations
         public QuestionValidation()
         {
             RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
-            RuleFor(x => x.Text).NotEmpty().MaximumLength(1000);
-            //RuleFor(x => x.Options).NotEmpty();
+            RuleFor(q => q.Text)
+                .NotEmpty().MaximumLength(1000).WithMessage("Question text is required.");
+            RuleFor(x => x.Grade)
+                .NotEmpty().WithMessage("Grade is required.")
+                .GreaterThan(0.0).WithMessage("Grade must be greater than 0.");
 
         }
     }

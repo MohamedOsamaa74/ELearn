@@ -9,7 +9,7 @@ namespace ELearn.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public required string Text { get; set; }
-        public int? Grade { get; set; }
+        public double? Grade { get; set; }
         public required string Option1 { get; set; }
         public required string Option2 { get; set; }
         public string? Option3 { get; set; }

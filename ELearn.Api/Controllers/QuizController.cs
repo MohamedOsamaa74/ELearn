@@ -54,7 +54,7 @@ namespace ELearn.Api.Controllers
 
         #region Get All Quizes
         [HttpGet("GetAll")]
-        [Authorize(Roles = "Admin ,Staff")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var response = await _quizService.GetAllQuizzesAsync();
@@ -64,7 +64,7 @@ namespace ELearn.Api.Controllers
 
         #region Delete Quiz
         [HttpDelete("Delete/{QuizId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin ,Staff")]
         public async Task<IActionResult> DeleteQuiz(int QuizId)
         {
             var response = await _quizService.DeleteAsync(QuizId);

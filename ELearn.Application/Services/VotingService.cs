@@ -8,6 +8,7 @@ using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using ELearn.InfraStructure.Validations;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 
 namespace ELearn.Application.Services
 {
@@ -37,12 +38,6 @@ namespace ELearn.Application.Services
                     return ResponseHandler.BadRequest<ViewVotingDTO>("You have to insert at least two options and at most five options");
 
 
-                if (vote.Title.IsNullOrEmpty())
-                    return ResponseHandler.BadRequest<ViewVotingDTO>("Title Is Required");
-
-                if (vote.Description.IsNullOrEmpty())
-                    return ResponseHandler.BadRequest<ViewVotingDTO>("Description Is Required");
-
                 var addOptions = AddOptions(vote, Model.Options);
                 if (addOptions != "Success")
                     return ResponseHandler.BadRequest<ViewVotingDTO>($"An Error Occurred, {addOptions}");
@@ -51,6 +46,12 @@ namespace ELearn.Application.Services
                 if (!validation.IsValid)
                     return ResponseHandler.BadRequest<ViewVotingDTO>(null, validation.Errors.Select(x => x.ErrorMessage).ToList());
 
+
+                if (vote.Title.IsNullOrEmpty())
+                    return ResponseHandler.BadRequest<ViewVotingDTO>("Title Is Required");
+
+                if (vote.Description.IsNullOrEmpty())
+                    return ResponseHandler.BadRequest<ViewVotingDTO>("Description Is Required");
                 await _unitOfWork.Votings.AddAsync(vote);
                 var sendVote = await SendToGroupsAsync(vote.Id, Model.groups);
                 if (sendVote != "Success")
@@ -94,9 +95,13 @@ namespace ELearn.Application.Services
         #region Delete
         public async Task<Response<ViewVotingDTO>> DeleteAsync(int Id)
         {
+            var user = await _userService.GetCurrentUserAsync();
             var vote = await _unitOfWork.Votings.GetByIdAsync(Id);
+            var role = await _userService.GetUserRoleAsync();
             if (vote is null)
                 return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
+            if (vote.CreatorId != user.Id && role != "Admin")
+                return ResponseHandler.Unauthorized<ViewVotingDTO>("You are not authorized to do this action");
             try
             {
                 await _unitOfWork.Votings.DeleteAsync(vote);
@@ -275,6 +280,13 @@ namespace ELearn.Application.Services
             try
             {
                 var originalVote = await _unitOfWork.Votings.GetByIdAsync(Id);
+                var user = await _userService.GetCurrentUserAsync();
+                var role= await _userService.GetUserRoleAsync();
+                if (user == null)
+                    return ResponseHandler.NotFound<ViewVotingDTO>("There is no such User");
+                if(originalVote.CreatorId != user.Id && role != "Admin")
+                    return ResponseHandler.Unauthorized<ViewVotingDTO>("You are not authorized to do this action");
+
                 if (originalVote is null)
                     return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
                 originalVote.Description = Model.Title;
@@ -286,6 +298,11 @@ namespace ELearn.Application.Services
                 var sendToGroups = await SendToGroupsAsync(Id, Model.groups);
                 if (sendToGroups != "Success")
                     return ResponseHandler.BadRequest<ViewVotingDTO>($"An Error Occured,{sendToGroups}");
+
+                var validation = new VotingValidation().Validate(originalVote);
+                if (!validation.IsValid)
+                    return ResponseHandler.BadRequest<ViewVotingDTO>(null, validation.Errors.Select(x => x.ErrorMessage).ToList());
+
                 await _unitOfWork.Votings.UpdateAsync(originalVote);
                 var viewVote = _mapper.Map<ViewVotingDTO>(originalVote);
                 return ResponseHandler.Success(viewVote);
@@ -302,9 +319,16 @@ namespace ELearn.Application.Services
         {
             try
             {
+                var user = await _userService.GetCurrentUserAsync();
+                var role = await _userService.GetUserRoleAsync();
+                
                 foreach (var id in Id)
                 {
                     var vote = await _unitOfWork.Votings.GetByIdAsync(id);
+                    if (vote is null)
+                        return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
+                    if (vote.CreatorId != user.Id && role != "Admin")
+                        return ResponseHandler.Unauthorized<ViewVotingDTO>("You are not authorized to do this action");
                     if (vote is null)
                         return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
                     await _unitOfWork.Votings.DeleteAsync(vote);
@@ -323,6 +347,10 @@ namespace ELearn.Application.Services
         {
             try
             {
+                var user = await _userService.GetCurrentUserAsync();
+                var role = await _userService.GetUserRoleAsync();
+                if (role != "Admin")
+                    return ResponseHandler.Unauthorized<ICollection<ViewVotingDTO>>("Unauthorized");
                 var votes = await _unitOfWork.Votings.GetAllAsync();
                 if (votes.IsNullOrEmpty())
                     return ResponseHandler.NotFound<ICollection<ViewVotingDTO>>("There are no Votings yet");

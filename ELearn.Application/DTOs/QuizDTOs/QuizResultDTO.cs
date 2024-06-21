@@ -11,7 +11,7 @@ namespace ELearn.Application.DTOs.QuizDTOs
     {
         public int QuizId { get; set; }
         public string StudentName { get; set; }
-        public int ?TotalScore { get; set; }
+        public double ?TotalScore { get; set; }
         public List <QuestionAnswerDTO> QuestionAnswers { get; set; }
     }
 }

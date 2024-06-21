@@ -113,7 +113,8 @@ namespace ELearn.Application.Services
             if (AssignmentToUpdate == null)
                 return ResponseHandler.NotFound<UploadAssignmentDTO>();
             var user = await _userService.GetCurrentUserAsync();
-            if (AssignmentToUpdate.UserId != user.Id)
+            var role = await _userService.GetUserRoleAsync();
+            if (AssignmentToUpdate.UserId != user.Id && role != "Admin")
                 return ResponseHandler.Unauthorized<UploadAssignmentDTO>();
             try
             {

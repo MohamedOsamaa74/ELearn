@@ -3,6 +3,7 @@ using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.QuestionDTOs;
 using ELearn.Application.DTOs.QuizDTOs;
 using ELearn.Application.DTOs.SurveyDTOs;
+using ELearn.Application.DTOs.VotingDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
@@ -40,9 +41,15 @@ namespace ELearn.Application.Services
             {
                 var quiz = _mapper.Map<CreateQuizDTO, Quiz>(Model);
                 quiz.UserId = _userService.GetCurrentUserAsync().Result.Id;
+                var role = await _userService.GetUserRoleAsync();
+
                 if (quiz.UserId == null)
                 {
                     return ResponseHandler.BadRequest<CreateQuizDTO>("User not found");
+                }
+                if (role != "Staff" && role != "Admin")
+                {
+                    return ResponseHandler.Unauthorized<CreateQuizDTO>();
                 }
                 if (quiz.Start >= quiz.End || quiz.Start <= DateTime.Now)
                 {
@@ -97,11 +104,13 @@ namespace ELearn.Application.Services
             try
             {
                 var oldquiz = await _unitOfWork.Quizziz.GetByIdAsync(QuizId);
+                var role = await _userService.GetUserRoleAsync();
+
                 if (oldquiz is null)
                 {
                     return ResponseHandler.NotFound<EditQuizDTO>("Quiz not found");
                 }
-                if (oldquiz.UserId != _userService.GetCurrentUserAsync().Result.Id)
+                if (oldquiz.UserId != _userService.GetCurrentUserAsync().Result.Id && role != "Admin")
                 {
                     return ResponseHandler.Unauthorized<EditQuizDTO>();
                 }
@@ -113,7 +122,7 @@ namespace ELearn.Application.Services
                 var t= _questionService.GetQuestionsByQuizIdAsync(QuizId);
                 var tt = t.Result.Data.Sum(q => q.Grade);
                 //var totalQuestionGrade = oldquiz.Questions.Sum(q => q.Grade);
-                if (tt != Model.Grade )
+                if (tt != (double)Model.Grade )
                 {
                     return ResponseHandler.BadRequest<EditQuizDTO>("Sum of question grades doesn't match quiz grade");
                 }
@@ -195,6 +204,10 @@ namespace ELearn.Application.Services
             try
             {
                 var quiz = await _unitOfWork.Quizziz.GetByIdAsync(Id);
+                var user = await _userService.GetCurrentUserAsync();
+                var role = await _userService.GetUserRoleAsync();
+                if (quiz.UserId!= user.Id && role != "Admin")
+                    return ResponseHandler.Unauthorized<CreateQuizDTO>("You are not authorized to do this action");
                 if (quiz == null)
                     return ResponseHandler.NotFound<CreateQuizDTO>("Quiz not found");
 
@@ -223,7 +236,7 @@ namespace ELearn.Application.Services
                     return ResponseHandler.NotFound<QuizResultDTO>("There is no such Quiz");
 
         
-                var totalScore = 0;
+                var totalScore = 0.0;
                 foreach (var answer in userAnswerDto.Answers)
                 {
                     var question = await _unitOfWork.Questions.GetByIdAsync(answer.QuestionId);
@@ -232,7 +245,7 @@ namespace ELearn.Application.Services
                     var recieveAnswer = await _questionService.RecieveStudentAnswerAsync(answer);
                     if (!recieveAnswer.Succeeded)
                         return ResponseHandler.BadRequest<QuizResultDTO>($"An Error Occurred, {recieveAnswer.Message}");
-                    totalScore += recieveAnswer.Data.Score ??0;
+                    totalScore += recieveAnswer.Data.Score ?? 0;
                 }
                  var userAnswerQuiz = new UserAnswerQuiz { QuizId =userAnswerDto.QuizId , UserId = user.Id ,Grade=totalScore};
                 await _unitOfWork.UserAnswerQuizziz.AddAsync(userAnswerQuiz);

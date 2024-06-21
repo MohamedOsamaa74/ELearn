@@ -87,7 +87,7 @@ namespace ELearn.Api.Controllers
 
         #region GetUserGroupsVotes
         [HttpGet("GetUserGroupsVotes")]
-        [Authorize(Roles = "Staff, Student")]
+        [Authorize(Roles = "Staff, Student,Admin")]
         public async Task<IActionResult> GetUserGroupsVotes()
         {
             var response = await _votingService.GetUserGroupsVotes();

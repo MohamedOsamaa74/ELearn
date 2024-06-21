@@ -10,7 +10,7 @@ namespace ELearn.Domain.Entities
     {
         public int Id { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
-        public required int Grade { get; set; }
+        public required double Grade { get; set; }
 
         #region ForeignKeys
         public required string UserId { get; set; }
