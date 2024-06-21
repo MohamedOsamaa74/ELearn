@@ -7,6 +7,7 @@ using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.BadRequest<ViewMessageDTO>("Receiver not found or public key missing");
                 }
-                var encryptedText = EncryptionHelper.Encrypt(Model.Text, Receiver.PublicKey);
+                var encryptedText = Encrypt(Model.Text, Receiver.PublicKey);
                 var newMessage = new Message
                 {
                     SenderId = sender.Id,
@@ -59,9 +60,17 @@ namespace ELearn.Application.Services
                     Text = encryptedText,
                     CreationDate = DateTime.Now
                 };
+                // Validate the newMessage object
+                var validate = new MessageValidation().Validate(newMessage);
+                if (!validate.IsValid)
+                {
+                    // Get the errors 
+                    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ResponseHandler.BadRequest<ViewMessageDTO>(null,errors);
+                }
                 await _unitOfWork.Messages.AddAsync(newMessage);
                 var ViewMessage = _mapper.Map<ViewMessageDTO>(newMessage);
-                var deT = EncryptionHelper.Decrypt(newMessage.Text, Receiver.PrivateKey);
+                var deT = Decrypt(newMessage.Text, Receiver.PrivateKey);
                 ViewMessage.Text = deT;
                 string ViewUrl;
                 if (Model.File != null)
@@ -113,12 +122,12 @@ namespace ELearn.Application.Services
                         {
                             if(m.SenderId == user.Id)
                             {
-                                var deT = EncryptionHelper.Decrypt(m.Text, Receiver.PrivateKey);
+                                var deT = Decrypt(m.Text, Receiver.PrivateKey);
                                 viewMessage.Text = deT;
                             }
                             else
                             {
-                                var deT = EncryptionHelper.Decrypt(m.Text, user.PrivateKey);
+                                var deT = Decrypt(m.Text, user.PrivateKey);
                                 viewMessage.Text = deT;
                             }
                         }
@@ -154,12 +163,12 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.Unauthorized<ViewMessageDTO>("You are not allowed to edit this message");
                 }
-                var encryptedText = EncryptionHelper.Encrypt(Model.Text, Receiver.PublicKey);
+                var encryptedText = Encrypt(Model.Text, Receiver.PublicKey);
                 message.Text = encryptedText;
                 message.CreationDate= DateTime.UtcNow;
                 await _unitOfWork.Messages.UpdateAsync(message);
                 var ViewMessage = _mapper.Map<ViewMessageDTO>(message);
-                var deT = EncryptionHelper.Decrypt(message.Text, Receiver.PrivateKey);
+                var deT = Decrypt(message.Text, Receiver.PrivateKey);
                 ViewMessage.Text = deT;
                 string ViewUrl;
                 //delete old file
@@ -241,20 +250,8 @@ namespace ELearn.Application.Services
         #endregion
 
 
-        #region EncryptionHelper
-        public static class EncryptionHelper
-        {
-            public static (string publicKey, string privateKey) GenerateKeyPair()
-            {
-                using (var rsa = new RSACryptoServiceProvider(2048))
-                {
-                    return (
-                        publicKey: Convert.ToBase64String(rsa.ExportRSAPublicKey()),
-                        privateKey: Convert.ToBase64String(rsa.ExportRSAPrivateKey())
-                    );
-                }
-            }
-            public static string Encrypt(string plaintext, string publicKey)
+        #region Encryption
+            private static string Encrypt(string plaintext, string publicKey)
             {
                 using (var rsa = new RSACryptoServiceProvider())
                 {
@@ -264,7 +261,7 @@ namespace ELearn.Application.Services
                 }
             }
 
-            public static string Decrypt(string ciphertext, string privateKey)
+            private static string Decrypt(string ciphertext, string privateKey)
             {
                 using (var rsa = new RSACryptoServiceProvider())
                 {
@@ -273,7 +270,7 @@ namespace ELearn.Application.Services
                     return Encoding.UTF8.GetString(decryptedBytes).ToString();
                 }
             }
-        }
+        
         #endregion
 
 

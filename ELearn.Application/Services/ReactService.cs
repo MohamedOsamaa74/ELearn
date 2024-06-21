@@ -3,6 +3,7 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ELearn.Application.Services
@@ -36,6 +37,11 @@ namespace ELearn.Application.Services
                 else if(reactDTO.Parent == "Post")
                 {
                     react.PostID = reactDTO.ParentId;
+                }
+                var validate = new ReactValidation().Validate(react);
+                if (!validate.IsValid)
+                {
+                    return ResponseHandler.BadRequest<ReactDTO>(null,validate.Errors.Select(x => x.ErrorMessage).ToList());
                 }
                 await _unitOfWork.Reacts.AddAsync(react);
                 reactDTO.FirstName = user.FirstName;

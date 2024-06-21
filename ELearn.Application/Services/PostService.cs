@@ -7,6 +7,7 @@ using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,11 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.BadRequest<ViewPostDTO>();
                 }
+                var validate = new PostValidation().Validate(post); 
+                if (!validate.IsValid)
+                {
+                    return ResponseHandler.BadRequest<ViewPostDTO>(null,validate.Errors.Select(x => x.ErrorMessage).ToList());
+                }
                 await _unitOfWork.Posts.AddAsync(post);
                 List<string> ViewUrls = [];
                 if (Model.Files != null && Model.Files.Any())
@@ -97,6 +103,11 @@ namespace ELearn.Application.Services
                 post.UserId = user.Result.Id;
                 post.Text = Model.Text;
                 post.CreationDate = post.CreationDate;
+                var validate = new PostValidation().Validate(post);
+                if (!validate.IsValid)
+                {
+                    return ResponseHandler.BadRequest<ViewPostDTO>(null, validate.Errors.Select(x => x.ErrorMessage).ToList());
+                }
                 await _unitOfWork.Posts.UpdateAsync(post);
                 var viewpost = _mapper.Map<ViewPostDTO>(post);
                 viewpost.CreatorName = user.Result.FirstName + " " + user.Result.LastName;
