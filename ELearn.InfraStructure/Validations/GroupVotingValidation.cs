@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public GroupVotingValidation()
         {
-            RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
+            RuleFor(x => x.Id).NotNull();
         }
     }
 }
