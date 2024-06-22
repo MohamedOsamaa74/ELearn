@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs.CommentDTOs;
+using ELearn.Application.DTOs.MessageDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +52,15 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.BadRequest<ViewCommentDTO>();
                 }
+                // Validate the comment
+                var validate = new CommentValidation().Validate(comment);
+                if (!validate.IsValid)
+                {
+                    // Get the errors 
+                    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ResponseHandler.BadRequest<ViewCommentDTO>(null, errors);
+                }
+
                 await _unitOfWork.Comments.AddAsync(comment);
                 return ResponseHandler.Success<ViewCommentDTO>(viewComment);
             }
