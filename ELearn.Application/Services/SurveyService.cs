@@ -7,6 +7,7 @@ using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.ObjectModel;
 
@@ -36,6 +37,9 @@ namespace ELearn.Application.Services
                 var user = await _userService.GetCurrentUserAsync();
                 var survey = _mapper.Map<Survey>(Model);
                 survey.CreatorId = user.Id;
+                var validation = new SurveyValidation().Validate(survey);
+                if (!validation.IsValid)
+                    return ResponseHandler.BadRequest<CreateSurveyDTO>(null,validation.Errors.Select(x => x.ErrorMessage).ToList());
                 await _unitOfWork.Surveys.AddAsync(survey);
                 
                 var result = await SendToGroups(survey.Id, Model.GroupIds);

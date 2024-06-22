@@ -13,7 +13,7 @@ namespace ELearn.InfraStructure.Validations
         public ReactValidation()
         {
             RuleFor(r => r.PostID).NotEmpty();
-            RuleFor(r => r.UserID).NotEmpty();
+            RuleFor(r => r.UserID).NotEmpty().NotNull();
             RuleFor(r => r.CreationDate).NotEmpty();
             //RuleFor(r => r.Type).NotNull();
             RuleFor(r => r.Post).NotNull();

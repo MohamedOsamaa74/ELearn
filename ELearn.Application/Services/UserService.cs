@@ -20,6 +20,8 @@ using System.Collections.ObjectModel;
 using AutoMapper;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
 using ELearn.Application.DTOs.UserDTOs;
+using System.Security.Cryptography;
+using ELearn.InfraStructure.Validations;
 
 namespace ELearn.Application.Services
 {
@@ -94,6 +96,12 @@ namespace ELearn.Application.Services
             {
                 var NewUser = _mapper.Map<ApplicationUser>(Model);
                 NewUser.SecurityStamp = Guid.NewGuid().ToString();
+                var (publicKey, privateKey) = GenerateKeyPair();
+                NewUser.PublicKey = publicKey;
+                NewUser.PrivateKey = privateKey;
+                var valid = new ApplicationUserValidation().Validate(NewUser);
+                if (!valid.IsValid)
+                    return ResponseHandler.BadRequest<AddUserDTO>(null,valid.Errors.Select(x => x.ErrorMessage).ToList());
                 var result = await _userManager.CreateAsync(NewUser, NewUser.NId);
                 if (!result.Succeeded)
                 {
@@ -286,6 +294,19 @@ namespace ELearn.Application.Services
             if (string.IsNullOrEmpty(user.PhoneNumber)) return false;
             return true;
         }
+
+        #region CreateKeys
+        private static (string publicKey, string privateKey) GenerateKeyPair()
+        {
+            using (var rsa = new RSACryptoServiceProvider(2048))
+            {
+                return (
+                    publicKey: Convert.ToBase64String(rsa.ExportRSAPublicKey()),
+                    privateKey: Convert.ToBase64String(rsa.ExportRSAPrivateKey())
+                );
+            }
+        }
+        #endregion
         #endregion
     }
 }
