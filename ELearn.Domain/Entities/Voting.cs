@@ -11,9 +11,8 @@ namespace ELearn.Domain.Entities
         public required string Title { get; set; }
         public required string Description { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
-        public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
-        public bool IsActive { get => Start <= DateTime.Now && End >= DateTime.Now; }
+        public bool IsActive { get => CreationDate <= DateTime.Now && End >= DateTime.Now; }
         public required string Option1 { get; set; }
         public required string Option2 { get; set; }
         public string? Option3 { get; set; }

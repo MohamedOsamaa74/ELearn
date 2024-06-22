@@ -24,21 +24,15 @@ namespace ELearn.InfraStructure.Validations
                 .NotEmpty().WithMessage("Description is required.")
                 .NotNull().WithMessage("Description cannot be null.");
 
-            RuleFor(v => v.Start)
-               .NotEmpty().WithMessage("Start date is required.")
-               .NotNull().WithMessage("Start date cannot be null.")
-               .GreaterThan(DateTime.Now.AddMinutes(5)).WithMessage("Start date must be at least 5 minutes from now.")
-               .GreaterThanOrEqualTo(v => v.CreationDate).WithMessage("Start date must be after the creation date.");
-
             RuleFor(v => v.End)
                 .NotEmpty().WithMessage("End date is required.")
                 .NotNull().WithMessage("End date cannot be null.")
-                .GreaterThan(v => v.Start).WithMessage("End date must be after the start date.");
+                .GreaterThan(v => v.CreationDate).WithMessage("End date must be after the start date.");
 
             RuleFor(v => v.CreationDate)
                 .NotEmpty().WithMessage("Creation date is required.")
                 .NotNull().WithMessage("Creation date cannot be null.")
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Creation date cannot be in the future.");
+                .LessThanOrEqualTo(DateTime.UtcNow.ToLocalTime()).WithMessage("Creation date cannot be in the future.");
 
 
 

@@ -63,7 +63,7 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Get Quizzes From Group
-        [HttpPost("GetQuizzesFromGroup")]
+        [HttpGet("GetQuizzesFromGroup")]
         [Authorize]
         public async Task<IActionResult> GetQuizzesFromGroup([FromQuery] int groupId)
         {

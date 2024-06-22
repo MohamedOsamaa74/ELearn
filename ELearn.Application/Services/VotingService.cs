@@ -186,7 +186,7 @@ namespace ELearn.Application.Services
             {
                 if (date == null)
                     return ResponseHandler.BadRequest<ICollection<ViewVotingDTO>>("Invalid date");
-                var votes = await _unitOfWork.Votings.GetWhereSelectAsync(v => v.Start <= date && v.End >= date, v => v.Id);
+                var votes = await _unitOfWork.Votings.GetWhereSelectAsync(v => v.CreationDate <= date && v.End >= date, v => v.Id);
                 if (votes.IsNullOrEmpty())
                     return ResponseHandler.NotFound<ICollection<ViewVotingDTO>>("There are no Votings ");
                 ICollection<ViewVotingDTO> votesDto = new List<ViewVotingDTO>();
@@ -290,7 +290,6 @@ namespace ELearn.Application.Services
                 if (originalVote is null)
                     return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
                 originalVote.Description = Model.Title;
-                originalVote.Start = Model.Start;
                 originalVote.End = Model.End;
                 var editOptions = AddOptions(originalVote, Model.Options);
                 if (editOptions != "Success")

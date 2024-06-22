@@ -361,7 +361,6 @@ namespace ELearn.InfraStructure
                     {
                         Title = "Voting 1",
                         Description = "First Voting Description",
-                        Start = DateTime.Now,
                         End = DateTime.Now.AddDays(2),
                         CreatorId = Admin.Id,
                         Option1 = "Option 1 for Voting 1",
@@ -372,7 +371,6 @@ namespace ELearn.InfraStructure
                     {
                         Title = "Voting 2",
                         Description = "Second Voting Description",
-                        Start = DateTime.Now,
                         End = DateTime.Now.AddDays(3),
                         CreatorId = Staff.Id,
                         Option1 = "Option 1 for Voting 2",
@@ -382,7 +380,6 @@ namespace ELearn.InfraStructure
                     {
                         Title = "Voting 3",
                         Description = "Third Voting Description",
-                        Start = DateTime.Now,
                         End = DateTime.Now.AddDays(4),
                         CreatorId = Staff.Id,
                         Option1 = "Option 1 for Voting 3",
