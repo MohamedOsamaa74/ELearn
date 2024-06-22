@@ -19,6 +19,8 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ViewMessageDTO>> DeleteMessageAsync(int Id);
         public Task<Response<bool>> DeleteAllMessagesAsync(string ReceiverId);
 
+        public Task<Response<ViewMessageDTO>> DeleteMessageFromOneUserAsync(int Id);
+
 
 
 

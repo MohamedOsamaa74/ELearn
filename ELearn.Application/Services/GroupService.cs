@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs.GroupDTOs;
+using ELearn.Application.DTOs.MessageDTOs;
 using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -14,6 +17,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace ELearn.Application.Services
 {
@@ -50,6 +54,16 @@ namespace ELearn.Application.Services
                     CreatorId = user.Id,
                     DepartmentId = Model.DepartmentId
                 };
+
+                // Validate The Group
+                var validate = new GroupValidation().Validate(group);
+                if (!validate.IsValid)
+                {
+                    // Get the errors 
+                    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ResponseHandler.BadRequest<GroupDTO>(null, errors);
+                }
+
                 await _unitOfWork.Groups.AddAsync(group);
                 return ResponseHandler.Created(Model);
             }

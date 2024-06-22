@@ -50,7 +50,7 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region DeleteMessage
-        [HttpDelete("DeleteMessage/{Id}")]
+        [HttpDelete("DeleteMessageFromTwoUser/{Id}")]
         [Authorize(Roles = "Admin ,Staff ,Student")]
         public async Task<IActionResult> DeleteMessage([FromRoute] int Id)
         {
@@ -60,11 +60,21 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region DeleteAllMessages
-        [HttpDelete("DeleteAllMessages/{ReceiverId}")]
+        [HttpDelete("DeleteAllMessagesFromOneUser/{ReceiverId}")]
         [Authorize(Roles = "Admin ,Staff ,Student")]
         public async Task<IActionResult> DeleteAllMessages([FromRoute] string ReceiverId)
         {
             var response = await _messageService.DeleteAllMessagesAsync(ReceiverId);
+            return this.CreateResponse(response);
+        }
+        #endregion
+
+        #region DeleteMessageFromOneUser
+        [HttpDelete("DeleteMessageFromOneUser/{Id}")]
+        [Authorize(Roles = "Admin ,Staff ,Student")]
+        public async Task<IActionResult> DeleteMessageFromOneUser([FromRoute] int Id)
+        {
+            var response = await _messageService.DeleteMessageFromOneUserAsync(Id);
             return this.CreateResponse(response);
         }
         #endregion

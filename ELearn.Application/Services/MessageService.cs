@@ -104,8 +104,9 @@ namespace ELearn.Application.Services
                     return ResponseHandler.NotFound<List<ViewMessageDTO>>("Chat Not Found");
                 }
                 var messages = await _unitOfWork.Messages.GetWhereAsync(m =>
-                            (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
-                            (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
+                ((m.ReceiverId == ReceiverId && m.SenderId == user.Id) || (m.ReceiverId == user.Id && m.SenderId == ReceiverId)) &&
+                ((m.SenderId == user.Id && !m.IsDeletedBySender) || (m.ReceiverId == user.Id && !m.IsDeletedByReceiver)));
+
                 var ViewMessages = _mapper.Map<List<ViewMessageDTO>>(messages);
                 foreach (var viewMessage in ViewMessages)
                 {
@@ -197,7 +198,7 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region DeleteMessage
+        #region DeleteMessageFromTwoUsers
         public async Task<Response<ViewMessageDTO>> DeleteMessageAsync(int Id)
         {
             try
@@ -213,7 +214,7 @@ namespace ELearn.Application.Services
                     return ResponseHandler.Unauthorized<ViewMessageDTO>("You are not allowed to delete this message");
                 }
                 await _unitOfWork.Messages.DeleteAsync(message);
-                return ResponseHandler.Success(_mapper.Map<ViewMessageDTO>(message));
+                return ResponseHandler.Deleted<ViewMessageDTO>();
             }
             catch (Exception ex)
             {
@@ -222,24 +223,108 @@ namespace ELearn.Application.Services
         }
         #endregion
 
-        #region DeleteAllMessages
+        #region DeleteMessageFromOneUser
+        public async Task<Response<ViewMessageDTO>> DeleteMessageFromOneUserAsync(int Id)
+        {
+            try
+            {
+                var user = await _userService.GetCurrentUserAsync();
+                var message = await _unitOfWork.Messages.GetByIdAsync(Id);
+                if (message == null)
+                {
+                    return ResponseHandler.NotFound<ViewMessageDTO>("Message not found");
+                }
+                var sender = await _userService.GetCurrentUserAsync();
+                if (message.SenderId != sender.Id)
+                {
+                    return ResponseHandler.Unauthorized<ViewMessageDTO>("You are not allowed to delete this message");
+                }
+                if (message.SenderId == user.Id)
+                {
+                    message.IsDeletedBySender = true; // Flag the message as deleted by sender
+                }
+                else if (message.ReceiverId == user.Id)
+                {
+                    message.IsDeletedByReceiver = true; // Flag the message as deleted by receiver
+                }
+                await _unitOfWork.Messages.UpdateAsync(message);
+                var viewMessage = _mapper.Map<ViewMessageDTO>(message);
+                var Receiver = await _unitOfWork.Users.GetByIdAsync(message.ReceiverId);
+                var deT = Decrypt(message.Text, Receiver.PrivateKey);
+                viewMessage.Text = deT;
+                var file = await _unitOfWork.Files.GetWhereSingleAsync(f => f.MessageId == Id);
+                if (file != null)
+                {
+                    viewMessage.url = file.ViewUrl.ToString();
+                }
+
+                return ResponseHandler.Deleted<ViewMessageDTO>();
+            }
+            catch (Exception ex)
+            {
+                return ResponseHandler.BadRequest<ViewMessageDTO>(ex.Message);
+            }
+        }
+        #endregion
+
+        //#region DeleteAllMessagesFromTwoUsers
+        //public async Task<Response<bool>> DeleteAllMessagesAsync(string ReceiverId)
+        //{
+        //    try
+        //    {
+        //        var user = await _userService.GetCurrentUserAsync();
+        //        var Receiver = await _unitOfWork.Users.GetByIdAsync(ReceiverId);
+        //        if (ReceiverId == null)
+        //        {
+        //            return ResponseHandler.NotFound<bool>("Chat Not Found");
+        //        }
+        //        var messages = await _unitOfWork.Messages.GetWhereAsync(m =>
+        //                                   (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
+        //                                                              (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
+        //        foreach (var message in messages)
+        //        {
+        //            await _unitOfWork.Messages.DeleteAsync(message);
+        //        }
+        //        return ResponseHandler.Success(true);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ResponseHandler.BadRequest<bool>(ex.Message);
+        //    }
+        //}
+        //#endregion
+
+        #region DeleteAllMessagesfromOneUser
+
         public async Task<Response<bool>> DeleteAllMessagesAsync(string ReceiverId)
         {
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
-                var Receiver = await _unitOfWork.Users.GetByIdAsync(ReceiverId);
-                if (ReceiverId == null)
+                var receiver = await _unitOfWork.Users.GetByIdAsync(ReceiverId);
+                if (receiver == null)
                 {
                     return ResponseHandler.NotFound<bool>("Chat Not Found");
                 }
+
                 var messages = await _unitOfWork.Messages.GetWhereAsync(m =>
-                                           (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
-                                                                      (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
+                    (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
+                    (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
                 foreach (var message in messages)
                 {
-                    await _unitOfWork.Messages.DeleteAsync(message);
+                    if (message.SenderId == user.Id)
+                    {
+                        message.IsDeletedBySender = true; // Flag the message as deleted by sender
+                    }
+                    else if (message.ReceiverId == user.Id)
+                    {
+                        message.IsDeletedByReceiver = true; // Flag the message as deleted by receiver
+                    }
+                    await _unitOfWork.Messages.UpdateAsync(message);
                 }
+ 
+                await _unitOfWork.Messages.SaveChangesAsync();
+
                 return ResponseHandler.Success(true);
             }
             catch (Exception ex)
@@ -250,8 +335,16 @@ namespace ELearn.Application.Services
         #endregion
 
 
+
+
+
+
+
+
+
+
         #region Encryption
-            private static string Encrypt(string plaintext, string publicKey)
+        private static string Encrypt(string plaintext, string publicKey)
             {
                 using (var rsa = new RSACryptoServiceProvider())
                 {

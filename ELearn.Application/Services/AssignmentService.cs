@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.DTOs.FileDTOs;
+using ELearn.Application.DTOs.MessageDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using MailKit;
 using Microsoft.AspNetCore.Http;
 
@@ -50,6 +52,16 @@ namespace ELearn.Application.Services
                     return ResponseHandler.Unauthorized<ViewAssignmentDTO>("You are not a member of this group");
                 var assignment = _mapper.Map<Assignment>(Model);
                 assignment.UserId = user.Id;
+
+                // Validate the Assignment
+                var validate = new AssignmentValidation().Validate(assignment);
+                if (!validate.IsValid)
+                {
+                    // Get the errors 
+                    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ResponseHandler.BadRequest<ViewAssignmentDTO>(null, errors);
+                }
+
                 await _unitOfWork.Assignments.AddAsync(assignment);
                 ICollection<string> ViewURLs = [];
                 if (Model.Attachements != null && Model.Attachements.Count != 0)

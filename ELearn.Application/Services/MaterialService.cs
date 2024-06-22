@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
+using ELearn.Application.DTOs.MessageDTOs;
 using ELearn.Application.Helpers.Response;
 using ELearn.Application.Interfaces;
 using ELearn.Data;
 using ELearn.Domain.Entities;
 using ELearn.InfraStructure.Repositories.UnitOfWork;
+using ELearn.InfraStructure.Validations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +45,14 @@ namespace ELearn.Application.Services
                 var material = _mapper.Map<Material>(Model);
                 material.GroupId = GroupId;
                 material.UserId = await _userService.GetCurrentUserIDAsync();
+                // Validate the material
+                var validate = new MaterialValidation().Validate(material);
+                if (!validate.IsValid)
+                {
+                    // Get the errors 
+                    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
+                    return ResponseHandler.BadRequest<MaterialDTO>(null, errors);
+                }
                 await _unitOfWork.Materials.AddAsync(material);
                 var fileDto = new UploadFileDTO
                 {

@@ -36,7 +36,6 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.FilesUrls, opt => opt.Ignore());
 
             CreateMap<Announcement, ViewAnnouncementDTO>()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .ForMember(dest => dest.FilesUrls, opt => opt.Ignore())
                 .ForMember(dest => dest.Groups, opt => opt.Ignore());
             #endregion
