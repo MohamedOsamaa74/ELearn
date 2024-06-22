@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public MessageValidation()
         {
-            RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
+            RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Text).NotEmpty().NotNull().Length(1, 2000);
             RuleFor(x => x.SenderId).NotEmpty().NotNull();
             RuleFor(x => x.ReceiverId).NotEmpty().NotNull();

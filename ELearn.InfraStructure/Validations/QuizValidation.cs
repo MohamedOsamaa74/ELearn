@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public QuizValidation()
         {
-            RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
+            RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.title).MaximumLength(100).NotEmpty();
             RuleFor(x => x.UserId).NotEmpty().NotNull();
             RuleFor(x => x.GroupId).NotEmpty().NotNull();
