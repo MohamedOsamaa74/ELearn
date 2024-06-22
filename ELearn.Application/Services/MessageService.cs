@@ -104,8 +104,9 @@ namespace ELearn.Application.Services
                     return ResponseHandler.NotFound<List<ViewMessageDTO>>("Chat Not Found");
                 }
                 var messages = await _unitOfWork.Messages.GetWhereAsync(m =>
-                            (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
-                            (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
+                ((m.ReceiverId == ReceiverId && m.SenderId == user.Id) || (m.ReceiverId == user.Id && m.SenderId == ReceiverId)) &&
+                ((m.SenderId == user.Id && !m.IsDeletedBySender) || (m.ReceiverId == user.Id && !m.IsDeletedByReceiver)));
+
                 var ViewMessages = _mapper.Map<List<ViewMessageDTO>>(messages);
                 foreach (var viewMessage in ViewMessages)
                 {
@@ -213,7 +214,7 @@ namespace ELearn.Application.Services
                     return ResponseHandler.Unauthorized<ViewMessageDTO>("You are not allowed to delete this message");
                 }
                 await _unitOfWork.Messages.DeleteAsync(message);
-                return ResponseHandler.Success(_mapper.Map<ViewMessageDTO>(message));
+                return ResponseHandler.Deleted<ViewMessageDTO>();
             }
             catch (Exception ex)
             {
@@ -227,6 +228,7 @@ namespace ELearn.Application.Services
         {
             try
             {
+                var user = await _userService.GetCurrentUserAsync();
                 var message = await _unitOfWork.Messages.GetByIdAsync(Id);
                 if (message == null)
                 {
@@ -237,9 +239,26 @@ namespace ELearn.Application.Services
                 {
                     return ResponseHandler.Unauthorized<ViewMessageDTO>("You are not allowed to delete this message");
                 }
-                message.IsDeleted = true;
+                if (message.SenderId == user.Id)
+                {
+                    message.IsDeletedBySender = true; // Flag the message as deleted by sender
+                }
+                else if (message.ReceiverId == user.Id)
+                {
+                    message.IsDeletedByReceiver = true; // Flag the message as deleted by receiver
+                }
                 await _unitOfWork.Messages.UpdateAsync(message);
-                return ResponseHandler.Success(_mapper.Map<ViewMessageDTO>(message));
+                var viewMessage = _mapper.Map<ViewMessageDTO>(message);
+                var Receiver = await _unitOfWork.Users.GetByIdAsync(message.ReceiverId);
+                var deT = Decrypt(message.Text, Receiver.PrivateKey);
+                viewMessage.Text = deT;
+                var file = await _unitOfWork.Files.GetWhereSingleAsync(f => f.MessageId == Id);
+                if (file != null)
+                {
+                    viewMessage.url = file.ViewUrl.ToString();
+                }
+
+                return ResponseHandler.Deleted<ViewMessageDTO>();
             }
             catch (Exception ex)
             {
@@ -277,7 +296,6 @@ namespace ELearn.Application.Services
 
         #region DeleteAllMessagesfromOneUser
 
-
         public async Task<Response<bool>> DeleteAllMessagesAsync(string ReceiverId)
         {
             try
@@ -292,14 +310,19 @@ namespace ELearn.Application.Services
                 var messages = await _unitOfWork.Messages.GetWhereAsync(m =>
                     (m.ReceiverId == ReceiverId && m.SenderId == user.Id) ||
                     (m.ReceiverId == user.Id && m.SenderId == ReceiverId));
-
                 foreach (var message in messages)
                 {
-                    message.IsDeleted = true; // Flag the message as deleted
+                    if (message.SenderId == user.Id)
+                    {
+                        message.IsDeletedBySender = true; // Flag the message as deleted by sender
+                    }
+                    else if (message.ReceiverId == user.Id)
+                    {
+                        message.IsDeletedByReceiver = true; // Flag the message as deleted by receiver
+                    }
                     await _unitOfWork.Messages.UpdateAsync(message);
                 }
-
-
+ 
                 await _unitOfWork.Messages.SaveChangesAsync();
 
                 return ResponseHandler.Success(true);
