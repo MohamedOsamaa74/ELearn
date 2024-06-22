@@ -211,7 +211,9 @@ namespace ELearn.Application.Services
                 if (NewData.Address != null) user.Address = NewData.Address;
                 if (NewData.BirthDate != null) user.BirthDate = (DateTime)NewData.BirthDate;
                 if (NewData.DepartmentId != 0) user.DepartmentId = NewData.DepartmentId;
-
+                var valid = new ApplicationUserValidation().Validate(user);
+                if (!valid.IsValid)
+                    return ResponseHandler.BadRequest<AddUserDTO>(null, valid.Errors.Select(x => x.ErrorMessage).ToList());
                 await _unitOfWork.Users.UpdateAsync(user);
                 return ResponseHandler.Updated(_mapper.Map<AddUserDTO>(user));
             }
