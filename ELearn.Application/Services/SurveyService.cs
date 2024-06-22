@@ -39,7 +39,7 @@ namespace ELearn.Application.Services
                 survey.CreatorId = user.Id;
                 var validation = new SurveyValidation().Validate(survey);
                 if (!validation.IsValid)
-                    return ResponseHandler.BadRequest<CreateSurveyDTO>(null,validation.Errors.Select(x => x.ErrorMessage).ToList());
+                    return ResponseHandler.BadRequest<ViewSurveyDTO>(null,validation.Errors.Select(x => x.ErrorMessage).ToList());
                 await _unitOfWork.Surveys.AddAsync(survey);
                 
                 var result = await SendToGroups(survey.Id, Model.GroupIds);

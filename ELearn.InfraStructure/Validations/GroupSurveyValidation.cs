@@ -11,7 +11,7 @@ namespace ELearn.InfraStructure.Validations
     public class GroupSurveyValidation : AbstractValidator<GroupSurvey>
     {
         public GroupSurveyValidation() {
-            RuleFor(x=>x.Id).NotEmpty().GreaterThanOrEqualTo(1);
+            RuleFor(x => x.Id).NotNull();
         }
     }
 }

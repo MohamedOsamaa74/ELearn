@@ -12,7 +12,7 @@ namespace ELearn.InfraStructure.Validations
     {
         public PostValidation()
         {
-            RuleFor(x => x.Id).NotEmpty().GreaterThanOrEqualTo(1);
+            RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Text).NotEmpty().NotNull();
             RuleFor(x => x.UserId).NotEmpty().NotNull();
         }
