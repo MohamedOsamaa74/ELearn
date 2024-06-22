@@ -30,9 +30,6 @@ namespace ELearn.InfraStructure.Validations
                 .NotNull().WithMessage("End date cannot be null.")
                 .GreaterThan(x => x.Start).WithMessage("End date must be after the start date.");
 
-            RuleFor(x => x.Questions)
-                .NotEmpty().WithMessage("There must be at least one question.")
-                .ForEach(q => q.SetValidator(new QuestionValidation()));
 
         }
     }

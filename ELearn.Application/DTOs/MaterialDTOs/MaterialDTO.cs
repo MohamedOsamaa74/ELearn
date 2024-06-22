@@ -16,5 +16,6 @@ namespace ELearn.Application.DTOs.MaterialDTOs
         public required string DownloadUrl { get; set; }
         public required string ViewUrl { get; set; }
         public DateTime CreationDate { get; set; }
+        public string? CreatorName { get; set; }
     }
 }

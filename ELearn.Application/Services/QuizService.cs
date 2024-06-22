@@ -211,9 +211,11 @@ namespace ELearn.Application.Services
                 ICollection<ViewQuizDTO> quizDtos = [];
                 foreach (var quiz in quizzes)
                 {
+                    var creator = await _unitOfWork.Users.GetByIdAsync(quiz.UserId);
                     var quizDto = _mapper.Map<ViewQuizDTO>(quiz);
                     var questions = await _questionService.GetQuestionsByQuizIdAsync(quiz.Id);
                     quizDto.Questions = questions.Data;
+                    quizDto.CreatorName = creator.FirstName + ' ' + creator.LastName;
                     quizDtos.Add(quizDto);
                 }
 

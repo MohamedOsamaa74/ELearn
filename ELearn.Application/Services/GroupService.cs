@@ -120,7 +120,9 @@ namespace ELearn.Application.Services
                 foreach(var id in usersIds)
                 {
                     var user = await _unitOfWork.Users.GetByIdAsync(id);
+                    var department = await _unitOfWork.Departments.GetByIdAsync(user.DepartmentId);
                     var userDto = _mapper.Map<ParticipantDTO>(user);
+                    userDto.DepartmentName = department.Title;
                     usersDto.Add(userDto);
                 }
                 return ResponseHandler.ManySuccess(usersDto);
@@ -143,7 +145,11 @@ namespace ELearn.Application.Services
                 var groupsDto = new List<GroupDTO>();
                 foreach(var group in groups)
                 {
+                    var creator = await _unitOfWork.Users.GetByIdAsync(group.CreatorId);
+                    var dept = await _unitOfWork.Departments.GetByIdAsync(group.DepartmentId);
                     var dto = _mapper.Map<GroupDTO>(group);
+                    dto.InstructorName = creator.FirstName + ' ' + creator.LastName;
+                    dto.DepartmentName = dept.Title;
                     groupsDto.Add(dto);
                 }
                 return ResponseHandler.ManySuccess(groupsDto);

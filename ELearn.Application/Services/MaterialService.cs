@@ -178,6 +178,7 @@ namespace ELearn.Application.Services
                 ICollection<MaterialDTO> materialDTOs = [];
                 foreach(var material in materials)
                 {
+                    var creator = await _unitOfWork.Users.GetByIdAsync(material.UserId);
                     var materialDTO = _mapper.Map<MaterialDTO>(material);
                     var file = await _unitOfWork.Files.GetWhereSingleAsync(f => f.MaterialId == material.Id);
                     if (file != null)
@@ -186,6 +187,7 @@ namespace ELearn.Application.Services
                         materialDTO.DownloadUrl = file.DownloadUrl;
                         materialDTO.ViewUrl = file.ViewUrl;
                     }
+                    materialDTO.CreatorName = creator.FirstName + ' ' + creator.LastName;
                     materialDTOs.Add(materialDTO);
                 }
                 return ResponseHandler.Success(materialDTOs);

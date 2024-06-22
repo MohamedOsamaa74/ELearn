@@ -14,6 +14,7 @@ namespace ELearn.Application.DTOs.GroupDTOs
         public string? CreatorId { get; set; }
         public string? InstructorName { get; set; }
         public required int DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
 
         //public DateTime CreateDate => DateTime.UtcNow.ToLocalTime();
     }

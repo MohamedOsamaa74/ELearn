@@ -16,8 +16,6 @@ namespace ELearn.InfraStructure.Validations
             RuleFor(r => r.UserID).NotEmpty().NotNull();
             RuleFor(r => r.CreationDate).NotEmpty();
             //RuleFor(r => r.Type).NotNull();
-            RuleFor(r => r.Post).NotNull();
-            RuleFor(r => r.User).NotNull();
         }
     }
 }

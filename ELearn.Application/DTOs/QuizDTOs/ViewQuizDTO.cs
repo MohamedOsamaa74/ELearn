@@ -14,6 +14,7 @@ namespace ELearn.Application.DTOs.QuizDTOs
         public required int Grade { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
+        public string? CreatorName { get; set; }
         public virtual required ICollection<QuestionDTO> Questions { get; set; } = [];
     }
 }
