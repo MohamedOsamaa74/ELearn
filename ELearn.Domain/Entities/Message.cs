@@ -10,6 +10,8 @@ namespace ELearn.Domain.Entities
         public int Id { get; set; }
         public required string Text { get; set; }
         public required DateTime CreationDate { get; set; } = DateTime.UtcNow.ToLocalTime();
+        public bool IsDeleted { get; set; } = false;
+       // public bool SenderDeleted { get; set; } = false;
 
         #region ForeignKeys
         public required string SenderId { get; set; }
