@@ -23,7 +23,7 @@ namespace ELearn.Application.Interfaces
         public Task<Response<AddUserDTO>> EditUserAsync(string id, EditUserDTO NewData);
         public Task<Response<AddUserDTO>> DeleteUserAsync(string Id);
         public Task<Response<ICollection<AddUserDTO>>> DeleteManyAsync(List<string> Ids);
-
+        public Task<Response<ICollection<AddUserDTO>>> GetUsersWithRoleAsync(string Role);
         public Task<string> GetUserRoleAsync();
     }
 }

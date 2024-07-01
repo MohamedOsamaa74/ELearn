@@ -4,7 +4,6 @@
     {
         public int Id { get; set; }
         public required string Text { get; set; }
-        //file
         public required string Option1 { get; set; }
         public required string Option2 { get; set; }
         public string? Option3 { get; set; }

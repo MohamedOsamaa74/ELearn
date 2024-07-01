@@ -91,6 +91,16 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
+        #region GetAllDepartements
+        [HttpGet("GetAllDepartements")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> GetAllDepartements()
+        {
+            var response = await _groupService.GetAllDepartementsAsync();
+            return this.CreateResponse(response);
+        }
+        #endregion
+
         #region GetUserGroups
         [HttpGet("GetUserGroups")]
         [Authorize]

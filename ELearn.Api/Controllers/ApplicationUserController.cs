@@ -56,6 +56,16 @@ namespace ELearn.Api.Controllers
         }
         #endregion
 
+        #region Get By Role
+        [HttpGet("GetByRole{Role}")]
+        [Authorize(Roles =("Admin"))]
+        public async Task<IActionResult>GetByRole(string Role)
+        {
+            var responses = await _userService.GetUsersWithRoleAsync(Role);
+            return this.CreateResponse(responses);
+        }
+        #endregion
+
         #region Delete One
         [HttpDelete("DeleteUser{Id}")]
         [Authorize(Roles = "Admin")]

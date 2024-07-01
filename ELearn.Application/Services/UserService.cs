@@ -87,6 +87,30 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region GetUsersWithRole
+        public async Task<Response<ICollection<AddUserDTO>>> GetUsersWithRoleAsync(string Role)
+        {
+            var users = await _userManager.GetUsersInRoleAsync(Role);
+            if (users.IsNullOrEmpty())
+                return ResponseHandler.NotFound<ICollection<AddUserDTO>>("There Are No Users");
+            try
+            {
+                var usersDTO = new List<AddUserDTO>();
+                foreach (var item in users)
+                {
+                    var dto = _mapper.Map<AddUserDTO>(item);
+                    dto.Role = (await _userManager.GetRolesAsync(item)).FirstOrDefault();
+                    usersDTO.Add(dto);
+                }
+                return ResponseHandler.ManySuccess(usersDTO);
+            }
+            catch (Exception Ex)
+            {
+                return ResponseHandler.BadRequest<ICollection<AddUserDTO>>($"An Error Occurred,{Ex}");
+            }
+        }
+        #endregion
+
         #region CreateNewUser
         public async Task<Response<AddUserDTO>> CreateNewUserAsync(AddUserDTO Model)
         {
@@ -110,7 +134,10 @@ namespace ELearn.Application.Services
                         errors += error.Description;
                     return ResponseHandler.BadRequest<AddUserDTO>(errors);
                 }
-                await _userManager.AddToRoleAsync(NewUser, UserRoles.Student);
+                if (Model.Role == "Instructor")
+                    await _userManager.AddToRoleAsync(NewUser, UserRoles.Staff);
+                else if(Model.Role == "Student")
+                    await _userManager.AddToRoleAsync(NewUser, UserRoles.Student);
                 return ResponseHandler.Created(Model);
             }
             catch (Exception Ex)
@@ -166,6 +193,7 @@ namespace ELearn.Application.Services
                 foreach (var item in users)
                 {
                     var dto = _mapper.Map<AddUserDTO>(item);
+                    dto.Role = (await _userManager.GetRolesAsync(item)).FirstOrDefault();
                     usersDTO.Add(dto);
                 }
                 return ResponseHandler.ManySuccess(usersDTO);

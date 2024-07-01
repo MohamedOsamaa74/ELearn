@@ -45,14 +45,14 @@ namespace ELearn.Application.Services
                 var material = _mapper.Map<Material>(Model);
                 material.GroupId = GroupId;
                 material.UserId = await _userService.GetCurrentUserIDAsync();
-                // Validate the material
-                var validate = new MaterialValidation().Validate(material);
-                if (!validate.IsValid)
-                {
-                    // Get the errors 
-                    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
-                    return ResponseHandler.BadRequest<MaterialDTO>(null, errors);
-                }
+                //// Validate the material
+                //var validate = new MaterialValidation().Validate(material);
+                //if (!validate.IsValid)
+                //{
+                //    // Get the errors 
+                //    var errors = validate.Errors.Select(e => e.ErrorMessage).ToList();
+                //    return ResponseHandler.BadRequest<MaterialDTO>(null, errors);
+                //}
                 await _unitOfWork.Materials.AddAsync(material);
                 var fileDto = new UploadFileDTO
                 {

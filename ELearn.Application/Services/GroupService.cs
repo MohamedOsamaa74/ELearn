@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ELearn.Application.DTOs.DepartementDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MessageDTOs;
 using ELearn.Application.DTOs.UserDTOs;
@@ -226,6 +227,9 @@ namespace ELearn.Application.Services
                 if (UserName != null)
                     user = await _userService.GetByUserName(UserName);
                 var groups = await _unitOfWork.UserGroups.GetWhereSelectAsync(u => u.UserId == user.Id, g => g.GroupId);
+                if (groups.IsNullOrEmpty())
+                    return ResponseHandler.NotFound<ICollection<GroupDTO>>("there Are No Groups Yet");
+                
                 var groupsDto = new List<GroupDTO>();
                 foreach(var item in groups)
                 {
@@ -242,6 +246,19 @@ namespace ELearn.Application.Services
             {
                 return ResponseHandler.BadRequest<ICollection<GroupDTO>>($"An Error Occurred, {ex}");
             }
+        }
+        #endregion
+
+        #region GetAllDepartements
+        public async Task<Response<ICollection<ViewDepartementDTO>>> GetAllDepartementsAsync()
+        {
+            var depts = await _unitOfWork.Departments.GetAllAsync();
+            ICollection<ViewDepartementDTO> deptsDto = [];
+            foreach(var dept in depts)
+            {
+                deptsDto.Add(_mapper.Map<ViewDepartementDTO>(dept));
+            }
+            return ResponseHandler.Success(deptsDto);
         }
         #endregion
         

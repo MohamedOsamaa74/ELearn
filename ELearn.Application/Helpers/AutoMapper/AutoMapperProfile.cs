@@ -3,6 +3,7 @@ using ELearn.Application.DTOs;
 using ELearn.Application.DTOs.AnnouncementDTOs;
 using ELearn.Application.DTOs.AssignmentDTOs;
 using ELearn.Application.DTOs.CommentDTOs;
+using ELearn.Application.DTOs.DepartementDTOs;
 using ELearn.Application.DTOs.FileDTOs;
 using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.MaterialDTOs;
@@ -41,7 +42,8 @@ namespace ELearn.Application.Helpers.AutoMapper
             #endregion
 
             #region User Mapper
-            CreateMap<ApplicationUser, AddUserDTO>();
+            CreateMap<ApplicationUser, AddUserDTO>()
+                .ForMember(dest => dest.Role, opt => opt.Ignore());
 
             CreateMap<AddUserDTO, ApplicationUser>();
 
@@ -55,6 +57,12 @@ namespace ELearn.Application.Helpers.AutoMapper
 
             CreateMap<ApplicationUser, ParticipantDTO>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FirstName + ' ' + src.LastName));
+            #endregion
+
+            #region Departement Mapper
+
+            CreateMap<Department, ViewDepartementDTO>();
+
             #endregion
 
             #region Group Mapper

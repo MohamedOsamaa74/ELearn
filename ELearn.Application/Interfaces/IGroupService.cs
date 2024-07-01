@@ -1,4 +1,5 @@
-﻿using ELearn.Application.DTOs.GroupDTOs;
+﻿using ELearn.Application.DTOs.DepartementDTOs;
+using ELearn.Application.DTOs.GroupDTOs;
 using ELearn.Application.DTOs.UserDTOs;
 using ELearn.Application.Helpers.Response;
 using System;
@@ -23,5 +24,7 @@ namespace ELearn.Application.Interfaces
         //public Task<bool> IsActiveAsync();
         public Task<Response<UserGroupDTO>> AddUserToGroupAsync(UserGroupDTO Model);
         public Task<bool> UserInGroupAsync(int GroupId, string UserName);
+
+        public Task<Response<ICollection<ViewDepartementDTO>>> GetAllDepartementsAsync();
     }
 }

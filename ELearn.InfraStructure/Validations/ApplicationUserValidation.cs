@@ -19,13 +19,13 @@ namespace ELearn.InfraStructure.Validations
             RuleFor(user => user.FirstName)
                 .NotEmpty().WithMessage("First name is required.")
                 .MaximumLength(50).WithMessage("First name cannot exceed 50 characters.")
-                .Matches("^[a-zA-Z]+$").WithMessage("First name can only contain alphabetic characters.");
-
+                .Matches("^[a-zA-Z\u0621-\u064A ]+$").WithMessage("First name can only contain alphabetic characters.");
 
             RuleFor(user => user.LastName)
                 .NotEmpty().WithMessage("Last name is required.")
                 .MaximumLength(50).WithMessage("Last name cannot exceed 50 characters.")
-                .Matches("^[a-zA-Z]+$").WithMessage("Name can only contain alphabetic characters.");
+                .Matches("^[a-zA-Z\u0621-\u064A ]+$").WithMessage("Last name can only contain alphabetic characters.");
+
 
 
             RuleFor(user => user.BirthDate)

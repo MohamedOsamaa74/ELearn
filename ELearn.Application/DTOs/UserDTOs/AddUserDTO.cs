@@ -17,6 +17,7 @@ namespace ELearn.Application.DTOs.UserDTOs
         public required string Faculty { get; set; }
         public required string NId { get; set; }
         public required string UserName { get; set; }
+        public string? Role { get; set; }
         public string? Grade { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
