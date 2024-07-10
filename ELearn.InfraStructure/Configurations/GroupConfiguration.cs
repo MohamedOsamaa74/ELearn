@@ -26,7 +26,8 @@ namespace ELearn.InfraStructure.Configurations
             //one user create many groups  
             builder.HasOne(u => u.User)
                 .WithMany(g => g.CreatedGroups)
-                .HasForeignKey(u => u.CreatorId);
+                .HasForeignKey(u => u.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //many user in many groups
             builder.HasMany(u => u.UsersInGroup)
@@ -63,7 +64,7 @@ namespace ELearn.InfraStructure.Configurations
             builder.HasMany(u => u.UserGroups)
                 .WithOne(g => g.Group)
                 .HasForeignKey(g => g.GroupId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

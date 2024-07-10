@@ -4,7 +4,7 @@ namespace ELearn.Application.DTOs
 {
     public class CreateSurveyDTO
     {
-        public required string Text { get; set; }
+        public required string title { get; set; }
         public required DateTime Start { get; set; }
         public required DateTime End { get; set; }
         public required ICollection<int> GroupIds { get; set; } = new HashSet<int>();

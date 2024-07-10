@@ -19,11 +19,13 @@ namespace ELearn.InfraStructure.Configurations
             builder
                 .HasOne(ug => ug.User)
                 .WithMany(ug => ug.UserGroups)
-                .HasForeignKey(ug => ug.UserId);
+                .HasForeignKey(ug => ug.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
             builder
                 .HasOne(ug => ug.Group)
                 .WithMany(ug => ug.UserGroups)
-                .HasForeignKey(ug => ug.GroupId);
+                .HasForeignKey(ug => ug.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

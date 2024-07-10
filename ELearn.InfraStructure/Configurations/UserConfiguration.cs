@@ -16,6 +16,20 @@ namespace ELearn.InfraStructure.Configurations
     {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
+
+            //one user created many groups
+            builder.HasMany(p => p.CreatedGroups)
+                .WithOne(r => r.User)
+                .HasForeignKey(p => p.CreatorId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            //many users in many groups
+            builder.HasMany(u => u.UserGroups)
+                .WithOne(g => g.User)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             //one user(o)  to many posts(M)
            builder.HasMany(p => p.Posts)
                   .WithOne(r => r.User)

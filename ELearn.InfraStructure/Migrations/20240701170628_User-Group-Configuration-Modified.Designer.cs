@@ -4,6 +4,7 @@ using ELearn.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELearn.InfraStructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240701170628_User-Group-Configuration-Modified")]
+    partial class UserGroupConfigurationModified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -374,6 +377,7 @@ namespace ELearn.InfraStructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("DepartmentId")
@@ -1245,7 +1249,8 @@ namespace ELearn.InfraStructure.Migrations
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
                         .WithMany("CreatedGroups")
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("ELearn.Domain.Entities.Department", "Department")
                         .WithMany("GroupsOfDepartment")
@@ -1536,13 +1541,13 @@ namespace ELearn.InfraStructure.Migrations
                     b.HasOne("ELearn.Domain.Entities.Group", "Group")
                         .WithMany("UserGroups")
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("ELearn.Domain.Entities.ApplicationUser", "User")
                         .WithMany("UserGroups")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Group");
