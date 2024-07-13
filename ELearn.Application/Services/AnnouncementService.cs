@@ -123,7 +123,7 @@ namespace ELearn.Application.Services
                 await _unitOfWork.Announcments.AddAsync(announcement);
 
                 var ViewAnnouncement = _mapper.Map<ViewAnnouncementDTO>(announcement);
-                ViewAnnouncement.UserId = userId;
+                ViewAnnouncement.UserName = userId;
                 ViewAnnouncement.Groups = (ICollection<int>)Model.Groups;
 
                 List<string> ViewUrls = [];
@@ -212,7 +212,9 @@ namespace ELearn.Application.Services
                 var viewAnnouncementDTOs = new List<ViewAnnouncementDTO>();
                 foreach (var item in announcements)
                 {
+                    var creator = await _userService.GetByIdAsync(item.UserId);
                     var dto = _mapper.Map<ViewAnnouncementDTO>(item);
+                    dto.UserName = creator.UserName;
                     dto.Groups = (ICollection<int>)await GetAnnouncementGroupsAsync(item.Id);
                     dto.FilesUrls = await GetAnnouncementFiles(item.Id);
                     viewAnnouncementDTOs.Add(dto);

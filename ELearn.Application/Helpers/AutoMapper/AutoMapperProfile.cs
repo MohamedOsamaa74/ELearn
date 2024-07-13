@@ -32,7 +32,7 @@ namespace ELearn.Application.Helpers.AutoMapper
                 .ForMember(dest => dest.Files, opt => opt.Ignore());
 
             CreateMap<UploadAnnouncementDTO, ViewAnnouncementDTO>()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.UserName, opt => opt.Ignore())
                 .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
                 .ForMember(dest => dest.FilesUrls, opt => opt.Ignore());
 
