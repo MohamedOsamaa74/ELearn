@@ -114,16 +114,16 @@ namespace ELearn.Application.Services
         {
             try
             {
-                var userId = await _userService.GetCurrentUserIDAsync();
+                var user = await _userService.GetCurrentUserAsync();
                 var announcement = _mapper.Map<Announcement>(Model);
-                announcement.UserId = userId;
+                announcement.UserId = user.Id;
                 var validate = new AnnouncementValidation().Validate(announcement);
                 if (!validate.IsValid)
                     return ResponseHandler.BadRequest<ViewAnnouncementDTO>(null, validate.Errors.Select(e => e.ErrorMessage).ToList());
                 await _unitOfWork.Announcments.AddAsync(announcement);
 
                 var ViewAnnouncement = _mapper.Map<ViewAnnouncementDTO>(announcement);
-                ViewAnnouncement.UserName = userId;
+                ViewAnnouncement.UserName = user.UserName;
                 ViewAnnouncement.Groups = (ICollection<int>)Model.Groups;
 
                 List<string> ViewUrls = [];
