@@ -217,6 +217,7 @@ namespace ELearn.Application.Services
                     dto.UserName = creator.UserName;
                     dto.Groups = (ICollection<int>)await GetAnnouncementGroupsAsync(item.Id);
                     dto.FilesUrls = await GetAnnouncementFiles(item.Id);
+                    dto.UserProfilePictureUrl = await _userService.GetUserProfilePictureAsync(item.UserId);
                     viewAnnouncementDTOs.Add(dto);
                 }
 

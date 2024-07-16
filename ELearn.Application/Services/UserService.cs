@@ -270,6 +270,18 @@ namespace ELearn.Application.Services
         }
         #endregion
 
+        #region GetUserProfilePicture
+        public async Task<string> GetUserProfilePictureAsync(string UserId = null)
+        {
+            if (UserId == null)
+                UserId = await GetCurrentUserIDAsync();
+            var ProfilePictureUrl = await _unitOfWork.Files.GetWhereAsync(x => x.UserId == UserId && x.FolderName == "ProfilePictures");
+            if (ProfilePictureUrl.IsNullOrEmpty())
+                return null;
+            return ProfilePictureUrl.FirstOrDefault().ViewUrl;
+        }
+        #endregion
+
         #region Private Methods
         private async Task<IEnumerable<ApplicationUser>> UploadCSV(IFormFile file)
         {

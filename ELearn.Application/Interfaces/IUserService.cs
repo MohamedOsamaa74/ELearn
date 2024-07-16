@@ -25,5 +25,6 @@ namespace ELearn.Application.Interfaces
         public Task<Response<ICollection<AddUserDTO>>> DeleteManyAsync(List<string> Ids);
         public Task<Response<ICollection<AddUserDTO>>> GetUsersWithRoleAsync(string Role);
         public Task<string> GetUserRoleAsync();
+        public Task<string> GetUserProfilePictureAsync(string UserId = null);
     }
 }
