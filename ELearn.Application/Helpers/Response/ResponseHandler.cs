@@ -72,7 +72,15 @@ namespace ELearn.Application.Helpers.Response
                 Message = message
             };
         }
-
+        public static Response<T> Forbidden<T>(string message = "Forbidden")
+        {
+            return new Response<T>()
+            {
+                StatusCode = HttpStatusCode.Forbidden,
+                Succeeded = false,
+                Message = message
+            };
+        }
         public static Response<T> BadRequest<T>(string Message = null, List<string> Errors = null)
         {
             return new Response<T>()

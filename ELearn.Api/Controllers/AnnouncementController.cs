@@ -84,7 +84,7 @@ namespace ELearn.Api.Controllers
 
         #region Edit
         [HttpPut("EditAnnouncement/{AnnouncementId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> UpdateAnnouncement([FromBody] UploadAnnouncementDTO Model, int AnnouncementId)
         {
             if (!ModelState.IsValid)
@@ -98,7 +98,7 @@ namespace ELearn.Api.Controllers
 
         #region Delete One
         [HttpDelete("Delete/{AnnouncementId:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> DeleteAnnouncement(int AnnouncementId)
         {
             var response = await _announcementService.DeleteAsync(AnnouncementId);

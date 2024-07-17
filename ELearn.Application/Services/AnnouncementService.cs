@@ -154,6 +154,9 @@ namespace ELearn.Application.Services
             var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
             if (announcement is null)
                 return ResponseHandler.NotFound<UploadAnnouncementDTO>();
+            var user = await _userService.GetCurrentUserAsync();
+            if(user.Id != announcement.UserId)
+                return ResponseHandler.Forbidden<UploadAnnouncementDTO>();
             try
             {
                 await _unitOfWork.Announcments.DeleteAsync(announcement);
@@ -172,6 +175,9 @@ namespace ELearn.Application.Services
             var announcement = await _unitOfWork.Announcments.GetByIdAsync(Id);
             if (announcement is null)
                 return ResponseHandler.NotFound<UploadAnnouncementDTO>();
+            var user = await _userService.GetCurrentUserAsync();
+            if (user.Id != announcement.UserId)
+                return ResponseHandler.Forbidden<UploadAnnouncementDTO>();
             try
             {
                 announcement.Text = Model.Text;
