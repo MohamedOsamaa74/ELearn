@@ -12,6 +12,7 @@ namespace ELearn.InfraStructure.Repositories.Base
         Task<IEnumerable<T>> GetWhereAsync(Expression<Func<T, bool>> expression);
         Task<T> GetWhereSingleAsync(Expression<Func<T, bool>> expression);
         Task<List<TResult>> GetWhereSelectAsync<TResult>(Expression<Func<T, bool>> Condition, Expression<Func<T, TResult>> expression);
+        Task<int> CountAsync(Expression<Func<T, bool>> expression);
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         Task UpdateAsync(T entity);

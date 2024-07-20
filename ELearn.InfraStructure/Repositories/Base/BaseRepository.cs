@@ -64,6 +64,11 @@ namespace ELearn.InfraStructure.Repositories.Base
             return await _context.Set<T>().Where(Condition).Select(expression).ToListAsync();
         }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>> expression)
+        {
+            return await _context.Set<T>().CountAsync(expression);
+        }
+
         public virtual async Task<IEnumerable<object>> GetAllAsync(Expression<Func<T, object>> Selected = null)
             => await _context.Set<T>().Select(Selected).ToListAsync();
 
