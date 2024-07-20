@@ -60,6 +60,15 @@ namespace ELearn.Application.Services
                 var viewVote = _mapper.Map<ViewVotingDTO>(vote);
                 viewVote.Groups = Model.groups;
                 viewVote.CreatorName = user.FirstName + " " + user.LastName;
+                foreach(var opt in Model.Options)
+                {
+                    OptionPercentageDTO optionPercentage = new()
+                    {
+                        Text = opt,
+                        Percentage = 0
+                    };
+
+                }
                 return ResponseHandler.Created(viewVote);
             }
             catch (Exception Ex)
@@ -83,6 +92,7 @@ namespace ELearn.Application.Services
                 viewVote.Groups = await _unitOfWork.GroupVotings
                     .GetWhereSelectAsync(v => v.Id == Id, v => v.GroupId);
                 viewVote.CreatorName = user.FirstName + " " + user.LastName;
+                viewVote.OptionPercentages = await GetVotingOptionsPercentageAsync(Id);
                 return ResponseHandler.Success(viewVote);
             }
             catch (Exception Ex)
@@ -304,6 +314,7 @@ namespace ELearn.Application.Services
 
                 await _unitOfWork.Votings.UpdateAsync(originalVote);
                 var viewVote = _mapper.Map<ViewVotingDTO>(originalVote);
+                viewVote.OptionPercentages = await GetVotingOptionsPercentageAsync(Id);
                 return ResponseHandler.Success(viewVote);
             }
             catch (Exception Ex)
@@ -477,6 +488,62 @@ namespace ELearn.Application.Services
             {
                 return ResponseHandler.BadRequest<ICollection<ViewVotingDTO>>($"An Error Occurred, {Ex}");
             }
+        }
+        #endregion
+
+        #region GetVotingOptionsPercentage
+        private async Task<ICollection<OptionPercentageDTO>> GetVotingOptionsPercentageAsync(int VoteId)
+        {
+            var vote = await _unitOfWork.Votings.GetByIdAsync(VoteId);
+            if (vote is null)
+                return null;
+
+            ICollection<OptionPercentageDTO> options = [];
+            
+            options.Add(new OptionPercentageDTO()
+            {
+                Text = vote.Option1,
+                Percentage = await _unitOfWork.UserAnswerVotings
+                    .CountAsync(v => v.VotingId == VoteId && v.Option == vote.Option1)
+            });
+
+            options.Add(new OptionPercentageDTO()
+            {
+                Text = vote.Option2,
+                Percentage = await _unitOfWork.UserAnswerVotings
+                    .CountAsync(v => v.VotingId == VoteId && v.Option == vote.Option2)
+            });
+
+            if(vote.Option3 != null)
+            {
+                options.Add(new OptionPercentageDTO()
+                {
+                    Text = vote.Option3,
+                    Percentage = await _unitOfWork.UserAnswerVotings
+                    .CountAsync(v => v.VotingId == VoteId && v.Option == vote.Option3)
+                });
+            }
+
+            if (vote.Option4 != null)
+            {
+                options.Add(new OptionPercentageDTO()
+                {
+                    Text = vote.Option4,
+                    Percentage = await _unitOfWork.UserAnswerVotings
+                    .CountAsync(v => v.VotingId == VoteId && v.Option == vote.Option4)
+                });
+            }
+
+            if (vote.Option5 != null)
+            {
+                options.Add(new OptionPercentageDTO()
+                {
+                    Text = vote.Option5,
+                    Percentage = await _unitOfWork.UserAnswerVotings
+                    .CountAsync(v => v.VotingId == VoteId && v.Option == vote.Option5)
+                });
+            }
+            return options;
         }
         #endregion
 
