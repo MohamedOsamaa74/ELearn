@@ -88,11 +88,15 @@ namespace ELearn.Application.Services
                     return ResponseHandler.NotFound<ViewVotingDTO>("There is no such Voting");
 
                 var user = await _unitOfWork.Users.GetByIdAsync(vote.CreatorId);
+                var currentUser = await _userService.GetCurrentUserAsync();
                 var viewVote = _mapper.Map<ViewVotingDTO>(vote);
                 viewVote.Groups = await _unitOfWork.GroupVotings
                     .GetWhereSelectAsync(v => v.Id == Id, v => v.GroupId);
                 viewVote.CreatorName = user.FirstName + " " + user.LastName;
                 viewVote.OptionPercentages = await GetVotingOptionsPercentageAsync(Id);
+                var userId = currentUser.Id;
+                var hasVoted = await _unitOfWork.UserAnswerVotings.GetWhereAsync(v => v.VotingId == Id && v.UserId == currentUser.Id);
+                viewVote.hasVoted = hasVoted is null ? false : true;
                 return ResponseHandler.Success(viewVote);
             }
             catch (Exception Ex)

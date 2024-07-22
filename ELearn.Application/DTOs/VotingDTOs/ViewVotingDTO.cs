@@ -18,6 +18,7 @@ namespace ELearn.Application.DTOs.VotingDTOs
         public bool IsActive { get; set; }
         public required ICollection<int> Groups { get; set; }
         public required ICollection<OptionPercentageDTO> OptionPercentages { get; set; }
+        public bool? hasVoted { get; set; }
         //public required string Option1 { get; set; }
         //public required string Option2 { get; set; }
         //public string? Option3 { get; set; }
