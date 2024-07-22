@@ -37,9 +37,9 @@ namespace ELearn.Api.Controllers
         #endregion
 
         #region Recieve Student Response
-        [HttpPost("SubmitResponse/{VoteId:int}/{Option}")]
+        [HttpPost("SubmitResponse/{VoteId:int}")]
         [Authorize]
-        public async Task<IActionResult> SubmitResponse(int VoteId, string Option)
+        public async Task<IActionResult> SubmitResponse(int VoteId,[FromBody] string Option)
         {
             var response = await _votingService.SubmitResponseAsync(VoteId, Option);
             return this.CreateResponse(response);

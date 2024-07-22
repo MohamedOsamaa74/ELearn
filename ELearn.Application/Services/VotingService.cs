@@ -34,7 +34,7 @@ namespace ELearn.Application.Services
                 var user = await _userService.GetCurrentUserAsync();
                 var vote = _mapper.Map<Voting>(Model);
                 vote.CreatorId = user.Id;
-                if (Model.Options.IsNullOrEmpty() || Model.Options.Count() < 2 || Model.Options.Count()>5)
+                if (Model.Options.IsNullOrEmpty() || Model.Options.Count() < 2 || Model.Options.Count() > 5)
                     return ResponseHandler.BadRequest<ViewVotingDTO>("You have to insert at least two options and at most five options");
 
 
@@ -57,19 +57,8 @@ namespace ELearn.Application.Services
                 if (sendVote != "Success")
                     return ResponseHandler.BadRequest<ViewVotingDTO>($"An Error Occurred, {sendVote}");
 
-                var viewVote = _mapper.Map<ViewVotingDTO>(vote);
-                viewVote.Groups = Model.groups;
-                viewVote.CreatorName = user.FirstName + " " + user.LastName;
-                foreach(var opt in Model.Options)
-                {
-                    OptionPercentageDTO optionPercentage = new()
-                    {
-                        Text = opt,
-                        Percentage = 0
-                    };
-
-                }
-                return ResponseHandler.Created(viewVote);
+                var viewVote = await GetByIdAsync(vote.Id);
+                return ResponseHandler.Created(viewVote.Data);
             }
             catch (Exception Ex)
             {
@@ -167,7 +156,7 @@ namespace ELearn.Application.Services
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
-                if(user == null)
+                if (user == null)
                     return ResponseHandler.NotFound<ICollection<ViewVotingDTO>>("There is no such User");
                 var groups = await _unitOfWork.UserGroups.GetWhereSelectAsync(g => g.UserId == user.Id, g => g.GroupId);
                 if (groups.IsNullOrEmpty())
@@ -261,6 +250,8 @@ namespace ELearn.Application.Services
             try
             {
                 var user = await _userService.GetCurrentUserAsync();
+                if(user is null)
+                    return ResponseHandler.Forbidden<UserVotingDTO>();
                 var vote = await _unitOfWork.Votings.GetByIdAsync(VotingId);
                 if (vote is null)
                     return ResponseHandler.NotFound<UserVotingDTO>("There is no such Voting");
@@ -296,10 +287,10 @@ namespace ELearn.Application.Services
             {
                 var originalVote = await _unitOfWork.Votings.GetByIdAsync(Id);
                 var user = await _userService.GetCurrentUserAsync();
-                var role= await _userService.GetUserRoleAsync();
+                var role = await _userService.GetUserRoleAsync();
                 if (user == null)
                     return ResponseHandler.NotFound<ViewVotingDTO>("There is no such User");
-                if(originalVote.CreatorId != user.Id && role != "Admin")
+                if (originalVote.CreatorId != user.Id && role != "Admin")
                     return ResponseHandler.Unauthorized<ViewVotingDTO>("You are not authorized to do this action");
 
                 if (originalVote is null)
@@ -336,7 +327,7 @@ namespace ELearn.Application.Services
             {
                 var user = await _userService.GetCurrentUserAsync();
                 var role = await _userService.GetUserRoleAsync();
-                
+
                 foreach (var id in Id)
                 {
                     var vote = await _unitOfWork.Votings.GetByIdAsync(id);
@@ -432,7 +423,7 @@ namespace ELearn.Application.Services
         #endregion
 
         #region AddOptions
-        private string AddOptions(Voting vote, ICollection<string> Options)
+        private static string AddOptions(Voting vote, ICollection<string> Options)
         {
             try
             {
@@ -458,7 +449,7 @@ namespace ELearn.Application.Services
         {
             if (Option is null)
                 return false;
-                if (Option != vote.Option1 && Option == vote.Option2) return true;
+                if (Option == vote.Option1 || Option == vote.Option2) return true;
                 if (vote.Option3 != null && Option == vote.Option3) return true;
                 if (vote.Option4 != null && Option == vote.Option4) return true;
                 if (vote.Option5 != null && Option == vote.Option5) return true;
