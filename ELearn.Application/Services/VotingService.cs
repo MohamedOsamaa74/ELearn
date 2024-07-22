@@ -95,8 +95,9 @@ namespace ELearn.Application.Services
                 viewVote.CreatorName = user.FirstName + " " + user.LastName;
                 viewVote.OptionPercentages = await GetVotingOptionsPercentageAsync(Id);
                 var userId = currentUser.Id;
-                var hasVoted = await _unitOfWork.UserAnswerVotings.GetWhereAsync(v => v.VotingId == Id && v.UserId == currentUser.Id);
-                viewVote.hasVoted = hasVoted is null ? false : true;
+                var userVote = await _unitOfWork.UserAnswerVotings.GetWhereSingleAsync(v => v.VotingId == Id && v.UserId == currentUser.Id);
+                viewVote.HasVoted = userVote is null ? false : true;
+                viewVote.UserVote = userVote?.Option;
                 return ResponseHandler.Success(viewVote);
             }
             catch (Exception Ex)
