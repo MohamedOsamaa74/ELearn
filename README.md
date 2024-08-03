@@ -1,6 +1,9 @@
 # ELearn
 
-<!-- ![ELearn Logo](https://drive.google.com/file/d/1lIIJcKZKe6ATFdjr2pKaddIHnMNYMppB/view?usp=sharing)   -->
+<!-- ![ELearn Logo](https://github.com/user-attachments/assets/cd7a4c5b-cf04-452d-880e-2f8f5ab1379e)-->
+
+![Untitled-4-Bi-XWAN7](https://github.com/user-attachments/assets/07ebbd01-14d0-4180-a9ca-fd9bec170e8a)
+
 
 ## Table of Contents
 
@@ -21,7 +24,6 @@ ELearn is a comprehensive educational platform that can be devided to 3 subsyste
 - Learning Manegment System
 - Quizzing Systme
 - Communication System: Similar to a social media platform that contains both Community Forum and Chatting between system users
-- 
 This project is developed as a graduation project for the Computer Science department at South Valley University.
 
 ## Features
