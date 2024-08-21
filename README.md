@@ -22,9 +22,10 @@
 ## About the Project
 
 ELearn is a comprehensive educational platform that can be devided to 3 subsystems:
-- Learning Manegment System
-- Quizzing Systme
+- Learning Management System
+- Quizzing Systym
 - Communication System: Similar to a social media platform that contains both Community Forum and Chatting between system users
+
 This project is developed as a graduation project for the Computer Science department at South Valley University.
 
 ## Features
